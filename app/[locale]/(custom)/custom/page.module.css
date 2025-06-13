@@ -1,0 +1,559 @@
+@font-face {
+    font-family: 'dk_crayonistaregular';
+    src: url('/fonts/dk_crayonista-webfont.woff2') format('woff2'),
+    url('/fonts/dk_crayonista-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'dk_cool_crayonregular';
+    src: url('/fonts/dk_cool_crayon-webfont.woff2') format('woff2'),
+    url('/fonts/dk_cool_crayon-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+
+
+/*实现鼠标移动上去，有放大效果*/
+.zoomContainer {
+    position: relative;
+    z-index: 1;
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s ease;
+    transform-origin: top right; /* 左上角为变换原点 */
+}
+
+/* 悬停效果 - 放大和阴影增强 */
+.zoomContainer:hover {
+    transform: scale(1) translate(-3px, -3px);
+    box-shadow: 0 10px 20px -3px rgba(0, 0, 0, 0.1), 0 10px 20px -5px rgba(0, 0, 0, 0.05);
+    z-index: 2;
+}
+
+
+/*边框手绘效果 的样式，注意：如果你要边框，一定要加这个样式，然后在根据layout.tsx 中a 的标签的写法来定义
+--border-width
+--border-style
+--border-color
+--border-radius
+这四个属性
+*/
+.borderHandDrown{
+    font-family: "'Comic Sans MS', 'Marker Felt', cursive";
+    position: relative;
+    display: inline-block;
+    padding: 24px 8px;
+    text-decoration: none;
+    z-index: 1;
+    min-height: 0;
+    line-height: 1;
+}
+
+.borderHandDrown::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    filter: url(#hand-drawn);
+    pointer-events: none;
+    z-index: -1;
+
+    /* 使用CSS变量控制所有边框属性 */
+    border-width: var(--border-width, 2px);
+    border-style: var(--border-style, solid);
+    border-color: var(--border-color, transparent);
+    border-radius: var(--border-radius, 0px);
+
+    box-sizing: border-box;
+    transition: border-color 0.3s ease; /* 添加边框颜色过渡效果 */
+}
+
+
+
+/*将页面的字体更换*/
+.pageMain {
+
+
+}
+
+/*头部的字体更换*/
+.headerFont {
+    /*font-family: 'dk_crayonistaregular';*/
+}
+
+
+/*头部按钮的圆圈*/
+.headerCircle {
+    font-family: "'Comic Sans MS', 'Marker Felt', cursive";
+    color: #71bc93;
+    font-size: 20px;
+    position: relative;
+    display: inline-block;
+    padding: 8px 16px;
+    text-decoration: none;
+    z-index: 1;
+
+}
+
+
+.headerCircle::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    filter: url(#hand-drawn);
+    pointer-events: none;
+    z-index: -1;
+
+    /* 使用CSS变量控制所有边框属性 */
+    border-width: var(--border-width, 2px);
+    border-style: var(--border-style, solid);
+    border-color: var(--border-color, #9333ea);
+    border-radius: var(--border-radius, 0px);
+
+    box-sizing: border-box;
+}
+
+
+/*头部按钮鼠标移动上的效果*/
+.headerCircle:hover {
+    background: #64bd9b !important;
+    color: white !important;
+    transform: scale(1.05);
+    border-radius: var(--border-radius) !important; /* 使用元素实际设置的圆角值 */
+}
+
+.headerCircle:hover::before {
+    border-color: #64bd9b !important; /* 悬停时边框也变成相同颜色 */
+    border-radius: var(--border-radius) !important; /* 悬停时使用相同的圆角值 */
+}
+
+/*photo to coloring page 和 text 的按钮*/
+.buttonBorder {
+    font-family: "'Comic Sans MS', 'Marker Felt', cursive";
+    position: relative;
+    display: inline-block;
+    padding: 24px 16px;
+    text-decoration: none;
+    z-index: 1;
+    min-height: 0;
+    line-height: 1;
+}
+
+
+.buttonBorder::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    filter: url(#hand-drawn);
+    pointer-events: none;
+    z-index: -1;
+
+    /* 使用CSS变量控制所有边框属性 */
+    border-width: var(--border-width, 2px);
+    border-style: var(--border-style, solid);
+    border-color: var(--border-color, #f8e71c);
+    border-radius: var(--border-radius, 0px);
+
+    box-sizing: border-box;
+}
+
+
+
+
+/* 图片容器样式 */
+.imageContainer {
+    display: flex;
+    justify-content: center;
+    margin: 3rem 0;
+}
+
+
+/* 关键功能区域容器 */
+.keyFeaturesSection {
+    margin: 30px 0;
+}
+
+/* 关键功能卡片容器（一行三列） */
+.keyFeaturesContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    width: 75vw;
+    margin: 20px auto;
+    color: black;
+}
+
+/* 单个关键功能卡片 */
+.keyFeatureCard {
+    flex: 1 1 calc(33.33% - 16px); /* 一行三列，计算间距 */
+    background-color: #f9f3e8; /* 浅米色背景 */
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    min-width: 260px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+
+    font-family: 'dk_cool_crayonregular';
+
+
+}
+
+.keyFeatureCard::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    filter: url(#hand-drawn);
+    pointer-events: none;
+    z-index: -1;
+
+    /* 使用CSS变量控制所有边框属性 */
+    border-width: var(--border-width, 2px);
+    border-style: var(--border-style, solid);
+    border-color: var(--border-color, #f8e71c);
+    border-radius: var(--border-radius, 0px);
+
+    box-sizing: border-box;
+}
+
+
+
+.keyFeatureCard:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* 图片部份的定义 */
+.featureIconContainer {
+    width: 80px;
+    height: 80px;
+    /*border-radius: 50%;*/
+    /*background-color: #fff;*/
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 18px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+
+}
+
+/* 图片容器 */
+.featureImageContainer {
+    width: 100%;
+    height: 0;
+    padding-bottom: 66.67%; /* 保持宽高比，如图片是 3:2 比例，这里用 2/3 的值，可根据实际图片比例调整 */
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+.featureImage {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    object-fit: cover;
+}
+
+
+.featureIcon {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+}
+
+/* 功能内容区域 */
+.featureContent {
+    flex: 1;
+}
+
+.featureTitle {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 10px 0;
+}
+
+.featureDescription {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* 响应式调整 */
+@media (max-width: 992px) {
+    .keyFeatureCard {
+        flex: 1 1 calc(50% - 12px); /* 中等屏幕两行两列 */
+    }
+}
+
+@media (max-width: 768px) {
+    .keyFeatureCard {
+        flex: 1 1 100%; /* 小屏幕单行一列 */
+    }
+}
+
+
+/* 用户评论 部分样式 */
+.testimonialsContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    width: 75vw;
+    margin: 20px auto;
+    color: black;
+}
+
+.testimonialCard {
+    flex: 1 1 calc(50% - 15px); /* 一行两个卡片，考虑间距 */
+    background-color: #f9f3e8;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
+    min-width: 300px; /* 防止卡片过窄 */
+
+    font-family: 'dk_cool_crayonregular';
+
+}
+
+.testimonialCard::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    filter: url(#hand-drawn);
+    pointer-events: none;
+    z-index: -1;
+
+    /* 使用CSS变量控制所有边框属性 */
+    border-width: var(--border-width, 2px);
+    border-style: var(--border-style, solid);
+    border-color: var(--border-color, #f8e71c);
+    border-radius: var(--border-radius, 0px);
+
+    box-sizing: border-box;
+}
+/* 响应式调整：在小屏幕上每行显示一个卡片 */
+@media (max-width: 768px) {
+    .testimonialCard {
+        flex: 1 1 100%;
+    }
+}
+
+.testimonialContentWrapper {
+    display: flex;
+    gap: 15px;
+}
+
+.testimonialAvatarContainer {
+    flex: 0 0 60px; /* 固定头像区域宽度 */
+    display: flex;
+    justify-content: center;
+    padding-top: 5px; /* 垂直居中微调 */
+}
+
+.testimonialAvatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.testimonialTextContainer {
+    flex: 1; /* 文字区域占据剩余空间 */
+}
+
+.testimonialInfo {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 8px;
+}
+
+.testimonialName {
+    font-size: 18px;
+    font-weight: 500;
+    margin: 0;
+}
+
+.testimonialTitle {
+    font-size: 14px;
+    color: #666;
+    margin: 0;
+}
+
+.testimonialRating {
+    display: flex;
+    margin-bottom: 12px;
+}
+
+.star {
+    color: #ddd;
+    font-size: 20px;
+    margin-right: 2px;
+}
+
+.filledStar {
+    color: #fdb827;
+}
+
+.testimonialContent {
+    font-size: 16px;
+    line-height: 1.5;
+    color: #333;
+    margin: 0;
+}
+
+
+/* 折叠面板外层容器 - 用于居中 */
+.accordionContainerWrapper {
+    display: flex;
+    justify-content: center;
+    margin: 0 auto 3rem;
+    width: 100%;
+}
+
+/* 标题样式 */
+.accordionTitle {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+/* 标题下面的提示文本样式 */
+.accordionTip {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #333;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    position: relative;
+    width: 35vw;
+    margin: 0 auto 1.5rem auto;
+}
+
+/* 折叠面板容器 - 固定宽度 */
+.accordionContainer {
+    width: 60vw; /* 固定宽度 */
+    font-family: 'dk_cool_crayonregular';
+
+    color: #000000;
+    font-size: 1.25rem;
+    background-color: #f9f3e8;
+}
+
+.accordionContainer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    filter: url(#hand-drawn);
+    pointer-events: none;
+    z-index: -1;
+
+    /* 使用CSS变量控制所有边框属性 */
+    border-width: var(--border-width, 2px);
+    border-style: var(--border-style, solid);
+    border-color: var(--border-color, #f8e71c);
+    border-radius: var(--border-radius, 0px);
+
+    box-sizing: border-box;
+}
+
+
+/* 折叠面板公共样式 */
+.trigger {
+    width: 100%;
+    padding: 1rem;
+    /*background-color: #f9fafb;*/ /*这个是折叠面板头部的背景*/
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    font-size: 1rem;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.2s ease;
+}
+
+.trigger:hover {
+    /*background-color: #f3f4f6;*/
+}
+
+/* 箭头容器 */
+.arrowContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 箭头图标基础样式 */
+.arrowIcon {
+    width: 18px;
+    height: 18px;
+    color: #000;
+    transition: opacity 0.3s ease;
+}
+
+/* 打开状态图标 - 默认隐藏 */
+.openIcon {
+    opacity: 0;
+}
+
+/* 关闭状态图标 - 默认显示 */
+.closedIcon {
+    opacity: 1;
+}
+
+/* 打开状态时的图标显示逻辑 */
+[data-state='open'] .openIcon {
+    opacity: 1;
+}
+
+[data-state='open'] .closedIcon {
+    opacity: 0;
+}
+
+.content {
+    padding: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.content p {
+    color: #000;
+    line-height: 1.6;
+    padding: 1rem;
+    margin: 0;
+}
+
