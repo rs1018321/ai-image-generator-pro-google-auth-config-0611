@@ -619,37 +619,13 @@ const PhotoColor: React.FC = () => {
                         alignItems: "center",
                     }}
                 >
-                    {selectedImage && selectedImage !== clearImage ? (
-                        <img
-                            src={selectedImage}
-                            alt="result"
-                            style={{
-                                width: "100%",
-                                height: "100%",
-                                objectFit: "cover",
-                                filter: "grayscale(100%)",
-                            }}
-                        />
-                    ) : selectedImage !== clearImage ? (
-                        <img
-                            src={defaultImage}
-                            alt="clear-result"
-                            style={{
-                                width: "100%",
-                                height: "100%",
-                                objectFit: "cover",
-                                filter: "grayscale(100%)",
-                            }}
-                        />
-                    ) : (
-                        <div style={{ 
-                            color: "#666", 
-                            fontSize: "14px",
-                            fontFamily: "'Comic Sans MS', 'Marker Felt', cursive"
-                        }}>
-                            选择图片后将显示处理效果
-                        </div>
-                    )}
+                    <div style={{ 
+                        color: "#666", 
+                        fontSize: "14px",
+                        fontFamily: "'Comic Sans MS', 'Marker Felt', cursive"
+                    }}>
+                        点击Generate后将显示处理效果
+                    </div>
                 </div>
                 <div style={{ display: "flex", gap: "5px", marginBottom: "10px", marginTop: "1px", justifyContent: "space-between", width: "80%", margin: "1px auto 10px auto" }}>
                     <button

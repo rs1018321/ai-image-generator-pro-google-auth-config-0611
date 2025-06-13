@@ -16,7 +16,8 @@ const TextColor: React.FC = () => {
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [selectedPrompt, setSelectedPrompt] = useState<string>(""); // 存储选中的提示文本
     const [selectedSize, setSelectedSize] = useState<string>("Auto");
-    const [selectedStyle, setSelectedStyle] = useState<string>(""); // 添加selectedStyle状态
+    const [selectedStyle, setSelectedStyle] = useState<string>("medium"); // 默认选择Medium detailed
+    const [isCleared, setIsCleared] = useState<boolean>(false); // 跟踪是否已被清除
     const defaultImage = "https://picsum.photos/id/1015/300/200";
     const clearImage = "/imgs/custom/photo.png";
 
@@ -25,7 +26,7 @@ const TextColor: React.FC = () => {
         size: "Auto",
         age: [],
         pages: [],
-        prompt: "A cheerful animal parade with elephants, bunnies, and bears holding balloons and playing instruments. Colorful and playful, in storybook style." // 文本框默认值
+        prompt: "A little boy flying with balloons over a peaceful village, with a few birds in the sky and soft clouds around. Whimsical and lighthearted, in a crayon-style illustration." // 更新文本框默认值
     };
 
     const {
@@ -107,7 +108,9 @@ const TextColor: React.FC = () => {
     const handleClear = () => {
         setSelectedPrompt("");
         setSelectedImage(clearImage);
+        setSelectedStyle(""); // 清除Style选择
         setValue("prompt", ""); // 清空文本框
+        setIsCleared(true); // 设置清除状态为true
     };
 
     const handleSizeSelect = (size: string) => {
@@ -622,36 +625,25 @@ const TextColor: React.FC = () => {
                         display: "flex", justifyContent: "center", alignItems: "center",
                     }}
                 >
-                    {selectedImage && selectedImage !== clearImage ? (
-                        <img
-                            src={selectedImage}
-                            alt="result"
+                    {selectedStyle && !isCleared ? (
+                        <img 
+                            src="/imgs/custom/textcolor-result-preview.png"
+                            alt="Text Color Result Preview"
                             style={{
-                                width: "100%",
-                                height: "100%",
-                                objectFit: "cover",
-                                filter: "grayscale(100%)",
+                                maxWidth: "100%",
+                                maxHeight: "100%",
+                                objectFit: "contain",
+                                borderRadius: "10px"
                             }}
                         />
-                    ) : selectedImage === clearImage ? (
+                    ) : (
                         <div style={{ 
                             color: "#666", 
                             fontSize: "14px",
                             fontFamily: "'Comic Sans MS', 'Marker Felt', cursive"
                         }}>
-                            选择提示文字后将显示对应图片
+                            {isCleared ? "点击Generate后将显示处理效果" : "请选择Style后查看效果"}
                         </div>
-                    ) : (
-                        <img
-                            src={defaultImage}
-                            alt="result"
-                            style={{
-                                width: "100%",
-                                height: "100%",
-                                objectFit: "cover",
-                                filter: "grayscale(100%)",
-                            }}
-                        />
                     )}
                 </div>
                 <div style={{ display: "flex", gap: "5px", marginBottom: "10px", marginTop: "1px", justifyContent: "space-between", width: "80%", margin: "1px auto 10px auto" }}>
