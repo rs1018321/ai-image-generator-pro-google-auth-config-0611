@@ -206,6 +206,12 @@ const PhotoColor: React.FC = () => {
         setSelectedSize("Auto"); // 重置尺寸选择为 Auto
         setSelectedStyle("simplified"); // 重置样式选择为 simplified
         setGeneratedImage(null); // 完全清空生成的结果图片
+        
+        // 重置文件输入框的值，解决重复上传同一张图片不显示的问题
+        const fileInput = document.getElementById('photo-upload') as HTMLInputElement;
+        if (fileInput) {
+            fileInput.value = '';
+        }
     };
 
     // 处理尺寸选择

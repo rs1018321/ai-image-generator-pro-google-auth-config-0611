@@ -18,8 +18,18 @@ const TextColor: React.FC = () => {
     const [selectedSize, setSelectedSize] = useState<string>("Auto");
     const [selectedStyle, setSelectedStyle] = useState<string>("medium"); // 默认选择Medium detailed
     const [isCleared, setIsCleared] = useState<boolean>(false); // 跟踪是否已被清除
+    const [generatedImage, setGeneratedImage] = useState<string | null>(null); // 添加生成图片状态
+    const [isGenerating, setIsGenerating] = useState<boolean>(false); // 添加生成中状态
     const defaultImage = "https://picsum.photos/id/1015/300/200";
     const clearImage = "/imgs/custom/photo.png";
+    
+    // 默认结果图片 - 在 result 虚线框中显示
+    const defaultResultImage = "/imgs/custom/textcolor-default-result.png"; // 您需要准备这张图片
+    
+    // 初始化时设置默认结果图片
+    React.useEffect(() => {
+        setGeneratedImage(defaultResultImage);
+    }, []);
 
     // 设置表单默认值
     const defaultFormValues = {
@@ -45,20 +55,69 @@ const TextColor: React.FC = () => {
         "Kids in bright raincoats jumping in puddles, with smiling frogs, paper boats, and a rainbow in the sky. Crayon-style, full of joy.": "https://picsum.photos/id/1062/300/200"
     };
 
-    const onSubmit: SubmitHandler<FormData> = (data) => {
-        axios
-            .post("/your-backend-api-url", {
-                size: selectedSize,
-                age: data.age,
-                prompt: data.prompt,
-                selectedImage: selectedImage || defaultImage,
-            })
-            .then((response) => {
-                console.log("文字颜色处理请求成功，后端返回：", response.data);
-            })
-            .catch((error) => {
-                console.error("请求失败：", error);
+    const onSubmit: SubmitHandler<FormData> = async (data) => {
+        if (!selectedStyle) {
+            alert("请选择一个Style选项");
+            return;
+        }
+
+        if (!data.prompt.trim()) {
+            alert("请输入描述文字");
+            return;
+        }
+
+        setIsGenerating(true);
+        setGeneratedImage(null);
+
+        try {
+            // 创建 FormData 对象
+            const formData = new FormData();
+            
+            // 将 Size 比例值映射为 API 期望的像素尺寸
+            const sizeMapping: { [key: string]: string } = {
+                "Auto": "1024x1024",      // 默认正方形
+                "1:1": "1024x1024",       // 正方形 1:1
+                "4:3": "1248x832",        // 横版 3:2 (接近4:3)
+                "3:4": "832x1248",        // 竖版 2:3 (接近3:4)
+                "16:9": "1248x832",       // 横版 3:2 (接近16:9)
+                "9:16": "832x1248",       // 竖版 2:3 (接近9:16)
+            };
+            
+            const apiSize = sizeMapping[selectedSize] || "1024x1024";
+            
+            // 直接传递用户输入的描述，固定的黑白线稿 prompt 在 API 中处理
+            formData.append('prompt', data.prompt.trim());
+            formData.append('size', apiSize);
+            formData.append('style', selectedStyle);
+            
+            console.log(`🎯 发送请求到 generate-text-to-image API:`);
+            console.log(`📝 用户描述: ${data.prompt.trim()}`);
+            console.log(`📐 Size: ${selectedSize} -> ${apiSize}`);
+            console.log(`🎨 Style: ${selectedStyle}`);
+
+            const response = await axios.post("/api/generate-text-to-image", formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
             });
+            
+            console.log("✅ API 请求成功，后端返回：", response.data);
+            
+            // 处理返回的结果，显示生成的图片
+            if (response.data.success && response.data.image) {
+                console.log("🖼️ 生成的涂色书图片已准备就绪");
+                setGeneratedImage(response.data.image);
+                setIsCleared(false); // 重置清除状态，确保显示生成的图片
+            } else {
+                alert("生成失败：未收到有效的图片数据");
+            }
+            
+        } catch (error: any) {
+            console.error("❌ API 请求失败：", error);
+            alert(`生成失败: ${error.response?.data?.error || error.message}`);
+        } finally {
+            setIsGenerating(false);
+        }
     };
 
     const sizeOptions = [
@@ -108,8 +167,10 @@ const TextColor: React.FC = () => {
     const handleClear = () => {
         setSelectedPrompt("");
         setSelectedImage(clearImage);
-        setSelectedStyle(""); // 清除Style选择
+        setSelectedStyle("simplified"); // 重置为 simplified
+        setSelectedSize("Auto"); // 重置尺寸为 Auto
         setValue("prompt", ""); // 清空文本框
+        setGeneratedImage(null); // 清除所有图片（包括默认图片和生成的图片）
         setIsCleared(true); // 设置清除状态为true
     };
 
@@ -119,6 +180,22 @@ const TextColor: React.FC = () => {
 
     const handleStyleSelect = (style: string) => {
         setSelectedStyle(style);
+    };
+
+    // 新增：处理图片下载
+    const handleDownload = () => {
+        if (!generatedImage) {
+            alert("没有可下载的图片，请先生成涂色书");
+            return;
+        }
+
+        // 创建下载链接
+        const link = document.createElement('a');
+        link.href = generatedImage;
+        link.download = `text-coloring-book-${selectedStyle}-${selectedSize}-${Date.now()}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     };
 
     return (
@@ -257,7 +334,7 @@ const TextColor: React.FC = () => {
                                 '--border-style': 'dashed',
                                 '--border-color': '#000',
                                 '--border-radius': '8px',
-                                width: "400px", /* 修改输入框宽度 */
+                                width: "350px", /* 修改输入框宽度，从400px改为300px */
                                 height: "100px",
                                 margin: "10px auto",
                                 display: "flex",
@@ -625,24 +702,32 @@ const TextColor: React.FC = () => {
                         display: "flex", justifyContent: "center", alignItems: "center",
                     }}
                 >
-                    {selectedStyle && !isCleared ? (
-                        <img 
-                            src="/imgs/custom/textcolor-result-preview.png"
-                            alt="Text Color Result Preview"
+                    {isGenerating ? (
+                        <div style={{ 
+                            color: "#666", 
+                            fontSize: "14px",
+                            fontFamily: "'Comic Sans MS', 'Marker Felt', cursive"
+                        }}>
+                            生成中...
+                        </div>
+                    ) : generatedImage && !isCleared ? (
+                        <img
+                            src={generatedImage}
+                            alt="Generated Coloring Book"
                             style={{
-                                maxWidth: "100%",
-                                maxHeight: "100%",
+                                width: "100%",
+                                height: "100%",
                                 objectFit: "contain",
-                                borderRadius: "10px"
                             }}
                         />
                     ) : (
                         <div style={{ 
                             color: "#666", 
                             fontSize: "14px",
-                            fontFamily: "'Comic Sans MS', 'Marker Felt', cursive"
+                            fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                            textAlign: "center"
                         }}>
-                            {isCleared ? "点击Generate后将显示处理效果" : "请选择Style后查看效果"}
+                            点击Generate后将显示处理效果
                         </div>
                     )}
                 </div>
@@ -667,6 +752,7 @@ const TextColor: React.FC = () => {
                     </button>
                     <button  
                         className={styles.borderHandDrown}
+                        onClick={handleDownload}
                         style={{
                             // @ts-ignore
                             '--border-width': '3px',
@@ -679,7 +765,9 @@ const TextColor: React.FC = () => {
                             padding: "12px 20px",
                             fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
                             borderRadius: "20px",
-                            border: "none"
+                            border: "none",
+                            cursor: generatedImage ? "pointer" : "not-allowed",
+                            opacity: generatedImage ? 1 : 0.5
                         }}>
                         Download Image
                     </button>
