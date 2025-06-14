@@ -1,5 +1,5 @@
 'use client'; // 标记为客户端组件，用于处理交互逻辑
-import React, { ReactNode, useState } from 'react';
+import React, { ReactNode, useState, use } from 'react';
 import clsx from 'clsx';
 import { Globe, Moon, Sun } from 'lucide-react'; // 假设使用 lucide-react 图标
 import styles from './custom/page.module.css';
@@ -16,11 +16,14 @@ const backgroundStyle = {
 
 export default function CustomLayout({
                                          children,
-                                         params: { locale }, // 从 props 直接拿国际化参数 locale
+                                         params,
                                      }: {
     children: ReactNode;
-    params: { locale: string };
+    params: Promise<{ locale: string }>;
 }) {
+    // 使用 use() hook 来解析 Promise
+    const { locale } = use(params);
+    
     // 状态管理
     const [showLanguageDropdown, setShowLanguageDropdown] = useState(false); // 语言下拉展开状态
     const [theme, setTheme] = useState<'light' | 'dark'>('light'); // 主题状态（示例）
@@ -201,23 +204,22 @@ export default function CustomLayout({
                             transform: `translateY(${buttonVerticalOffset}px)` // 与导航按钮位置对齐
                         }}
                     >
-                        Sign In
+                        Login
                     </button>
                 </div>
             </header>
 
-            {/* 页面主要内容，渲染子组件 */}
-            <main className="px-6 py-8">{children}</main>
+            {/* 主要内容区域 */}
+            <main className="flex-1">
+                {children}
+            </main>
 
-
-            <svg height="0" xmlns="http://www.w3.org/2000/svg">
-                <filter id="hand-drawn">
-                    <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" result="turbulence"/>
-                    <feDisplacementMap in="SourceGraphic" in2="turbulence" scale="5" />
-                </filter>
-            </svg>
-
-
+            {/* 页脚 */}
+            <footer className="bg-gray-800 text-white py-8 px-6">
+                <div className="max-w-6xl mx-auto text-center">
+                    <p>&copy; 2024 Coloring Page Generator. All rights reserved.</p>
+                </div>
+            </footer>
         </div>
     );
 }

@@ -1,0 +1,435 @@
+@font-face {
+    font-family: 'dk_crayonistaregular';
+    src: url('/fonts/dk_crayonista-webfont.woff2') format('woff2'),
+    url('/fonts/dk_crayonista-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'dk_cool_crayonregular';
+    src: url('/fonts/dk_cool_crayon-webfont.woff2') format('woff2'),
+    url('/fonts/dk_cool_crayon-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+/*实现鼠标移动上去，有放大效果*/
+.zoomContainer {
+    position: relative;
+    z-index: 1;
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s ease;
+    transform-origin: top right; /* 左上角为变换原点 */
+}
+
+/* 悬停效果 - 放大和阴影增强 */
+.zoomContainer:hover {
+    transform: scale(1) translate(-3px, -3px);
+    box-shadow: 0 10px 20px -3px rgba(0, 0, 0, 0.1), 0 10px 20px -5px rgba(0, 0, 0, 0.05);
+    z-index: 2;
+}
+
+/*边框手绘效果 的样式*/
+.borderHandDrown{
+    font-family: "'Comic Sans MS', 'Marker Felt', cursive";
+    position: relative;
+    display: inline-block;
+    padding: 24px 8px;
+    text-decoration: none;
+    z-index: 1;
+    min-height: 0;
+    line-height: 1;
+}
+
+.borderHandDrown::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    filter: url(#hand-drawn);
+    pointer-events: none;
+    z-index: -1;
+
+    /* 使用CSS变量控制所有边框属性 */
+    border-width: var(--border-width, 2px);
+    border-style: var(--border-style, solid);
+    border-color: var(--border-color, transparent);
+    border-radius: var(--border-radius, 0px);
+
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
+}
+
+/*将页面的字体更换*/
+.pageMain {
+    font-family: "'Comic Sans MS', 'Marker Felt', cursive";
+}
+
+/*头部的字体更换*/
+.headerFont {
+    font-family: "'Comic Sans MS', 'Marker Felt', cursive";
+}
+
+/*头部按钮的圆圈*/
+.headerCircle {
+    font-family: "'Comic Sans MS', 'Marker Felt', cursive";
+    color: #71bc93;
+    font-size: 20px;
+    position: relative;
+    display: inline-block;
+    padding: 8px 16px;
+    text-decoration: none;
+    z-index: 1;
+}
+
+.headerCircle::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    filter: url(#hand-drawn);
+    pointer-events: none;
+    z-index: -1;
+
+    /* 使用CSS变量控制所有边框属性 */
+    border-width: var(--border-width, 2px);
+    border-style: var(--border-style, solid);
+    border-color: var(--border-color, #9333ea);
+    border-radius: var(--border-radius, 0px);
+
+    box-sizing: border-box;
+}
+
+/*头部按钮鼠标移动上的效果*/
+.headerCircle:hover {
+    background: #64bd9b !important;
+    color: white !important;
+    transform: scale(1.05);
+    border-radius: var(--border-radius) !important;
+}
+
+.headerCircle:hover::before {
+    border-color: #64bd9b !important;
+    border-radius: var(--border-radius) !important;
+}
+
+/*photo to coloring page 和 text 的按钮*/
+.buttonBorder {
+    font-family: "'Comic Sans MS', 'Marker Felt', cursive";
+    position: relative;
+    display: inline-block;
+    padding: 24px 16px;
+    text-decoration: none;
+    z-index: 1;
+    min-height: 0;
+    line-height: 1;
+}
+
+.buttonBorder::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    filter: url(#hand-drawn);
+    pointer-events: none;
+    z-index: -1;
+
+    /* 使用CSS变量控制所有边框属性 */
+    border-width: var(--border-width, 2px);
+    border-style: var(--border-style, solid);
+    border-color: var(--border-color, #f8e71c);
+    border-radius: var(--border-radius, 0px);
+
+    box-sizing: border-box;
+}
+
+/* 图片容器样式 */
+.imageContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 40px 0;
+    padding: 20px;
+}
+
+/* 关键功能区域样式 */
+.keyFeaturesSection {
+    padding: 60px 20px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.keyFeaturesContainer {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.keyFeatureCard {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: all 0.3s ease;
+    border: 3px solid transparent;
+}
+
+.keyFeatureCard:hover {
+    border-color: #4ade80;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.featureImageContainer {
+    margin-bottom: 20px;
+}
+
+.featureImage {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 0 auto;
+}
+
+.featureContent {
+    text-align: center;
+}
+
+.featureTitle {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #2d3748;
+    font-family: 'Comic Sans MS', 'Marker Felt', cursive;
+}
+
+.featureDescription {
+    color: #4a5568;
+    line-height: 1.6;
+    font-size: 1rem;
+}
+
+/* 用户评价区域样式 */
+.testimonialsContainer {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.testimonialCard {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    border: 3px solid transparent;
+}
+
+.testimonialCard:hover {
+    border-color: #f7c863;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.testimonialContentWrapper {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.testimonialAvatarContainer {
+    flex-shrink: 0;
+}
+
+.testimonialAvatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.testimonialTextContainer {
+    flex: 1;
+}
+
+.testimonialInfo {
+    margin-bottom: 10px;
+}
+
+.testimonialName {
+    font-weight: bold;
+    color: #2d3748;
+    font-size: 1.1rem;
+    font-family: 'Comic Sans MS', 'Marker Felt', cursive;
+}
+
+.testimonialTitle {
+    color: #718096;
+    font-size: 0.9rem;
+    margin-top: 2px;
+}
+
+.testimonialRating {
+    margin-bottom: 15px;
+}
+
+.star {
+    font-size: 1.2rem;
+    margin-right: 2px;
+}
+
+.filledStar {
+    color: #ffd700;
+}
+
+.testimonialContent {
+    color: #4a5568;
+    line-height: 1.6;
+    font-style: italic;
+}
+
+/* FAQ 折叠面板样式 */
+.accordionContainerWrapper {
+    max-width: 800px;
+    margin: 60px auto;
+    padding: 0 20px;
+}
+
+.accordionTitle {
+    font-size: 2.5rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 1rem;
+    color: #2d3748;
+    font-family: 'Comic Sans MS', 'Marker Felt', cursive;
+}
+
+.accordionTip {
+    text-align: center;
+    color: #718096;
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+}
+
+.accordionContainer {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.trigger {
+    width: 100%;
+    padding: 25px 30px;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #e2e8f0;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #2d3748;
+    transition: all 0.3s ease;
+    text-align: left;
+    font-family: 'Comic Sans MS', 'Marker Felt', cursive;
+}
+
+.trigger:hover {
+    background: #f7fafc;
+    color: #4ade80;
+}
+
+.trigger:last-child {
+    border-bottom: none;
+}
+
+.arrowContainer {
+    position: relative;
+    width: 24px;
+    height: 24px;
+}
+
+.arrowIcon {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 24px;
+    height: 24px;
+    transition: all 0.3s ease;
+}
+
+.openIcon {
+    opacity: 1;
+    transform: rotate(0deg);
+}
+
+.closedIcon {
+    opacity: 0;
+    transform: rotate(180deg);
+}
+
+.trigger[data-state="open"] .openIcon {
+    opacity: 0;
+    transform: rotate(180deg);
+}
+
+.trigger[data-state="open"] .closedIcon {
+    opacity: 1;
+    transform: rotate(0deg);
+}
+
+.content {
+    padding: 0 30px 25px 30px;
+    color: #4a5568;
+    line-height: 1.6;
+    font-size: 1rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.content:last-child {
+    border-bottom: none;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .keyFeaturesContainer,
+    .testimonialsContainer {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .keyFeatureCard,
+    .testimonialCard {
+        padding: 20px;
+    }
+    
+    .testimonialContentWrapper {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .accordionTitle {
+        font-size: 2rem;
+    }
+    
+    .trigger {
+        padding: 20px;
+        font-size: 1.1rem;
+    }
+    
+    .content {
+        padding: 0 20px 20px 20px;
+    }
+} 
