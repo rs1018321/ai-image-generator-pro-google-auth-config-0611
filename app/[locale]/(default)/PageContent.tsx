@@ -44,33 +44,33 @@ interface LandingPageProps {
 const accordionData = [
   {
     id: '1',
-    title: '什么是AI涂色页生成器？',
-    content: 'AI涂色页生成器是一个使用先进人工智能技术的工具，可以将您的照片或文字描述转换为精美的线稿涂色页。它使用专门训练的AI模型来创建适合儿童和成人的涂色图案。'
+    title: 'What is this website about?',
+    content: 'This site uses state-of-the-art AI models to turn any photo or text into clean black-and-white coloring pages. It\'s creative, fun, and designed for everyone who loves art and imagination! You can create unique line art in just seconds — no skills needed.'
   },
   {
     id: '2',
-    title: '生成的涂色页质量如何？',
-    content: '我们的AI经过专门训练，能够捕捉图像的关键轮廓和细节，生成清晰、适合涂色的线稿图。用户一致称赞我们生成的涂色页具有专业品质和艺术美感。'
+    title: 'Who is this tool suitable for?',
+    content: 'Our coloring generator is perfect for all ages — from toddlers to grandparents. It\'s also great for parents, teachers, illustrators, designers, and anyone who enjoys coloring or needs line art. Whether you\'re drawing for fun or using it for work, it\'s made to help.'
   },
   {
     id: '3',
-    title: '支持哪些图片格式和尺寸？',
-    content: '我们支持常见的图片格式如JPG、PNG等，并提供多种尺寸比例选择，包括1:1正方形、4:3横版、3:4竖版、16:9宽屏和9:16竖屏格式，满足不同需求。'
+    title: 'Is it free to use?',
+    content: 'Yes! Our core features are completely free to use and require no login. You can try the image or text-to-line-art features instantly. We believe creativity should be accessible to everyone.'
   },
   {
     id: '4',
-    title: '可以商业使用生成的图片吗？',
-    content: '是的，通过我们的付费计划，您可以获得商业使用许可。免费计划仅限个人非商业用途。'
+    title: 'Is my uploaded image safe?',
+    content: 'We respect your privacy. Your images are processed securely and never used for training or shared with anyone. You stay in control of your content. Files are automatically deleted after a short time.'
   },
   {
     id: '5',
-    title: '每天可以生成多少张图片？',
-    content: '免费计划每天可生成3张图片。创作者计划每月100张图片。专业计划提供无限制的图片生成服务。'
+    title: 'Can I generate coloring pages just by typing text?',
+    content: 'Absolutely! Just describe your scene or character, and our model will turn it into a beautiful black-and-white outline. It\'s that easy. You can even try fun prompts like "a dog flying a spaceship"!'
   },
   {
     id: '6',
-    title: '生成的图片分辨率是多少？',
-    content: '免费计划生成1024×1024像素的图片。创作者计划提供2048×2048分辨率。专业计划提供超高清4096×4096像素图片，适合大幅打印和专业应用。'
+    title: 'How accurate is the generation?',
+    content: 'Very! Our model is fine-tuned for Ghibli-like features — soft lines, fantasy details, and charm. But results still depend on image quality and your text description clarity. Try uploading a clean portrait or a clear idea for best results.'
   }
 ];
 
@@ -82,22 +82,22 @@ interface ImgFeature {
 // 关键功能数据（6条，每行3列）
 const imgFeatures: ImgFeature[] = [
   {
-    image: "http://mms0.baidu.com/it/u=3137921165,1134579774&fm=253&app=138&f=JPEG?w=712&h=469"
+    image: "/imgs/gallery/coloring-page-1.png"
   },
   {
-    image: "http://mms0.baidu.com/it/u=3137921165,1134579774&fm=253&app=138&f=JPEG?w=712&h=469"
+    image: "/imgs/gallery/coloring-page-2.png"
   },
   {
-    image: "http://mms0.baidu.com/it/u=3137921165,1134579774&fm=253&app=138&f=JPEG?w=712&h=469"
+    image: "/imgs/gallery/coloring-page-3.png"
   },
   {
-    image: "http://mms0.baidu.com/it/u=3137921165,1134579774&fm=253&app=138&f=JPEG?w=712&h=469"
+    image: "/imgs/gallery/coloring-page-4.png"
   },
   {
-    image: "http://mms0.baidu.com/it/u=3137921165,1134579774&fm=253&app=138&f=JPEG?w=712&h=469"
+    image: "/imgs/gallery/coloring-page-5.png"
   },
   {
-    image: "http://mms0.baidu.com/it/u=3137921165,1134579774&fm=253&app=138&f=JPEG?w=712&h=469"
+    image: "/imgs/gallery/coloring-page-6.png"
   }
 ];
 
@@ -111,34 +111,34 @@ interface KeyFeature {
 // 关键功能数据（6条，每行3列）
 const keyFeatures: KeyFeature[] = [
   {
-    icon: "https://picsum.photos/id/237/64/64",
-    title: "多种涂色风格",
-    description: "选择各种涂色风格，包括简单线条、中等细节和复杂图案，适合不同年龄段的用户。"
+    icon: "/imgs/features/feature-icon-1.png",
+    title: "Top-Tier Model, Lightning-Fast Quality",
+    description: "Powered by a state-of-the-art generative model, our engine delivers crisp, high-quality line art in seconds."
   },
   {
-    icon: "https://picsum.photos/id/237/64/64",
-    title: "高分辨率输出",
-    description: "生成高达4K分辨率的图片，完美适用于打印、海报和专业项目。"
+    icon: "/imgs/features/feature-icon-2.png",
+    title: "Prompt-to-Page, Ideas Realized",
+    description: "Type a prompt and watch it turn into an original coloring page—no source images required, just pure imagination."
   },
   {
-    icon: "https://picsum.photos/id/237/64/64",
-    title: "智能线稿转换",
-    description: "AI智能识别图像轮廓，自动调整线条粗细和细节程度，生成最适合涂色的线稿。"
+    icon: "/imgs/features/feature-icon-3.png",
+    title: "Age-Tailored Outlines, Adjustable Difficulty",
+    description: "Choose from simple, moderate, or realistic detail levels, so every age—from preschoolers to adults—gets the perfect coloring challenge."
   },
   {
-    icon: "https://picsum.photos/id/237/64/64",
-    title: "批量生成",
-    description: "一次创建多个变体，探索同一概念的不同表现形式。"
+    icon: "/imgs/features/feature-icon-4.png",
+    title: "Free & Sign-Up-Free, Instant Access",
+    description: "Enjoy all core features without creating an account. Jump in anytime, anywhere—absolutely free."
   },
   {
-    icon: "https://picsum.photos/id/237/64/64",
-    title: "商业许可",
-    description: "高级计划包含商业使用权限，可用于商业项目。"
+    icon: "/imgs/features/feature-icon-5.png",
+    title: "Universal Style Support, Accurate Line Art",
+    description: "Whether you upload a cartoon, a realistic photo, an oil painting, or a hand-drawn sketch, our AI precisely extracts the main outlines and delivers a crisp black-and-white coloring page."
   },
   {
-    icon: "https://picsum.photos/id/237/64/64",
-    title: "提示词库",
-    description: "访问优化的提示词集合，帮助您创建完美的涂色页面。"
+    icon: "/imgs/features/feature-icon-6.png",
+    title: "Instant Share & Download, Joy on the Go",
+    description: "Save your page as PNG/JPG or post directly to social media in a single click—spreading coloring fun has never been easier."
   }
 ];
 
@@ -154,46 +154,46 @@ interface Testimonial {
 // 评价数据
 const testimonials: Testimonial[] = [
   {
-    avatar: "https://picsum.photos/id/64/100/100",
-    name: "张小明",
-    title: "插画师 & 涂色爱好者",
+    avatar: "/imgs/avatars/james-miller-parent.png",
+    name: "James Miller",
+    title: "Parent",
     rating: 5,
-    content: "AI涂色页生成器完美捕捉了图像的精髓。我用它来创作概念艺术和插画灵感。生成的线稿特别适合涂色！"
+    content: "The coloring page generator is fantastic! It provides endless fun for my kids. My children love choosing their favorite photos and seeing them turn into coloring pages. It's also a great way to spend quality time together on weekends."
   },
   {
-    avatar: "https://picsum.photos/id/64/100/100",
-    name: "李老师",
-    title: "儿童读物作者",
+    avatar: "/imgs/avatars/emilie-laurent-teacher.png",
+    name: "Émilie Laurent",
+    title: "Preschool Teacher",
     rating: 5,
-    content: "我用这些图片作为儿童读物的灵感来源。生成的涂色页风格非常适合创造吸引年轻读者的魅力场景。"
+    content: "I love this website! The coloring pages are perfect for my class activities. It encourages creativity and helps kids develop fine motor skills. I now use it regularly as part of my art curriculum."
   },
   {
-    avatar: "https://picsum.photos/id/64/100/100",
-    name: "王开发",
-    title: "游戏开发者",
-    rating: 4,
-    content: "在我们的游戏原型中集成涂色页风格非常顺畅。AI理解了涂色页所需的情感深度和视觉叙事。"
-  },
-  {
-    avatar: "https://picsum.photos/id/64/100/100",
-    name: "陈设计",
-    title: "平面设计师",
+    avatar: "/imgs/avatars/thomas-ricci-designer.png",
+    name: "Thomas Ricci",
+    title: "Publishing Designer",
     rating: 5,
-    content: "这些AI生成图像的色彩搭配和氛围光效令人惊叹。它们已经成为我创意工作流程的重要组成部分。"
+    content: "Amazing resource for creating unique illustrations for our books! The line art quality is professional and easy to modify if needed. It speeds up our workflow significantly while maintaining high standards."
   },
   {
-    avatar: "https://picsum.photos/id/64/100/100",
-    name: "刘动画",
-    title: "动画师",
-    rating: 4,
-    content: "作为动画师，我很欣赏角色设计和环境元素的细节关注。这是预可视化和故事板制作的绝佳工具。"
-  },
-  {
-    avatar: "https://picsum.photos/id/64/100/100",
-    name: "赵学生",
-    title: "电影学生",
+    avatar: "/imgs/avatars/lisa-thompson-hobbyist.png",
+    name: "Lisa Thompson",
+    title: "Hobbyist",
     rating: 5,
-    content: "AI完美模仿了涂色页的梦幻品质。我在毕业论文项目中使用了它，收到了无数关于视觉效果的赞美。"
+    content: "An excellent tool for designing custom coloring pages! I've created dozens of designs to print and color at home. The results are always charming and very satisfying to work with."
+  },
+  {
+    avatar: "/imgs/avatars/andrew-okoro-student.png",
+    name: "Andrew Okoro",
+    title: "Art Student",
+    rating: 5,
+    content: "The generator is easy to use and offers so many options! It helps me explore different composition and contrast styles. Great for experimenting with outlines and line weight."
+  },
+  {
+    avatar: "/imgs/avatars/ava-jensen-influencer.png",
+    name: "Ava Jensen",
+    title: "Social Media Influencer",
+    rating: 5,
+    content: "These coloring pages are a hit with my followers! Highly recommended. I use them in my content and get tons of positive feedback. Super fun, brand-friendly, and engaging for families."
   }
 ];
 
@@ -223,9 +223,9 @@ export default function LandingPage({ page, locale }: LandingPageProps) {
   const [tooltipMessage, setTooltipMessage] = useState("");
 
   // 🎯 Bookmark按钮位置调整变量 - 您可以修改这些数值来调整按钮位置
-  const bookmarkPositionTop = 215; // 距离顶部的距离（单位：px）- 调整到与滑动按钮对齐
-  const bookmarkPositionRight = 50; // 距离右边的距离（单位：px）
-  const bookmarkPositionLeft = 'auto'; // 距离左边的距离，可以是数字或'auto'
+  const bookmarkPositionTop = 185; // 距离顶部的距离（单位：px）- 调整到select photo步骤框上方
+  const bookmarkPositionRight = 'auto'; // 距离右边的距离（单位：px）
+  const bookmarkPositionLeft = 230; // 距离左边的距离，可以是数字或'auto'
   const bookmarkPositionBottom = 'auto'; // 距离底部的距离，可以是数字或'auto'
 
   // 将比例转换为具体尺寸
@@ -526,8 +526,8 @@ export default function LandingPage({ page, locale }: LandingPageProps) {
       <svg width="0" height="0" style={{ position: 'absolute' }}>
         <defs>
           <filter id="hand-drawn">
-            <feTurbulence baseFrequency="0.04" numOctaves="3" result="noise" seed="1" />
-            <feDisplacementMap in="SourceGraphic" in2="noise" scale="1" />
+            <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" result="turbulence"/>
+            <feDisplacementMap in="SourceGraphic" in2="turbulence" scale="5" />
           </filter>
         </defs>
       </svg>
@@ -548,18 +548,30 @@ export default function LandingPage({ page, locale }: LandingPageProps) {
             fontSize: '23px',
             fontWeight: 'bold',
             backgroundColor: '#fcf4a3',
-            color: '#69b08b',
+            color: '#6fd4c2',
             padding: "5px 12px",
             borderRadius: "25px",
             border: 'none',
             display: 'flex',
-            alignItems: 'center',
+            alignItems: 'flex-start',
             justifyContent: 'center',
-            textAlign: 'center'
+            textAlign: 'center',
+            gap: '2px',
+            paddingTop: '3px'
           }}
           className={clsx("rounded cursor-pointer hover:text-purple-600 transition-colors")}
         >
-          🌟 Bookmark
+          <img 
+            src="/imgs/icons/bookmark-icon.png" 
+            alt="Bookmark" 
+            style={{
+              width: '28px',
+              height: '28px',
+              objectFit: 'contain',
+              marginTop: '5px'
+            }}
+          />
+          Bookmark
         </div>
         {showTooltip && (
           <div style={{
@@ -582,7 +594,7 @@ export default function LandingPage({ page, locale }: LandingPageProps) {
       {/* 标题 - 绝对定位，独立移动不影响其他元素 */}
       <div style={{
         position: 'absolute',
-        top: '120px',
+        top: '100px', /*修改标题位置*/
         left: '0',
         width: '100vw',
         textAlign: 'center',
@@ -627,7 +639,7 @@ export default function LandingPage({ page, locale }: LandingPageProps) {
                 activeComponent === "photo"
                   ? "hover:opacity-80"
                   : "hover:opacity-80"
-              }`,styles.borderHandDrown)}
+              }`,styles.buttonBorder)}
             >
               Photo Color
             </button>
@@ -675,7 +687,7 @@ export default function LandingPage({ page, locale }: LandingPageProps) {
         <div className={clsx("bg-[#f9f3e8] max-w-5xl rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl",styles.zoomContainer)}
              style={{
                // width:`75vw`,
-               margin:`0 auto 8rem auto`
+               margin:`10rem auto 12rem auto` /*互动图片上下间距*/
             }}>
           {/* 卡片头部 - 标题单行居中 */}
           <div className="bg-[#f9f3e8] text-center"
@@ -683,8 +695,8 @@ export default function LandingPage({ page, locale }: LandingPageProps) {
               paddingTop: "3rem",
             }}>
             <h1 style={{
-              fontFamily: 'dk_crayonistaregular'
-            }} className="text-xl md:text-2xl font-bold tracking-tight text-gray-800 whitespace-nowrap overflow-hidden text-ellipsis">
+              fontFamily: 'dk_cool_crayonregular'
+            }} className="text-xl md:text-2xl font-normal tracking-tight text-gray-800 whitespace-nowrap overflow-hidden text-ellipsis">
               Drag the slider left and right to view the front and back comparison effect
             </h1>
           </div>
@@ -702,57 +714,58 @@ export default function LandingPage({ page, locale }: LandingPageProps) {
 
       </div>
 
-      {/* 展示图片网格 */}
-      <div className={styles.imageContainer}>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-          gap: '20px',
-          width: '75vw',
-          margin: '0 auto'
-        }}>
+      {/* Gallery of AI-Generated Coloring Pages 标题部份 */}
+      <div>
+        <h3 className={styles.accordionTitle}>Gallery of AI-Generated Coloring Pages</h3>
+        <p className={styles.accordionTip}>Explore magical worlds created with AI coloring page generator.</p>
+      </div>
+
+      <div className={styles.gallerySection}>
+        <div className={styles.keyFeaturesContainer}>
           {imgFeatures.map((feature, index) => (
-            <div key={index} className={styles.zoomContainer}>
-              <img
-                src={feature.image}
-                alt={`示例 ${index + 1}`}
-                style={{
-                  width: '100%',
-                  height: '200px',
-                  objectFit: 'cover',
-                  borderRadius: '12px',
-                  boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
-                }}
-              />
+            <div key={index}
+                 style={{
+                   // @ts-ignore
+                   '--border-width': '5px',
+                   '--border-style': 'solid',
+                   '--border-color': '#f8e71c',
+                   '--border-radius': '8px'
+                 }}
+                 className={clsx(styles.keyFeatureCard, styles.zoomContainer, styles.borderHandDrown)}>
+              <div className={styles.featureImageContainer}>
+                <img
+                  src={feature.image}
+                  alt={`AI Generated Coloring Page ${index + 1}`}
+                  className={styles.featureImage}
+                />
+              </div>
             </div>
           ))}
         </div>
       </div>
 
+      {/* Key Features of Ghibli Any 标题部份 */}
+      <div style={{ marginTop: '8rem' }}>
+        <h3 className={styles.accordionTitle}>Key Features of Ghibli Any</h3>
+        <p className={styles.accordionTip}>Everything you need to create magical Ghibli-inspired artwork for personal or commercial use.</p>
+      </div>
+
       {/* 关键功能区域 */}
       <div className={styles.keyFeaturesSection} id="features">
-        <h2 style={{
-          fontSize: '2.5rem',
-          fontWeight: 'bold',
-          textAlign: 'center',
-          marginBottom: '2rem',
-          color: '#2d3748',
-          fontFamily: "'Comic Sans MS', 'Marker Felt', cursive"
-        }}>
-          核心功能
-        </h2>
         <div className={styles.keyFeaturesContainer}>
           {keyFeatures.map((feature, index) => (
-            <div key={index} className={clsx(styles.keyFeatureCard, styles.zoomContainer)}>
-              <div className={styles.featureImageContainer}>
-                <img
-                  src={feature.icon}
-                  alt={feature.title}
-                  className={styles.featureImage}
-                />
+            <div key={index} style={{
+              // @ts-ignore
+              '--border-width': '5px',
+              '--border-style': 'solid',
+              '--border-color': '#f8e71c',
+              '--border-radius': '8px'
+            }} className={clsx(styles.keyFeatureCard, styles.zoomContainer)}>
+              <div className={styles.featureIconContainer}>
+                <img src={feature.icon} alt={feature.title} className={styles.featureIcon} />
               </div>
               <div className={styles.featureContent}>
-                <h3 className={styles.featureTitle}>{feature.title}</h3>
+                <h4 className={styles.featureTitle}>{feature.title}</h4>
                 <p className={styles.featureDescription}>{feature.description}</p>
               </div>
             </div>
@@ -760,88 +773,90 @@ export default function LandingPage({ page, locale }: LandingPageProps) {
         </div>
       </div>
 
-      {/* 用户评价区域 */}
-      <div style={{ margin: '60px 0' }}>
-        <h2 style={{
-          fontSize: '2.5rem',
-          fontWeight: 'bold',
-          textAlign: 'center',
-          marginBottom: '2rem',
-          color: '#2d3748',
-          fontFamily: "'Comic Sans MS', 'Marker Felt', cursive"
-        }}>
-          用户评价
-        </h2>
-        <div className={styles.testimonialsContainer}>
-          {testimonials.map((testimonial, index) => (
-            <div key={index} className={clsx(styles.testimonialCard, styles.zoomContainer)}>
-              <div className={styles.testimonialContentWrapper}>
-                <div className={styles.testimonialAvatarContainer}>
-                  <img
-                    src={testimonial.avatar}
-                    alt={testimonial.name}
-                    className={styles.testimonialAvatar}
-                  />
-                </div>
-                <div className={styles.testimonialTextContainer}>
-                  <div className={styles.testimonialInfo}>
-                    <div className={styles.testimonialName}>{testimonial.name}</div>
-                    <div className={styles.testimonialTitle}>{testimonial.title}</div>
-                  </div>
-                  <div className={styles.testimonialRating}>
-                    {[...Array(5)].map((_, i) => (
-                      <span key={i} className={clsx(styles.star, {
-                        [styles.filledStar]: i < testimonial.rating
-                      })}>
-                        ⭐
-                      </span>
-                    ))}
-                  </div>
-                  <p className={styles.testimonialContent}>"{testimonial.content}"</p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+      {/* What Users Say About Ghibli Any 标题部份 */}
+      <div style={{ marginTop: '8rem' }}>
+        <h3 className={styles.accordionTitle}>What Users Say About Ghibli Any</h3>
+        <p className={styles.accordionTip}>Hear from artists, fans, and creators who use our Ghibli-style AI generator.</p>
       </div>
 
-      {/* FAQ 区域 */}
-      <div className={styles.accordionContainerWrapper}>
-        <h2 className={styles.accordionTitle}>常见问题</h2>
-        <p className={styles.accordionTip}>以下是用户最常问的问题和答案</p>
-        
-        <div className={styles.accordionContainer}>
-          <Accordion type="single" collapsible>
-            {accordionData.map((item) => (
-              <AccordionItem key={item.id} value={item.id}>
+      {/* 2列card 部分 */}
+      <div className={styles.testimonialsContainer}>
+        {testimonials.map((testimonial, index) => (
+          <div key={index}
+               style={{
+                 // @ts-ignore
+                 '--border-width': '5px',
+                 '--border-style': 'solid',
+                 '--border-color': '#f8e71c',
+                 '--border-radius': '8px'
+               }}
+               className={clsx(styles.testimonialCard, styles.zoomContainer)} >
+            <div className={styles.testimonialContentWrapper}>
+              <div className={styles.testimonialAvatarContainer}>
+                <img
+                  src={testimonial.avatar}
+                  alt={testimonial.name}
+                  className={styles.testimonialAvatar}
+                />
+              </div>
+              <div className={styles.testimonialTextContainer}>
+                <div className={styles.testimonialInfo}>
+                  <h4 className={styles.testimonialName}>{testimonial.name}</h4>
+                  <p className={styles.testimonialTitle}>{testimonial.title}</p>
+                </div>
+                <div className={styles.testimonialRating}>
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <span
+                      key={i}
+                      className={`${styles.star} ${i < testimonial.rating ? styles.filledStar : ''}`}
+                    >
+                      ★
+                    </span>
+                  ))}
+                </div>
+                <p className={styles.testimonialContent}>{testimonial.content}</p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* FAQ 标题部份 */}
+      <div style={{ marginTop: '12rem', marginBottom: '3rem' }}>
+        <h3 className={styles.accordionTitle}>Frequently Asked Questions</h3>
+        <p className={styles.accordionTip}>Have another question? Contact us on Discord or by email.</p>
+      </div>
+      {/* FAQ 折叠面板 */}
+      {accordionData.map(item => (
+        <div key={item.id} className={clsx(styles.accordionContainerWrapper)}>
+          <div style={{
+            // @ts-ignore
+            '--border-width': '5px',
+            '--border-style': 'solid',
+            '--border-color': '#f8e71c',
+            '--border-radius': '8px'
+          }} className={clsx(styles.accordionContainer, styles.zoomContainer)}>
+            <Accordion type="single" collapsible>
+              <AccordionItem key={item.id} value={item.id} >
                 <AccordionTrigger className={styles.trigger}>
                   <span>{item.title}</span>
-                  <div className={styles.arrowContainer}>
+                  {/* 直接使用 data-state 属性判断状态 */}
+                  <span className={styles.arrowContainer}>
                     <ChevronDown className={clsx(styles.arrowIcon, styles.openIcon)} />
-                    <ChevronUp className={clsx(styles.arrowIcon, styles.closedIcon)} />
-                  </div>
+                    <ChevronRight className={clsx(styles.arrowIcon, styles.closedIcon)} />
+                  </span>
                 </AccordionTrigger>
                 <AccordionContent className={styles.content}>
                   <p>{item.content}</p>
                 </AccordionContent>
               </AccordionItem>
-            ))}
-          </Accordion>
+            </Accordion>
+          </div>
         </div>
-      </div>
+      ))}
 
       {/* 原本内容继续渲染 */}
-      {page.branding && <Branding section={page.branding} />}
-      {page.introduce && <Feature1 section={page.introduce} />}
-      {page.benefit && <Feature2 section={page.benefit} />}
-      {page.usage && <Feature3 section={page.usage} />}
-      {page.feature && <Feature section={page.feature} />}
-      {page.showcase && <Showcase section={page.showcase} />}
-      {page.stats && <Stats section={page.stats} />}
       {page.pricing && <Pricing pricing={page.pricing} />}
-      {page.testimonial && <Testimonial section={page.testimonial} />}
-      {page.faq && <FAQ section={page.faq} />}
-      {page.cta && <CTA section={page.cta} />}
     </div>
   );
 }

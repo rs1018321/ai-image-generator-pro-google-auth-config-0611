@@ -1,11 +1,13 @@
-'use client'; // 标记为客户端组件，用于处理交互逻辑
-import React, { ReactNode, useState } from 'react';
+import React, { ReactNode } from 'react';
 import clsx from 'clsx';
 import { Globe, Moon, Sun } from 'lucide-react'; // 假设使用 lucide-react 图标
 import Footer from "@/components/blocks/footer";
 import Header from "@/components/blocks/header";
 import { getLandingPage } from "@/services/page";
 import Feedback from "@/components/feedback";
+import HeaderSignButton from "@/components/sign/header-sign-button";
+import Link from "next/link";
+import styles from './page.module.css';
 
 // 定义背景样式
 const backgroundStyle = {
@@ -38,10 +40,15 @@ export default async function DefaultLayout({
             alt="Coloring Logo"
             className="h-8 w-auto mr-2"
           />
-          <h1 style={{
-            fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
-            color: '#64c19f'
-          }} className="font-bold text-5xl">Coloring Page</h1>
+          <Link 
+            href="/"
+            className="hover:opacity-80 transition-opacity cursor-pointer"
+          >
+            <h1 style={{
+              fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+              color: '#64c19f'
+            }} className="font-bold text-5xl">Coloring Page</h1>
+          </Link>
         </div>
 
         {/* 左侧区域：导航菜单项 - 调整位置与Logo对齐 */}
@@ -52,6 +59,11 @@ export default async function DefaultLayout({
           {/* 导航菜单项（桌面端显示） */}
           <nav className="hidden md:flex space-x-7 text-gray-800 items-center">
             <a href="#features" style={{
+              // @ts-ignore
+              '--border-width': '6px',
+              '--border-style': 'solid',
+              '--border-color': '#f8ed8c',
+              '--border-radius': '25px',
               fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
               color: '#69b08b',
               fontSize: '23px',
@@ -59,15 +71,19 @@ export default async function DefaultLayout({
               backgroundColor: '#fcf4a3',
               borderRadius: '25px',
               padding: '8px 16px',
-              border: '6px solid #f8ed8c',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               textAlign: 'center',
               textDecoration: 'none'
-            }} className="hover:bg-[#64bd9b] hover:text-white hover:scale-105 transition-all">Features</a>
+            }} className={clsx("hover:bg-[#64bd9b] hover:text-white hover:scale-105 transition-all", styles.headerCircle)}>Features</a>
             
             <a href="#pricing" style={{
+              // @ts-ignore
+              '--border-width': '6px',
+              '--border-style': 'solid',
+              '--border-color': '#f8ed8c',
+              '--border-radius': '25px',
               fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
               color: '#69b08b',
               fontSize: '23px',
@@ -75,15 +91,19 @@ export default async function DefaultLayout({
               backgroundColor: '#fcf4a3',
               borderRadius: '25px',
               padding: '8px 16px',
-              border: '6px solid #f8ed8c',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               textAlign: 'center',
               textDecoration: 'none'
-            }} className="hover:bg-[#64bd9b] hover:text-white hover:scale-105 transition-all">Pricing</a>
+            }} className={clsx("hover:bg-[#64bd9b] hover:text-white hover:scale-105 transition-all", styles.headerCircle)}>Pricing</a>
             
             <a href="#blog" style={{
+              // @ts-ignore
+              '--border-width': '6px',
+              '--border-style': 'solid',
+              '--border-color': '#f8ed8c',
+              '--border-radius': '25px',
               fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
               color: '#69b08b',
               fontSize: '23px',
@@ -91,15 +111,19 @@ export default async function DefaultLayout({
               backgroundColor: '#fcf4a3',
               borderRadius: '25px',
               padding: '8px 16px',
-              border: '6px solid #f8ed8c',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               textAlign: 'center',
               textDecoration: 'none'
-            }} className="hover:bg-[#64bd9b] hover:text-white hover:scale-105 transition-all">Blog</a>
+            }} className={clsx("hover:bg-[#64bd9b] hover:text-white hover:scale-105 transition-all", styles.headerCircle)}>Blog</a>
             
             <a href="#contact" style={{
+              // @ts-ignore
+              '--border-width': '6px',
+              '--border-style': 'solid',
+              '--border-color': '#f8ed8c',
+              '--border-radius': '25px',
               fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
               color: '#69b08b',
               fontSize: '23px',
@@ -107,13 +131,12 @@ export default async function DefaultLayout({
               backgroundColor: '#fcf4a3',
               borderRadius: '25px',
               padding: '8px 16px',
-              border: '6px solid #f8ed8c',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               textAlign: 'center',
               textDecoration: 'none'
-            }} className="hover:bg-[#64bd9b] hover:text-white hover:scale-105 transition-all">Contact</a>
+            }} className={clsx("hover:bg-[#64bd9b] hover:text-white hover:scale-105 transition-all", styles.headerCircle)}>Contact</a>
           </nav>
         </div>
 
@@ -137,20 +160,7 @@ export default async function DefaultLayout({
           </div>
 
           {/* 登录按钮 */}
-          <button 
-            className="px-4 py-1 text-white rounded cursor-pointer hover:opacity-80 transition-colors"
-            style={{
-              fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
-              fontSize: '23px',
-              fontWeight: 'bold',
-              backgroundColor: '#f7c863',
-              borderRadius: '25px',
-              border: 'none',
-              transform: 'translateY(7px)'
-            }}
-          >
-            Login
-          </button>
+          <HeaderSignButton locale={locale} />
         </div>
       </header>
 

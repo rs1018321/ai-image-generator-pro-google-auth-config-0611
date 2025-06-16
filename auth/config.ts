@@ -139,7 +139,7 @@ export const authOptions: NextAuthConfig = {
       return baseUrl;
     },
     async session({ session, token, user }) {
-      if (token && token.user && token.user) {
+      if (token && token.user) {
         session.user = token.user;
       }
       return session;
@@ -172,6 +172,14 @@ export const authOptions: NextAuthConfig = {
             };
           } catch (e) {
             console.error("save user failed:", e);
+            // 即使数据库操作失败，也要设置基本的用户信息到token中
+            token.user = {
+              uuid: dbUser.uuid,
+              email: dbUser.email,
+              nickname: dbUser.nickname,
+              avatar_url: dbUser.avatar_url,
+              created_at: dbUser.created_at,
+            };
           }
         }
         return token;

@@ -230,11 +230,11 @@ const TextColor: React.FC = () => {
                     textAlign: "center", 
                     margin: "10px auto", 
                     fontSize: "40px",
-                    fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                    fontFamily: "dk_cool_crayonregular",
                     color: "#f0c46b",
                     lineHeight: "1.1"
                 }}>
-                    Select<br />Prompt
+                    Select Prompt
                 </h3>
                 <div
                     style={{
@@ -317,7 +317,7 @@ const TextColor: React.FC = () => {
                 <h3 style={{ 
                     margin: "0 0 10px 0", 
                     fontSize: "40px",
-                    fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                    fontFamily: "dk_cool_crayonregular",
                     color: "#786312",
                     textAlign: "center"
                 }}>Describe</h3>
@@ -628,7 +628,13 @@ const TextColor: React.FC = () => {
                     <div style={{ display: "flex", gap: "40px", marginTop: "-10px", marginBottom: "0px", marginLeft: "20%" }}>
                         <button
                             type="button"
+                            className={styles.borderHandDrown}
                             style={{
+                                // @ts-ignore
+                                '--border-width': '3px',
+                                '--border-style': 'solid',
+                                '--border-color': '#d0f4da',
+                                '--border-radius': '25px',
                                 border: "none",
                                 fontSize: "22px",
                                 backgroundColor: "#d0f4da",
@@ -644,7 +650,13 @@ const TextColor: React.FC = () => {
                         </button>
                         <button
                             type="submit"
+                            className={styles.borderHandDrown}
                             style={{
+                                // @ts-ignore
+                                '--border-width': '3px',
+                                '--border-style': 'solid',
+                                '--border-color': '#679fb5',
+                                '--border-radius': '25px',
                                 fontSize: "22px",
                                 backgroundColor: "#679fb5",
                                 color: "#FFF",
@@ -684,7 +696,7 @@ const TextColor: React.FC = () => {
                 <h3 style={{ 
                     margin: "0 0 10px 0", 
                     fontSize: "40px",
-                    fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                    fontFamily: "dk_cool_crayonregular",
                     color: "#786312",
                     textAlign: "center"
                 }}>Result</h3>

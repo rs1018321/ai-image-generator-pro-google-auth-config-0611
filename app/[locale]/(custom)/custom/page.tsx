@@ -259,7 +259,7 @@ export default function CustomPage() {
             {/* 标题 - 绝对定位，独立移动不影响其他元素 */}
             <div style={{
                 position: 'absolute',
-                top: '120px',
+                top: '80px',
                 left: '0',
                 width: '100vw',
                 textAlign: 'center',

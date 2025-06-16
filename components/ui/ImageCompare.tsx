@@ -140,7 +140,7 @@ const ImageCompare: React.FC<ImageCompareProps> = ({
                     >
                         {/* 双向箭头图标 */}
                         <svg viewBox="0 0 24 24" className="text-[#91B493] transition-all duration-300 w-5 h-5"
-                             fill="none" stroke="currentColor" stroke-width="2">
+                             fill="none" stroke="currentColor" strokeWidth="2">
                             <path d="M21 12H3M3 12L9 6M3 12L9 18M21 12L15 6M21 12L15 18"></path>
                         </svg>
                     </div>

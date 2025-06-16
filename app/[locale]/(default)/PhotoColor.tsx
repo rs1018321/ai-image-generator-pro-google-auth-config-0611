@@ -272,18 +272,18 @@ const PhotoColor: React.FC = () => {
                     textAlign: "center", 
                     margin: "10px auto", 
                     fontSize: "40px",
-                    fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                    fontFamily: "dk_cool_crayonregular",
                     color: "#f0c46b",
                     lineHeight: "1.1"
                 }}>
-                    Select<br />Photo
+                    Select Photo
                 </h3>
                 <div
                     style={{
                         display: "grid",
                         gridTemplateColumns: "repeat(2, 1fr)",
-                        gap: "15px",
-                        marginTop: "3px"
+                        gap: "35px 5px", /* 第一个值是行间距，第二个值是列间距 */
+                        marginTop: "25px" /* 调整Photo选择区域与Upload区域之间的间距 */
                     }}
                 >
                     {photoOptions.map((photo, index) => (
@@ -362,7 +362,7 @@ const PhotoColor: React.FC = () => {
                 <h3 style={{ 
                     margin: "0 0 10px 0", 
                     fontSize: "40px",
-                    fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                    fontFamily: "dk_cool_crayonregular",
                     color: "#786312",
                     textAlign: "center"
                 }}>Upload</h3>
@@ -695,7 +695,13 @@ const PhotoColor: React.FC = () => {
                     <div style={{ display: "flex", gap: "40px", marginTop: "-10px", marginBottom: "0px", marginLeft: "20%" }}>
                         <button
                             type="button"
+                            className={styles.borderHandDrown}
                             style={{
+                                // @ts-ignore
+                                '--border-width': '3px',
+                                '--border-style': 'solid',
+                                '--border-color': '#d0f4da',
+                                '--border-radius': '25px',
                                 border: "none",
                                 fontSize: "22px",
                                 backgroundColor: "#d0f4da",
@@ -711,7 +717,13 @@ const PhotoColor: React.FC = () => {
                         </button>
                         <button
                             type="submit"
+                            className={styles.borderHandDrown}
                             style={{
+                                // @ts-ignore
+                                '--border-width': '3px',
+                                '--border-style': 'solid',
+                                '--border-color': '#679fb5',
+                                '--border-radius': '25px',
                                 fontSize: "22px",
                                 backgroundColor: "#679fb5",
                                 color: "#FFF",
@@ -751,7 +763,7 @@ const PhotoColor: React.FC = () => {
                 <h3 style={{ 
                     margin: "0 0 10px 0", 
                     fontSize: "40px",
-                    fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                    fontFamily: "dk_cool_crayonregular",
                     color: "#786312",
                     textAlign: "center"
                 }}>Result</h3>

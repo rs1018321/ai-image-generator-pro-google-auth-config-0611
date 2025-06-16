@@ -13,13 +13,22 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import Link from "next/link";
 import { User } from "@/types/user";
 import { signOut } from "next-auth/react";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 
 export default function SignUser({ user }: { user: User }) {
   const t = useTranslations();
+  const router = useRouter();
+
+  const handleUserCenterClick = () => {
+    router.push("/my-orders");
+  };
+
+  const handleAdminClick = () => {
+    window.open("/admin/users", "_blank");
+  };
 
   return (
     <DropdownMenu>
@@ -40,15 +49,13 @@ export default function SignUser({ user }: { user: User }) {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem className="flex justify-center cursor-pointer">
-          <Link href="/my-orders">{t("user.user_center")}</Link>
+        <DropdownMenuItem className="flex justify-center cursor-pointer" onClick={handleUserCenterClick}>
+          {t("user.user_center")}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem className="flex justify-center cursor-pointer">
-          <Link href="/admin/users" target="_blank">
-            {t("user.admin_system")}
-          </Link>
+        <DropdownMenuItem className="flex justify-center cursor-pointer" onClick={handleAdminClick}>
+          {t("user.admin_system")}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
 

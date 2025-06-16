@@ -59,6 +59,29 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
       updateInvite(data);
     } catch (e) {
       console.log("fetch user info failed");
+      
+      // 如果数据库不可用，直接使用session中的用户信息
+      if (session && session.user) {
+        const fallbackUser: User = {
+          uuid: session.user.uuid || '',
+          email: session.user.email || '',
+          nickname: session.user.name || session.user.email?.split('@')[0] || '',
+          avatar_url: session.user.image || '',
+          created_at: new Date().toISOString(),
+          signin_type: 'oauth',
+          signin_provider: 'google',
+          signin_openid: '',
+          signin_ip: '',
+          credits: {
+            left_credits: 0,
+            total_credits: 0,
+            used_credits: 0,
+            is_pro: false
+          }
+        };
+        setUser(fallbackUser);
+        console.log("Using fallback user info from session:", fallbackUser);
+      }
     }
   };
 

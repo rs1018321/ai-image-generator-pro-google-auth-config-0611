@@ -3,6 +3,8 @@ import React, { ReactNode, useState, use } from 'react';
 import clsx from 'clsx';
 import { Globe, Moon, Sun } from 'lucide-react'; // 假设使用 lucide-react 图标
 import styles from './custom/page.module.css';
+import HeaderSignButton from "@/components/sign/header-sign-button";
+import Link from "next/link";
 
 // 定义背景样式
 const backgroundStyle = {
@@ -56,10 +58,15 @@ export default function CustomLayout({
                         alt="Coloring Logo"
                         className="h-8 w-auto mr-2"
                     />
-                    <h1 style={{
-                        fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
-                        color: '#64c19f'
-                    }} className={clsx(" font-bold text-5xl")} >Coloring Page</h1>
+                    <Link 
+                        href="/"
+                        className="hover:opacity-80 transition-opacity cursor-pointer"
+                    >
+                        <h1 style={{
+                            fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                            color: '#64c19f'
+                        }} className={clsx(" font-bold text-5xl")} >Coloring Page</h1>
+                    </Link>
                 </div>
 
                 {/* 左侧区域：导航菜单项 - 调整位置与Logo对齐 */}
@@ -192,20 +199,7 @@ export default function CustomLayout({
                     </div>
 
                     {/* 登录按钮 */}
-                    <button 
-                        className="px-4 py-1 text-white rounded cursor-pointer hover:opacity-80 transition-colors"
-                        style={{
-                            fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
-                            fontSize: '23px',
-                            fontWeight: 'bold',
-                            backgroundColor: '#f7c863',
-                            borderRadius: '25px',
-                            border: 'none',
-                            transform: `translateY(${buttonVerticalOffset}px)` // 与导航按钮位置对齐
-                        }}
-                    >
-                        Login
-                    </button>
+                    <HeaderSignButton locale={locale} />
                 </div>
             </header>
 
