@@ -78,7 +78,7 @@ export default async function DefaultLayout({
               textDecoration: 'none'
             }} className={clsx("hover:bg-[#64bd9b] hover:text-white hover:scale-105 transition-all", styles.headerCircle)}>Features</a>
             
-            <a href="#pricing" style={{
+            <a href="#faq" style={{
               // @ts-ignore
               '--border-width': '6px',
               '--border-style': 'solid',
@@ -96,7 +96,7 @@ export default async function DefaultLayout({
               justifyContent: 'center',
               textAlign: 'center',
               textDecoration: 'none'
-            }} className={clsx("hover:bg-[#64bd9b] hover:text-white hover:scale-105 transition-all", styles.headerCircle)}>Pricing</a>
+            }} className={clsx("hover:bg-[#64bd9b] hover:text-white hover:scale-105 transition-all", styles.headerCircle)}>FAQ</a>
             
             <a href="#blog" style={{
               // @ts-ignore

@@ -881,7 +881,7 @@ export default function LandingPage({ page, locale }: LandingPageProps) {
       </div>
 
       {/* FAQ 标题部份 */}
-      <div style={{ marginTop: '12rem', marginBottom: '3rem' }}>
+      <div id="faq" style={{ marginTop: '12rem', marginBottom: '3rem' }}>
         <h3 className={styles.accordionTitle}>Frequently Asked Questions</h3>
         <p className={styles.accordionTip}>Have another question? Contact us on Discord or by email.</p>
       </div>
@@ -915,7 +915,8 @@ export default function LandingPage({ page, locale }: LandingPageProps) {
       ))}
 
       {/* 原本内容继续渲染 */}
-      {page.pricing && <Pricing pricing={page.pricing} />}
+      {/* 隐藏pricing部分 */}
+      {/* {page.pricing && <Pricing pricing={page.pricing} />} */}
     </div>
   );
 }

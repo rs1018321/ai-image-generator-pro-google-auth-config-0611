@@ -95,7 +95,7 @@ export default function CustomLayout({
                             textAlign: 'center'
 
                         }} className={clsx("hover:text-purple-600", styles.headerCircle)} >Features</a>
-                        <a href="#pricing"
+                        <a href="#faq"
                            style={{
                                // @ts-ignore
                                '--border-width': '6px',
@@ -108,11 +108,13 @@ export default function CustomLayout({
                                fontWeight: 'bold',
                                backgroundColor: '#fcf4a3',
                                borderRadius: '25px',
+                               padding: '8px 16px',
                                display: 'flex',
                                alignItems: 'center',
                                justifyContent: 'center',
-                               textAlign: 'center'
-                           }} className={clsx("hover:text-purple-600", styles.headerCircle)}  >Pricing</a>
+                               textAlign: 'center',
+                               textDecoration: 'none'
+                           }} className={clsx("hover:text-purple-600", styles.headerCircle)}  >FAQ</a>
                         <a href="#blog"
                            style={{
                                // @ts-ignore
