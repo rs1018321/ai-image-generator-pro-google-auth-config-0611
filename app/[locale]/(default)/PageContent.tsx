@@ -225,7 +225,7 @@ export default function LandingPage({ page, locale }: LandingPageProps) {
   // 🎯 Bookmark按钮位置调整变量 - 您可以修改这些数值来调整按钮位置
   const bookmarkPositionTop = 185; // 距离顶部的距离（单位：px）- 调整到select photo步骤框上方
   const bookmarkPositionRight = 'auto'; // 距离右边的距离（单位：px）
-  const bookmarkPositionLeft = 230; // 距离左边的距离，可以是数字或'auto'
+  const bookmarkPositionLeft = 110; // 距离左边的距离，可以是数字或'auto' - 从230减少到180，向左移动50px
   const bookmarkPositionBottom = 'auto'; // 距离底部的距离，可以是数字或'auto'
 
   // 将比例转换为具体尺寸
@@ -679,8 +679,8 @@ export default function LandingPage({ page, locale }: LandingPageProps) {
               style={{
                 border: "none",
                 fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
-                fontSize: "28px",
-                color: activeComponent === "photo" ? "white" : "white",
+                fontSize: "22px",
+                color: activeComponent === "photo" ? "white" : "#718096",
                 padding: "0 8px",
                 height: "45px",
                 backgroundColor: activeComponent === "photo" ? '#64bc99' : '#d6f5de',
@@ -700,7 +700,7 @@ export default function LandingPage({ page, locale }: LandingPageProps) {
                   : "hover:opacity-80"
               }`,styles.buttonBorder)}
             >
-              Photo Color
+              PHOTO TO COLORING PAGE
             </button>
             <button
               onClick={() => handleComponentChange("text")}
@@ -708,8 +708,8 @@ export default function LandingPage({ page, locale }: LandingPageProps) {
               style={{
                 border: "none",
                 fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
-                fontSize: "28px",
-                color: activeComponent === "text" ? "white" : "white",
+                fontSize: "22px",
+                color: activeComponent === "text" ? "white" : "#718096",
                 padding: "0 16px",
                 height: "45px",
                 backgroundColor: activeComponent === "text" ? '#64bc99' : '#d6f5de',
@@ -730,7 +730,7 @@ export default function LandingPage({ page, locale }: LandingPageProps) {
                   : "hover:opacity-80"
               }`,styles.buttonBorder)}
             >
-              Text Color 
+              TEXT TO COLORING PAGE
             </button>
           </div>
 

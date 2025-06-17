@@ -53,7 +53,7 @@ export default async function DefaultLayout({
 
         {/* 左侧区域：导航菜单项 - 调整位置与Logo对齐 */}
         <div className="flex items-center" style={{ 
-          marginLeft: '370px',
+          marginLeft: '450px',
           transform: 'translateY(7px)'
         }}>
           {/* 导航菜单项（桌面端显示） */}

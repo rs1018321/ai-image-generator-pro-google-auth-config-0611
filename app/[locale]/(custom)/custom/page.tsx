@@ -184,7 +184,7 @@ export default function CustomPage() {
 
     // 🎯 Bookmark按钮位置调整变量 - 您可以修改这些数值来调整按钮位置
     const bookmarkPositionTop = 215; // 距离顶部的距离（单位：px）- 调整到与滑动按钮对齐
-    const bookmarkPositionRight = 50; // 距离右边的距离（单位：px）
+    const bookmarkPositionRight = 100; // 距离右边的距离（单位：px）- 从50增加到100，向左移动50px
     const bookmarkPositionLeft = 'auto'; // 距离左边的距离，可以是数字或'auto'
     const bookmarkPositionBottom = 'auto'; // 距离底部的距离，可以是数字或'auto'
 
@@ -328,8 +328,8 @@ export default function CustomPage() {
                         style={{
                             border: "none",
                             fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
-                            fontSize: "28px",
-                            color: activeComponent === "photo" ? "white" : "white",
+                            fontSize: "22px",
+                            color: activeComponent === "photo" ? "white" : "#718096",
                             padding: "0 8px",
                             height: "45px",
                             backgroundColor: activeComponent === "photo" ? '#64bc99' : '#d6f5de',
@@ -349,7 +349,7 @@ export default function CustomPage() {
                                 : "hover:opacity-80"
                         }`,styles.borderHandDrown)}
                     >
-                        Photo Color
+                        PHOTO TO COLORING PAGE
                     </button>
                     <button
                         onClick={() => handleComponentChange("text")}
@@ -357,8 +357,8 @@ export default function CustomPage() {
                         style={{
                             border: "none",
                             fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
-                            fontSize: "28px",
-                            color: activeComponent === "text" ? "white" : "white",
+                            fontSize: "22px",
+                            color: activeComponent === "text" ? "white" : "#718096",
                             padding: "0 16px",
                             height: "45px",
                             backgroundColor: activeComponent === "text" ? '#64bc99' : '#d6f5de',
@@ -379,7 +379,7 @@ export default function CustomPage() {
                                 : "hover:opacity-80"
                         }`,styles.buttonBorder)}
                     >
-                        Text Color 
+                        TEXT TO COLORING PAGE
                     </button>
                 </div>
 
