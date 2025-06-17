@@ -20,6 +20,7 @@ const TextColor: React.FC = () => {
     const [isCleared, setIsCleared] = useState<boolean>(false); // 跟踪是否已被清除
     const [generatedImage, setGeneratedImage] = useState<string | null>(null); // 添加生成图片状态
     const [isGenerating, setIsGenerating] = useState<boolean>(false); // 添加生成中状态
+    const [promptValue, setPromptValue] = useState<string>(""); // 新增：跟踪文本框内容
     const defaultImage = "https://picsum.photos/id/1015/300/200";
     const clearImage = "/imgs/custom/photo.png";
     
@@ -44,9 +45,18 @@ const TextColor: React.FC = () => {
         handleSubmit,
         formState: { errors },
         setValue,
+        watch,
     } = useForm<FormData>({
         defaultValues: defaultFormValues // 应用默认值
     });
+
+    // 监听prompt字段的变化
+    const watchedPrompt = watch("prompt");
+
+    // 更新promptValue状态
+    React.useEffect(() => {
+        setPromptValue(watchedPrompt || "");
+    }, [watchedPrompt]);
 
     // 选项与图片的映射关系
     const promptImageMap = {
@@ -162,6 +172,7 @@ const TextColor: React.FC = () => {
         setSelectedPrompt(option.title);
         setSelectedImage(option.image);
         setValue("prompt", option.title); // 使用setValue更新表单值
+        setPromptValue(option.title); // 同步更新promptValue状态
     };
 
     const handleClear = () => {
@@ -170,6 +181,7 @@ const TextColor: React.FC = () => {
         setSelectedStyle("simplified"); // 重置为 simplified
         setSelectedSize("Auto"); // 重置尺寸为 Auto
         setValue("prompt", ""); // 清空文本框
+        setPromptValue(""); // 同步更新promptValue状态
         setGeneratedImage(null); // 清除所有图片（包括默认图片和生成的图片）
         setIsCleared(true); // 设置清除状态为true
     };
@@ -180,6 +192,14 @@ const TextColor: React.FC = () => {
 
     const handleStyleSelect = (style: string) => {
         setSelectedStyle(style);
+    };
+
+    // 新增：清空描述文本框的函数
+    const handleClearDescribe = (e: React.MouseEvent) => {
+        e.stopPropagation(); // 阻止事件冒泡
+        setValue("prompt", ""); // 清空文本框
+        setSelectedPrompt(""); // 清空选中的prompt状态
+        setPromptValue(""); // 同步更新promptValue状态
     };
 
     // 新增：处理图片下载
@@ -343,6 +363,7 @@ const TextColor: React.FC = () => {
                                 cursor: "pointer",
                                 padding: "0",
                                 boxSizing: "border-box",
+                                position: "relative", // 添加相对定位，为清空按钮做准备
                             }}
                         >
                             <textarea
@@ -361,8 +382,37 @@ const TextColor: React.FC = () => {
                                     textAlign: "justify",
                                     lineHeight: "1.4"
                                 }}
-                                placeholder="输入描述文字..."
+                                placeholder="Enter description text..."
                             />
+                            {/* 添加清空按钮 - 只在有内容时显示 */}
+                            {promptValue && promptValue.trim() && (
+                                <button
+                                    onClick={handleClearDescribe}
+                                    type="button"
+                                    style={{
+                                        position: "absolute",
+                                        top: "5px",
+                                        right: "5px",
+                                        width: "20px",
+                                        height: "20px",
+                                        borderRadius: "50%",
+                                        backgroundColor: "rgba(255, 0, 0, 0.8)",
+                                        color: "white",
+                                        border: "none",
+                                        cursor: "pointer",
+                                        fontSize: "12px",
+                                        fontWeight: "bold",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        zIndex: 1,
+                                        lineHeight: "1",
+                                    }}
+                                    title="清空文本"
+                                >
+                                    ×
+                                </button>
+                            )}
                         </div>
 
                         {/* Size选择区域，与PhotoColor一致 */}
@@ -739,7 +789,7 @@ const TextColor: React.FC = () => {
                             fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
                             textAlign: "center"
                         }}>
-                            点击Generate后将显示处理效果
+                            Click Generate to show the result
                         </div>
                     )}
                 </div>

@@ -41,6 +41,7 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData()
     const file = formData.get('image') as File
     const size = formData.get('size') as string || '1024x1024'
+    const style = formData.get('style') as string || 'medium'
 
     if (!file) {
       return NextResponse.json({ error: "未上传图片" }, { status: 400 })
@@ -52,12 +53,29 @@ export async function POST(request: NextRequest) {
     const imageDataUrl = `data:${file.type};base64,${base64Image}`
 
     console.log(`📁 收到图片文件: ${file.name}, 大小: ${file.size} bytes, 输出尺寸: ${size}`)
+    console.log(`🎨 Style: ${style}`)
+
+    // Style prompt 映射（与文生图API保持一致）
+    const stylePromptMapping: { [key: string]: string } = {
+      "simplified": "Few, thick outlines with very simple shapes. Large open areas for easy coloring. No textures or shading lines.",
+      "medium": "A moderate number of lines with more varied shapes. Adds light hatching and simple textures for depth. Still leaves plenty of open space to avoid clutter.",
+      "detailed": "Dense, fine linework with abundant realistic textures and details. Highly realistic style with rich shading and tonal variation. Minimal blank areas, offering a challenging coloring experience"
+    };
+
+    const stylePrompt = stylePromptMapping[style] || stylePromptMapping["medium"];
+
+    console.log(`📝 Style Prompt: ${stylePrompt}`)
+
+    // 构建完整的提示词：基础要求 + style prompt
+    const basePrompt = "Convert this colored illustration into clean black-and-white coloring-book line art. CRITICAL REQUIREMENT: The ENTIRE original image must be preserved completely - DO NOT crop, cut, trim, or remove ANY portion of the original image. ALL elements from edge to edge of the original image must remain visible and intact. Create a larger canvas with the target aspect ratio and place the complete, unmodified original image in the center. Fill the extra space around the original image with pure white background. Think of this as putting a complete postcard into a larger picture frame - the postcard (original image) stays exactly the same size and shape, you just add a white border around it. Draw bold, continuous pure-black strokes for outlines only. Remove all color, shading, gradients and fills, leaving crisp, simple contours. Output as a high-resolution PNG."
+    
+    const fullPrompt = `${basePrompt} ${stylePrompt}`;
 
     // 准备 Replicate API 参数
     const input = {
       //image: imageDataUrl,
       input_image: imageDataUrl,  
-      prompt: "Convert this colored illustration into clean black-and-white coloring-book line art. CRITICAL REQUIREMENT: The ENTIRE original image must be preserved completely - DO NOT crop, cut, trim, or remove ANY portion of the original image. ALL elements from edge to edge of the original image must remain visible and intact. Create a larger canvas with the target aspect ratio and place the complete, unmodified original image in the center. Fill the extra space around the original image with pure white background. Think of this as putting a complete postcard into a larger picture frame - the postcard (original image) stays exactly the same size and shape, you just add a white border around it. Draw bold, continuous pure-black strokes for outlines only. Remove all color, shading, gradients and fills, leaving crisp, simple contours. Output as a high-resolution PNG.",
+      prompt: fullPrompt,
       guidance_scale: 2.5,
       num_inference_steps: 28,
       aspect_ratio: size === "1024x1024" ? "1:1" :     // 1:1 正方形
@@ -66,6 +84,8 @@ export async function POST(request: NextRequest) {
                    "1:1",                              // 默认 1:1
       seed: Math.floor(Math.random() * 1000000)
     }
+
+    console.log(`📝 完整提示词: ${fullPrompt}`)
 
     // 重试循环（只重试 API 调用部分）
     for (let attempt = 1; attempt <= maxRetries; attempt++) {

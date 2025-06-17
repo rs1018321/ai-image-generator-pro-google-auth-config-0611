@@ -148,13 +148,12 @@ const ImageCompare: React.FC<ImageCompareProps> = ({
             </div>
 
             {/* 标签 - 位置和渐隐效果 */}
+            {/* 注释掉左右标签，去掉文本框
             <div className="absolute top-10 left-0 right-0 flex justify-between z-20">
-                {/* 左侧标签 - 左上角偏下30px */}
                 <div className="ml-4">
           <span
               className="px-3 py-1 bg-white/80 backdrop-blur-sm rounded-md text-xl font-medium text-gray-800 shadow-md"
               style={{
-                  // 当滑块接近最右侧时，左侧标签透明度降低
                   opacity: sliderPosition > 95 ? 0 : 1,
                   transition: 'opacity 0.3s ease',
               }}
@@ -163,12 +162,10 @@ const ImageCompare: React.FC<ImageCompareProps> = ({
           </span>
                 </div>
 
-                {/* 右侧标签 - 右上角偏下30px */}
                 <div className="mr-4">
           <span
               className="px-3 py-1 bg-white/80 backdrop-blur-sm rounded-md text-xl font-medium text-gray-800 shadow-md"
               style={{
-                  // 当滑块接近最左侧时，右侧标签透明度降低
                   opacity: sliderPosition < 5 ? 0 : 1,
                   transition: 'opacity 0.3s ease',
               }}
@@ -177,6 +174,7 @@ const ImageCompare: React.FC<ImageCompareProps> = ({
           </span>
                 </div>
             </div>
+            */}
         </div>
     );
 };

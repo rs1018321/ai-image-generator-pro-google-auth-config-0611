@@ -3,10 +3,10 @@
   "theme": "light",
   "header": {
     "brand": {
-      "title": "Mimi Panda",
+      "title": "Coloring Page",
       "logo": {
         "src": "/imgs/logo.png",
-        "alt": "Mimi Panda"
+        "alt": "Coloring Page"
       },
       "url": "https://mimi-panda.com/"
     },
@@ -203,15 +203,15 @@
     "text_align": "center",
     "items": [
       {
-        "title": "Get ShipAny",
-        "description": "Buy ShipAny with a one-time payment. Check your email for the code and documentation.",
+        "title": "Get Coloring Page",
+        "description": "Buy Coloring Page with a one-time payment. Check your email for the code and documentation.",
         "image": {
           "src": "/imgs/features/5.png"
         }
       },
       {
         "title": "Start Your Project",
-        "description": "Read the documentation and clone the code of ShipAny. Start building your AI SaaS startup.",
+        "description": "Read the documentation and clone the code of Coloring Page. Start building your AI coloring page generator.",
         "image": {
           "src": "/imgs/features/6.png"
         }
@@ -416,7 +416,7 @@
           "icon": "RiFlashlightFill"
         },
         "product_id": "starter",
-        "product_name": "ShipAny Boilerplate Starter",
+        "product_name": "Coloring Page Boilerplate Starter",
         "credits": 100,
         "valid_months": 1
       },
@@ -450,7 +450,7 @@
           "icon": "RiFlashlightFill"
         },
         "product_id": "standard",
-        "product_name": "ShipAny Boilerplate Standard",
+        "product_name": "Coloring Page Boilerplate Standard",
         "credits": 200,
         "valid_months": 3
       },
@@ -482,7 +482,7 @@
           "icon": "RiFlashlightFill"
         },
         "product_id": "premium",
-        "product_name": "ShipAny Boilerplate Premium",
+        "product_name": "Coloring Page Boilerplate Premium",
         "credits": 300,
         "valid_months": 12
       }
@@ -498,7 +498,7 @@
       {
         "title": "David Chen",
         "label": "Founder of AIWallpaper.shop",
-        "description": "ShipAny saved us months of development time. We launched our AI wallpaper business in just 2 days and got our first paying customer within a week!",
+        "description": "Coloring Page saved us months of development time. We launched our AI wallpaper business in just 2 days and got our first paying customer within a week!",
         "image": {
           "src": "/imgs/users/1.png"
         }
@@ -514,7 +514,7 @@
       {
         "title": "Marcus Thompson",
         "label": "Solo Developer",
-        "description": "As a solo developer, ShipAny gave me everything I needed - auth, payments, AI integration, and beautiful UI. Launched my SaaS in a weekend!",
+        "description": "As a solo developer, Coloring Page gave me everything I needed - auth, payments, AI integration, and beautiful UI. Launched my SaaS in a weekend!",
         "image": {
           "src": "/imgs/users/3.png"
         }
@@ -530,7 +530,7 @@
       {
         "title": "James Wilson",
         "label": "Tech Lead at GPTs.works",
-        "description": "ShipAny's infrastructure is rock-solid. We scaled from 0 to 10k users without touching the backend. Best investment for our AI startup.",
+        "description": "Coloring Page's infrastructure is rock-solid. We scaled from 0 to 10k users without touching the backend. Best investment for our AI startup.",
         "image": {
           "src": "/imgs/users/5.png"
         }
@@ -538,7 +538,7 @@
       {
         "title": "Anna Zhang",
         "label": "Startup Founder",
-        "description": "From idea to launch in 3 days! ShipAny's templates and deployment tools made it possible to test our AI business concept incredibly fast.",
+        "description": "From idea to launch in 3 days! Coloring Page's templates and deployment tools made it possible to test our AI business concept incredibly fast.",
         "image": {
           "src": "/imgs/users/6.png"
         }
@@ -587,15 +587,15 @@
   "footer": {
     "name": "footer",
     "brand": {
-      "title": "Mimi Panda",
+      "title": "Coloring Page",
       "description": "Create unique coloring pages from your photos and text with AI.",
       "logo": {
         "src": "/imgs/logo.png",
-        "alt": "Mimi Panda"
+        "alt": "Coloring Page"
       },
-      "url": "https://mimi-panda.com/"
+      "url": "https://mimi-panda.com/en"
     },
-    "copyright": "© 2025 • Mimi Panda All rights reserved.",
+    "copyright": "© 2025 • Coloring Page All rights reserved.",
     "nav": {
       "items": [
         {
@@ -623,17 +623,17 @@
           "children": [
             {
               "title": "Documents",
-              "url": "https://docs.shipany.ai",
+              "url": "https://docs.coloringpage.ai",
               "target": "_blank"
             },
             {
               "title": "Components",
-              "url": "https://shipany.ai/components",
+              "url": "https://coloringpage.ai/components",
               "target": "_blank"
             },
             {
               "title": "Templates",
-              "url": "https://shipany.ai/templates",
+              "url": "https://coloringpage.ai/templates",
               "target": "_blank"
             }
           ]
@@ -665,13 +665,13 @@
         {
           "title": "X",
           "icon": "RiTwitterXFill",
-          "url": "https://x.com/shipanyai",
+          "url": "https://x.com/coloringpageai",
           "target": "_blank"
         },
         {
           "title": "Github",
           "icon": "RiGithubFill",
-          "url": "https://github.com/shipanyai",
+          "url": "https://github.com/coloringpageai",
           "target": "_blank"
         },
         {
@@ -683,7 +683,7 @@
         {
           "title": "Email",
           "icon": "RiMailLine",
-          "url": "mailto:support@shipany.ai",
+          "url": "mailto:support@coloringpage.ai",
           "target": "_self"
         }
       ]

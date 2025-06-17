@@ -18,6 +18,7 @@ const PhotoColor: React.FC = () => {
     const [isGenerating, setIsGenerating] = useState<boolean>(false);
     const [selectedSize, setSelectedSize] = useState<string>("Auto");
     const [selectedStyle, setSelectedStyle] = useState<string>("medium");
+    const [imageDimensions, setImageDimensions] = useState<{width: number, height: number, imageWidth: number, imageHeight: number} | null>(null);
     const defaultImage = "https://picsum.photos/id/237/100/100";
     const clearImage = "/imgs/custom/photo.png"; // 新的默认图片URL
     
@@ -54,7 +55,7 @@ const PhotoColor: React.FC = () => {
             // 创建 FormData 对象
             const formData = new FormData();
             
-            // 将 Size 比例值映射为 API 期望的像素尺寸
+            // 将 Size 选择映射为对应的 API 尺寸参数
             const sizeMapping: { [key: string]: string } = {
                 "Auto": "1024x1024",      // 默认正方形
                 "1:1": "1024x1024",       // 正方形 1:1
@@ -64,18 +65,9 @@ const PhotoColor: React.FC = () => {
                 "9:16": "832x1248",       // 竖版 2:3 (接近9:16)
             };
             
-            // 将 Style 选择映射为对应的文字 prompt
-            const stylePromptMapping: { [key: string]: string } = {
-                "simplified": "Few, thick outlines with very simple shapes. Large open areas for easy coloring. No textures or shading lines.",
-                "medium": "A moderate number of lines with more varied shapes. Adds light. hatching and simple textures for depth. Still leaves plenty of open space to avoid clutter.", 
-                "detailed": "Dense, fine linework with abundant realistic textures and details. Highly realistic style with rich shading and tonal variation. Minimal blank areas, offering a challenging coloring experience"
-            };
-            
             const apiSize = sizeMapping[selectedSize] || "1024x1024";
-            const stylePrompt = stylePromptMapping[selectedStyle] || "";
             
             formData.append('size', apiSize);
-            formData.append('style_prompt', stylePrompt);
             
             // 处理图片数据
             if (uploadedImage) {
@@ -98,13 +90,12 @@ const PhotoColor: React.FC = () => {
                 formData.append('image', file);
             }
             
-            // 添加其他参数（可选）
+            // 添加style参数（后端会进行映射）
             formData.append('style', selectedStyle);
             
             console.log(`🎯 发送请求到 generate-coloring-book API:`);
             console.log(`📐 Size: ${selectedSize} -> ${apiSize}`);
             console.log(`🎨 Style: ${selectedStyle}`);
-            console.log(`📝 Style Prompt: ${stylePrompt}`);
 
             const response = await axios.post("/api/generate-coloring-book", formData, {
                 headers: {
@@ -177,6 +168,37 @@ const PhotoColor: React.FC = () => {
     const handleImageClick = (imageUrl: string) => {
         setSelectedImage(imageUrl);
         setUploadedImage(null);
+        
+        // 计算预设图片尺寸
+        const img = new Image();
+        img.onload = () => {
+            const maxImageSize = 120; // 图片最大尺寸（减去边距）
+            const padding = 10; // 虚线框内边距
+            const aspectRatio = img.width / img.height;
+            
+            let imageWidth, imageHeight;
+            if (aspectRatio > 1) {
+                // 横图
+                imageWidth = Math.min(maxImageSize, img.width);
+                imageHeight = imageWidth / aspectRatio;
+            } else {
+                // 竖图或正方形
+                imageHeight = Math.min(maxImageSize, img.height);
+                imageWidth = imageHeight * aspectRatio;
+            }
+            
+            // 虚线框尺寸 = 图片尺寸 + 内边距
+            const containerWidth = imageWidth + padding * 2;
+            const containerHeight = imageHeight + padding * 2;
+            
+            setImageDimensions({ 
+                width: containerWidth, 
+                height: containerHeight,
+                imageWidth,
+                imageHeight 
+            });
+        };
+        img.src = imageUrl;
     };
 
     // 新增：处理文件上传
@@ -188,6 +210,37 @@ const PhotoColor: React.FC = () => {
                 const result = e.target?.result as string;
                 setUploadedImage(result);
                 setSelectedImage(null);
+                
+                // 计算图片尺寸
+                const img = new Image();
+                img.onload = () => {
+                    const maxImageSize = 120; // 图片最大尺寸（减去边距）
+                    const padding = 10; // 虚线框内边距
+                    const aspectRatio = img.width / img.height;
+                    
+                    let imageWidth, imageHeight;
+                    if (aspectRatio > 1) {
+                        // 横图
+                        imageWidth = Math.min(maxImageSize, img.width);
+                        imageHeight = imageWidth / aspectRatio;
+                    } else {
+                        // 竖图或正方形
+                        imageHeight = Math.min(maxImageSize, img.height);
+                        imageWidth = imageHeight * aspectRatio;
+                    }
+                    
+                    // 虚线框尺寸 = 图片尺寸 + 内边距
+                    const containerWidth = imageWidth + padding * 2;
+                    const containerHeight = imageHeight + padding * 2;
+                    
+                    setImageDimensions({ 
+                        width: containerWidth, 
+                        height: containerHeight,
+                        imageWidth,
+                        imageHeight 
+                    });
+                };
+                img.src = result;
             };
             reader.readAsDataURL(file);
         }
@@ -196,7 +249,25 @@ const PhotoColor: React.FC = () => {
     // 新增：触发文件选择
     const handleCameraClick = () => {
         const fileInput = document.getElementById('photo-upload') as HTMLInputElement;
-        fileInput?.click();
+        if (fileInput) {
+            // 先清空文件输入框的值，解决重复上传同一文件的缓存问题
+            fileInput.value = '';
+            fileInput.click();
+        }
+    };
+
+    // 新增：删除上传的图片
+    const handleDeleteImage = (e: React.MouseEvent) => {
+        e.stopPropagation(); // 阻止事件冒泡，避免触发相机点击事件
+        setUploadedImage(null);
+        setSelectedImage(null);
+        setImageDimensions(null); // 重置图片尺寸
+        
+        // 重置文件输入框的值
+        const fileInput = document.getElementById('photo-upload') as HTMLInputElement;
+        if (fileInput) {
+            fileInput.value = '';
+        }
     };
 
     // 清除选中的图片
@@ -206,6 +277,7 @@ const PhotoColor: React.FC = () => {
         setSelectedSize("Auto"); // 重置尺寸选择为 Auto
         setSelectedStyle("simplified"); // 重置样式选择为 simplified
         setGeneratedImage(null); // 完全清空生成的结果图片
+        setImageDimensions(null); // 重置图片尺寸
         
         // 重置文件输入框的值，解决重复上传同一张图片不显示的问题
         const fileInput = document.getElementById('photo-upload') as HTMLInputElement;
@@ -379,8 +451,9 @@ const PhotoColor: React.FC = () => {
                                 '--border-style': 'dashed',
                                 '--border-color': '#000',
                                 '--border-radius': '8px',
-                                width: "140px",
-                                height: "140px",
+                                width: imageDimensions ? `${imageDimensions.width}px` : "140px",
+                                height: imageDimensions ? `${Math.max(imageDimensions.height, 140)}px` : "140px",
+                                minHeight: "140px", // 设置最小高度，保证其他元素位置稳定
                                 margin: "10px auto -40px auto",
                                 display: "flex",
                                 justifyContent: "center",
@@ -388,6 +461,8 @@ const PhotoColor: React.FC = () => {
                                 cursor: "pointer",
                                 padding: "0", // 确保没有内边距
                                 boxSizing: "border-box", // 确保边框不占用额外空间
+                                position: "relative", // 为删除按钮定位做准备
+                                transition: "width 0.3s ease, height 0.3s ease", // 添加过渡动画
                             }}
                             onClick={handleCameraClick}
                         >
@@ -400,27 +475,83 @@ const PhotoColor: React.FC = () => {
                             />
                             
                             {uploadedImage ? (
-                                <img
-                                    src={uploadedImage}
-                                    alt="uploaded"
-                                    style={{
-                                        width: "95%",
-                                        height: "95%",
-                                        objectFit: "cover",
-                                        borderRadius: "4px",
-                                    }}
-                                />
+                                <>
+                                    <img
+                                        src={uploadedImage}
+                                        alt="uploaded"
+                                        style={{
+                                            width: imageDimensions ? `${imageDimensions.imageWidth}px` : "120px",
+                                            height: imageDimensions ? `${imageDimensions.imageHeight}px` : "120px",
+                                            objectFit: "contain",
+                                            borderRadius: "4px",
+                                        }}
+                                    />
+                                    {/* 删除按钮 */}
+                                    <button
+                                        onClick={handleDeleteImage}
+                                        style={{
+                                            position: "absolute",
+                                            top: "5px",
+                                            right: "5px",
+                                            width: "20px",
+                                            height: "20px",
+                                            borderRadius: "50%",
+                                            backgroundColor: "rgba(255, 0, 0, 0.8)",
+                                            color: "white",
+                                            border: "none",
+                                            cursor: "pointer",
+                                            fontSize: "12px",
+                                            fontWeight: "bold",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            zIndex: 1,
+                                            lineHeight: "1",
+                                        }}
+                                        title="删除图片"
+                                    >
+                                        ×
+                                    </button>
+                                </>
                             ) : selectedImage ? (
-                                <img
-                                    src={selectedImage}
-                                    alt="selected"
-                                    style={{
-                                        width: "95%",
-                                        height: "95%",
-                                        objectFit: "cover",
-                                        borderRadius: "4px",
-                                    }}
-                                />
+                                <>
+                                    <img
+                                        src={selectedImage}
+                                        alt="selected"
+                                        style={{
+                                            width: imageDimensions ? `${imageDimensions.imageWidth}px` : "120px",
+                                            height: imageDimensions ? `${imageDimensions.imageHeight}px` : "120px",
+                                            objectFit: "contain",
+                                            borderRadius: "4px",
+                                        }}
+                                    />
+                                    {/* 删除按钮 - 也为选中的预设图片添加 */}
+                                    <button
+                                        onClick={handleDeleteImage}
+                                        style={{
+                                            position: "absolute",
+                                            top: "5px",
+                                            right: "5px",
+                                            width: "20px",
+                                            height: "20px",
+                                            borderRadius: "50%",
+                                            backgroundColor: "rgba(255, 0, 0, 0.8)",
+                                            color: "white",
+                                            border: "none",
+                                            cursor: "pointer",
+                                            fontSize: "12px",
+                                            fontWeight: "bold",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            zIndex: 1,
+                                            lineHeight: "1",
+                                        }}
+                                        title="删除图片"
+                                    >
+                                        ×
+                                    </button>
+                                </>
                             ) : (
                                 <img
                                     src={clearImage}
@@ -808,7 +939,7 @@ const PhotoColor: React.FC = () => {
                             fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
                             textAlign: "center"
                         }}>
-                            点击Generate后将显示处理效果
+                            Click Generate to show the result
                         </div>
                     )}
                 </div>

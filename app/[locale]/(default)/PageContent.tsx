@@ -497,19 +497,78 @@ export default function LandingPage({ page, locale }: LandingPageProps) {
   }
 
   // 处理添加书签的函数
-  const handleBookmark = () => {
+  const handleBookmark = async () => {
     try {
-      if (window.sidebar && (window.sidebar as any).addPanel) {
-        (window.sidebar as any).addPanel(window.location.href, document.title, "");
-      } else if ((window as any).external && (window as any).external.AddFavorite) {
-        (window as any).external.AddFavorite(location.href, document.title);
-      } else {
-        setTooltipMessage("请使用 Ctrl+D (Windows) 或 Cmd+D (Mac) 来添加书签");
-        setShowTooltip(true);
-        setTimeout(() => setShowTooltip(false), 3000);
+      // 现代浏览器的收藏API
+      if ('bookmarks' in navigator) {
+        try {
+          // @ts-ignore - Bookmarks API仍在实验阶段
+          await navigator.bookmarks.create({
+            title: document.title,
+            url: window.location.href
+          });
+          setTooltipMessage("Website successfully added to bookmarks!");
+          setShowTooltip(true);
+          setTimeout(() => setShowTooltip(false), 3000);
+          return;
+        } catch (error) {
+          console.log('Bookmarks API unavailable, trying other methods');
+        }
       }
+
+      // 检测用户代理并提供适当的指导
+      const userAgent = navigator.userAgent.toLowerCase();
+      let shortcutKey = '';
+      let message = '';
+
+      if (userAgent.includes('mac')) {
+        shortcutKey = 'Cmd + D';
+        message = `Please press ${shortcutKey} to add this page to bookmarks`;
+      } else if (userAgent.includes('windows') || userAgent.includes('linux')) {
+        shortcutKey = 'Ctrl + D';
+        message = `Please press ${shortcutKey} to add this page to bookmarks`;
+      } else if (userAgent.includes('android')) {
+        message = 'Please click "Add to Bookmarks" option in your browser menu';
+      } else if (userAgent.includes('iphone') || userAgent.includes('ipad')) {
+        message = 'Please click the share button, then select "Add to Bookmarks"';
+      } else {
+        message = 'Please use your browser\'s bookmark feature to add this page to bookmarks';
+      }
+
+      // 尝试传统的IE方法（仅限IE浏览器）
+      if ((window as any).external && (window as any).external.AddFavorite) {
+        try {
+          (window as any).external.AddFavorite(window.location.href, document.title);
+          setTooltipMessage("Website successfully added to bookmarks!");
+          setShowTooltip(true);
+          setTimeout(() => setShowTooltip(false), 3000);
+          return;
+        } catch (error) {
+          console.log('IE bookmark method failed');
+        }
+      }
+
+      // 尝试Firefox的方法
+      if (window.sidebar && (window.sidebar as any).addPanel) {
+        try {
+          (window.sidebar as any).addPanel(document.title, window.location.href, "");
+          setTooltipMessage("Website successfully added to bookmarks!");
+          setShowTooltip(true);
+          setTimeout(() => setShowTooltip(false), 3000);
+          return;
+        } catch (error) {
+          console.log('Firefox bookmark method failed');
+        }
+      }
+
+      // 如果所有自动方法都失败，显示指导信息
+      setTooltipMessage(message);
+      setShowTooltip(true);
+      setTimeout(() => setShowTooltip(false), 5000);
+
     } catch (error) {
-      setTooltipMessage("请使用 Ctrl+D (Windows) 或 Cmd+D (Mac) 来添加书签");
+      console.error('Failed to add bookmark:', error);
+      setTooltipMessage("Please use browser shortcut Ctrl+D (Windows) or Cmd+D (Mac) to add bookmark");
       setShowTooltip(true);
       setTimeout(() => setShowTooltip(false), 3000);
     }
@@ -744,10 +803,10 @@ export default function LandingPage({ page, locale }: LandingPageProps) {
         </div>
       </div>
 
-      {/* Key Features of Ghibli Any 标题部份 */}
+      {/* Key Features of Coloring Page 标题部份 */}
       <div style={{ marginTop: '8rem' }}>
-        <h3 className={styles.accordionTitle}>Key Features of Ghibli Any</h3>
-        <p className={styles.accordionTip}>Everything you need to create magical Ghibli-inspired artwork for personal or commercial use.</p>
+        <h3 className={styles.accordionTitle}>Key Features of Coloring Page</h3>
+        <p className={styles.accordionTip}>Everything you need to create coloring page artwork for personal or commercial use.</p>
       </div>
 
       {/* 关键功能区域 */}
@@ -773,10 +832,10 @@ export default function LandingPage({ page, locale }: LandingPageProps) {
         </div>
       </div>
 
-      {/* What Users Say About Ghibli Any 标题部份 */}
+      {/* What Users Say About Coloring Page 标题部份 */}
       <div style={{ marginTop: '8rem' }}>
-        <h3 className={styles.accordionTitle}>What Users Say About Ghibli Any</h3>
-        <p className={styles.accordionTip}>Hear from artists, fans, and creators who use our Ghibli-style AI generator.</p>
+        <h3 className={styles.accordionTitle}>What Users Say About Coloring Page</h3>
+        <p className={styles.accordionTip}>Hear from artists, fans, and creators who use our Coloring Page AI generator.</p>
       </div>
 
       {/* 2列card 部分 */}

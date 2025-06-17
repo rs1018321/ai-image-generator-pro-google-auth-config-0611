@@ -28,10 +28,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "未提供描述文字" }, { status: 400 })
     }
 
-    // 构建完整的提示词：用户描述 + 固定的黑白线稿要求
-    const fullPrompt = `${userPrompt.trim()}, drawn as clean black-and-white coloring-book line art for children. Keep only bold, continuous pure-black outlines of the main subject and essential scene elements; remove all color, shading, gradients and fills. Have the characters and scene elements fill the entire canvas, avoiding large blank areas. Background must remain pure white. Centered composition, high-resolution PNG.`
+    // Style prompt 映射
+    const stylePromptMapping: { [key: string]: string } = {
+      "simplified": "Few, thick outlines with very simple shapes. Large open areas for easy coloring. No textures or shading lines.",
+      "medium": "A moderate number of lines with more varied shapes. Adds light hatching and simple textures for depth. Still leaves plenty of open space to avoid clutter.",
+      "detailed": "Dense, fine linework with abundant realistic textures and details. Highly realistic style with rich shading and tonal variation. Minimal blank areas, offering a challenging coloring experience"
+    };
+
+    const stylePrompt = stylePromptMapping[style] || stylePromptMapping["medium"];
+
+    // 构建完整的提示词：用户描述 + style prompt + 固定的黑白线稿要求
+    const fullPrompt = `${userPrompt.trim()}, ${stylePrompt}. IMPORTANT: Create ONLY black and white line art coloring book style. NO COLOR, NO SHADING, NO GRADIENTS. Pure black outlines on white background only. Clean coloring book line art for children. Keep only bold, continuous pure-black outlines of the main subject and essential scene elements; remove all color, shading, gradients and fills. Have the characters and scene elements fill the entire canvas, avoiding large blank areas. Background must remain pure white. Centered composition, high-resolution PNG.`
 
     console.log(`📝 收到文生图请求: ${userPrompt}, 输出尺寸: ${size}, 风格: ${style}`)
+    console.log(`📝 Style Prompt: ${stylePrompt}`)
     console.log(`📝 完整提示词: ${fullPrompt}`)
 
     // 准备 Replicate API 参数 (MiniMax 模型参数)
@@ -42,7 +52,7 @@ export async function POST(request: NextRequest) {
                    size === "1248x832" ? "3:2" :      // 3:2 横版
                    "1:1",                              // 默认 1:1
       number_of_images: 1,
-      prompt_optimizer: true
+      prompt_optimizer: false  // 关闭prompt优化器，确保我们的黑白线稿指令不被修改
     }
 
     // 重试循环

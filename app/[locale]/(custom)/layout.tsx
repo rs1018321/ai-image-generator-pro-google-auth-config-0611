@@ -56,7 +56,7 @@ export default function CustomLayout({
                     <img
                         src="/imgs/logo.png"
                         alt="Coloring Logo"
-                        className="h-8 w-auto mr-2"
+                        className="h-12 w-auto mr-2"
                     />
                     <Link 
                         href="/"

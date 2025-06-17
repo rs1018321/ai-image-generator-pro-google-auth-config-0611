@@ -72,11 +72,11 @@ export default function Footer({ footer }: { footer: FooterType }) {
                 {footer.copyright}
                 {process.env.NEXT_PUBLIC_SHOW_POWERED_BY === "false" ? null : (
                   <a
-                    href="https://shipany.ai"
+                    href="https://coloringpage.ai"
                     target="_blank"
-                    className="px-2 text-primary"
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                   >
-                    build with ShipAny
+                    build with Coloring Page
                   </a>
                 )}
               </p>

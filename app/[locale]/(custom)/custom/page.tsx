@@ -189,27 +189,70 @@ export default function CustomPage() {
     const bookmarkPositionBottom = 'auto'; // 距离底部的距离，可以是数字或'auto'
 
     // 处理添加书签的函数
-    const handleBookmark = () => {
+    const handleBookmark = async () => {
         try {
-            if (window.sidebar && window.sidebar.addPanel) {
-                // Firefox
-                window.sidebar.addPanel(window.location.href, document.title, "");
-            } else if (/*@cc_on!@*/false) {
-                // IE Favorite
-                // @ts-ignore
-                window.external.AddFavorite(location.href, document.title);
-            } else if (window.opera && window.print()) {
-                // Opera
-                // @ts-ignore
-                this.title = document.title;
-                return true;
-            } else {
-                // webkit - safari/chrome
-                alert('Press ' + (navigator.userAgent.toLowerCase().indexOf('mac') != -1 ? 'Command' : 'CTRL') + ' and D to bookmark this page.');
+            // 现代浏览器的收藏API
+            if ('bookmarks' in navigator) {
+                try {
+                    // @ts-ignore - Bookmarks API仍在实验阶段
+                    await navigator.bookmarks.create({
+                        title: document.title,
+                        url: window.location.href
+                    });
+                    alert("Website successfully added to bookmarks!");
+                    return;
+                } catch (error) {
+                    console.log('Bookmarks API unavailable, trying other methods');
+                }
             }
-        } catch (error) {
-            console.error("添加书签失败:", error);
 
+            // 检测用户代理并提供适当的指导
+            const userAgent = navigator.userAgent.toLowerCase();
+            let shortcutKey = '';
+            let message = '';
+
+            if (userAgent.includes('mac')) {
+                shortcutKey = 'Cmd + D';
+                message = `Please press ${shortcutKey} to add this page to bookmarks`;
+            } else if (userAgent.includes('windows') || userAgent.includes('linux')) {
+                shortcutKey = 'Ctrl + D';
+                message = `Please press ${shortcutKey} to add this page to bookmarks`;
+            } else if (userAgent.includes('android')) {
+                message = 'Please click "Add to Bookmarks" option in your browser menu';
+            } else if (userAgent.includes('iphone') || userAgent.includes('ipad')) {
+                message = 'Please click the share button, then select "Add to Bookmarks"';
+            } else {
+                message = 'Please use your browser\'s bookmark feature to add this page to bookmarks';
+            }
+
+            // 尝试传统的IE方法（仅限IE浏览器）
+            if ((window as any).external && (window as any).external.AddFavorite) {
+                try {
+                    (window as any).external.AddFavorite(window.location.href, document.title);
+                    alert("Website successfully added to bookmarks!");
+                    return;
+                } catch (error) {
+                    console.log('IE bookmark method failed');
+                }
+            }
+
+            // 尝试Firefox的方法
+            if (window.sidebar && (window.sidebar as any).addPanel) {
+                try {
+                    (window.sidebar as any).addPanel(document.title, window.location.href, "");
+                    alert("Website successfully added to bookmarks!");
+                    return;
+                } catch (error) {
+                    console.log('Firefox bookmark method failed');
+                }
+            }
+
+            // 如果所有自动方法都失败，显示指导信息
+            alert(message);
+
+        } catch (error) {
+            console.error("Failed to add bookmark:", error);
+            alert('Please use browser shortcut Ctrl+D (Windows) or Cmd+D (Mac) to add bookmark');
         }
     };
 
@@ -413,10 +456,10 @@ export default function CustomPage() {
 
 
 
-            {/* Key Features of Ghibli Any 标题部份 */}
-            <div>
-                <h3 className={styles.accordionTitle}>Key Features of Ghibli Any</h3>
-                <p className={styles.accordionTip}>Everything you need to create magical Ghibli-inspired artwork for personal or commercial use..</p>
+            {/* Key Features of Coloring Page 标题部份 */}
+            <div style={{ marginTop: '8rem' }}>
+                <h3 className={styles.accordionTitle}>Key Features of Coloring Page</h3>
+                <p className={styles.accordionTip}>Everything you need to create coloring page artwork for personal or commercial use.</p>
             </div>
 
             {/* Key Features 一行三列卡片 */}
@@ -444,10 +487,10 @@ export default function CustomPage() {
 
 
 
-            {/* What Users Say About Ghibli Any 标题部份 */}
+            {/* What Users Say About Coloring Page 标题部份 */}
             <div>
-                <h3 className={styles.accordionTitle}>What Users Say About Ghibli Any</h3>
-                <p className={styles.accordionTip}>Hear from artists, fans, and creators who use our Ghibli-style AI generator.</p>
+                <h3 className={styles.accordionTitle}>What Users Say About Coloring Page</h3>
+                <p className={styles.accordionTip}>Hear from artists, fans, and creators who use our Coloring Page AI generator.</p>
             </div>
 
             {/* 2列card 部分 */}

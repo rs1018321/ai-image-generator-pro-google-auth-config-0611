@@ -4,6 +4,7 @@ import { ReactNode } from "react";
 import { Sidebar } from "@/types/blocks/sidebar";
 import { getUserInfo } from "@/services/user";
 import { redirect } from "next/navigation";
+import { RiGithubFill, RiDiscordFill, RiTwitterXFill } from "react-icons/ri";
 
 export default async function AdminLayout({
   children,
@@ -22,12 +23,11 @@ export default async function AdminLayout({
 
   const sidebar: Sidebar = {
     brand: {
-      title: "ShipAny",
+      title: "Coloring Page",
       logo: {
-        src: "/logo.png",
-        alt: "ShipAny",
+        src: "/imgs/logo.png",
+        alt: "Coloring Page",
       },
-      url: "/admin",
     },
     nav: {
       items: [
@@ -69,21 +69,21 @@ export default async function AdminLayout({
         },
         {
           title: "Github",
-          url: "https://github.com/shipanyai/shipany-template-one",
+          icon: "RiGithubFill",
+          url: "https://github.com/coloringpageai/coloringpage-template-one",
           target: "_blank",
-          icon: "RiGithubLine",
         },
         {
           title: "Discord",
+          icon: "RiDiscordFill",
           url: "https://discord.gg/HQNnrzjZQS",
           target: "_blank",
-          icon: "RiDiscordLine",
         },
         {
-          title: "X",
-          url: "https://x.com/shipanyai",
+          title: "Twitter",
+          icon: "RiTwitterXFill",
+          url: "https://x.com/coloringpageai",
           target: "_blank",
-          icon: "RiTwitterLine",
         },
       ],
     },
