@@ -28,6 +28,19 @@ const nextConfig = {
       },
     ],
   },
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          {
+            key: "Content-Security-Policy",
+            value: "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://accounts.google.com https://apis.google.com; object-src 'none'; base-uri 'self';"
+          },
+        ],
+      },
+    ];
+  },
   async redirects() {
     return [];
   },
