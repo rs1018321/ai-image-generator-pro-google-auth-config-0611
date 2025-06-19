@@ -33,7 +33,7 @@
 - services/: Business logics.
 - public/: Static assets
 - lib/: Custom libraries and functions
-- .env.development: Development environment variables
+- .env.local: Local environment variables (development and production)
 
 ## Coding Conventions
 

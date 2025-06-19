@@ -6,16 +6,56 @@
 
 html {
   scroll-behavior: smooth;
+  background-color: #f5f3e8;
+  /* 禁用过度滚动行为 */
+  overscroll-behavior: none;
+  overscroll-behavior-y: none;
+  /* 防止iOS Safari的弹性滚动 */
+  -webkit-overflow-scrolling: touch;
+  /* 确保页面高度填满视口 */
+  height: 100%;
+  /* 防止水平过度滚动 */
+  overflow-x: hidden;
 }
 
+body {
+  background-color: #f5f3e8;
+  /* 禁用过度滚动行为 */
+  overscroll-behavior: none;
+  overscroll-behavior-y: none;
+  /* 防止页面被拖拽 */
+  position: relative;
+  /* 确保body高度填满 */
+  min-height: 100vh;
+  height: 100%;
+  /* 控制滚动行为 */
+  overflow-y: auto;
+  overflow-x: hidden;
+  /* 防止水平滚动时的过度滚动 */
+  overscroll-behavior-x: none;
+}
 
+/* 针对移动端的额外防护 */
+@media (max-width: 768px) {
+  html, body {
+    /* 在移动端更严格地控制滚动 */
+    overscroll-behavior: none;
+    -webkit-overscroll-behavior: none;
+  }
+  
+  /* 防止iOS Safari的弹性滚动 */
+  body {
+    -webkit-overflow-scrolling: touch;
+    position: relative;
+  }
+}
 
 @layer base {
   * {
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
   }
 
   :root {

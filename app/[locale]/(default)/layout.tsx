@@ -11,12 +11,16 @@ import styles from './page.module.css';
 
 // 定义背景样式
 const backgroundStyle = {
+    backgroundColor: "#f5f3e8", // 添加回退背景色，米黄色
     backgroundImage: "url('/imgs/custom/bg-image.jpg')",
     backgroundSize: "cover",
     backgroundPosition: "center",
     backgroundAttachment: "fixed", // 可选：固定背景
     minHeight: "100vh",
     width: "100%",
+    // 防止过度滚动
+    overscrollBehavior: "none" as const,
+    position: "relative" as const,
 };
 
 export default async function DefaultLayout({
@@ -118,7 +122,7 @@ export default async function DefaultLayout({
               textDecoration: 'none'
             }} className={clsx("hover:bg-[#64bd9b] hover:text-white hover:scale-105 transition-all", styles.headerCircle)}>Blog</a>
             
-            <a href="#contact" style={{
+            <a href={`/${locale}/pricing`} style={{
               // @ts-ignore
               '--border-width': '6px',
               '--border-style': 'solid',
@@ -136,7 +140,7 @@ export default async function DefaultLayout({
               justifyContent: 'center',
               textAlign: 'center',
               textDecoration: 'none'
-            }} className={clsx("hover:bg-[#64bd9b] hover:text-white hover:scale-105 transition-all", styles.headerCircle)}>Contact</a>
+            }} className={clsx("hover:bg-[#64bd9b] hover:text-white hover:scale-105 transition-all", styles.headerCircle)}>Pricing</a>
           </nav>
         </div>
 

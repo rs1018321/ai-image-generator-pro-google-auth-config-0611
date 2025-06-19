@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Icon from "@/components/icon";
 import { Label } from "@/components/ui/label";
-import { loadStripe } from "@stripe/stripe-js";
+// import { loadStripe } from "@stripe/stripe-js"; // 注释掉Stripe
 import { toast } from "sonner";
 import { useAppContext } from "@/contexts/app";
 
@@ -24,6 +24,68 @@ export default function Pricing({ pricing }: { pricing: PricingType }) {
   const [isLoading, setIsLoading] = useState(false);
   const [productId, setProductId] = useState<string | null>(null);
 
+  // 使用Creem支付的处理函数
+  const handleCreemCheckout = async (item: PricingItem, cn_pay: boolean = false) => {
+    try {
+      if (!user) {
+        setShowSignModal(true);
+        return;
+      }
+
+      const params = {
+        product_id: item.product_id,
+        product_name: item.product_name,
+        credits: item.credits,
+        interval: item.interval,
+        amount: cn_pay ? item.cn_amount : item.amount,
+        currency: cn_pay ? "cny" : item.currency,
+        valid_months: item.valid_months,
+      };
+
+      setIsLoading(true);
+      setProductId(item.product_id);
+
+      // 调用Creem checkout API
+      const response = await fetch("/api/creem-checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(params),
+      });
+
+      if (response.status === 401) {
+        setIsLoading(false);
+        setProductId(null);
+        setShowSignModal(true);
+        return;
+      }
+
+      const { code, message, data } = await response.json();
+      if (code !== 0) {
+        toast.error(message);
+        return;
+      }
+
+      const { checkout_url } = data;
+
+      // 直接跳转到Creem的checkout页面
+      if (checkout_url) {
+        window.location.href = checkout_url;
+      } else {
+        toast.error("Failed to get checkout URL");
+      }
+    } catch (e) {
+      console.log("Creem checkout failed: ", e);
+      toast.error("Checkout failed");
+    } finally {
+      setIsLoading(false);
+      setProductId(null);
+    }
+  };
+
+  // 原有的Stripe处理函数（保留但注释掉）
+  /*
   const handleCheckout = async (item: PricingItem, cn_pay: boolean = false) => {
     try {
       if (!user) {
@@ -90,6 +152,7 @@ export default function Pricing({ pricing }: { pricing: PricingType }) {
       setProductId(null);
     }
   };
+  */
 
   useEffect(() => {
     if (pricing.items) {
@@ -100,25 +163,27 @@ export default function Pricing({ pricing }: { pricing: PricingType }) {
   }, [pricing.items]);
 
   return (
-    <section id={pricing.name} className="py-16">
-      <div className="container">
-        <div className="mx-auto mb-12 text-center">
-          <h2 className="mb-4 text-4xl font-semibold lg:text-5xl">
-            {pricing.title}
-          </h2>
-          <p className="text-muted-foreground lg:text-lg">
-            {pricing.description}
-          </p>
+    <section className="py-24">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-2xl text-center">
+          {pricing.title && (
+            <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+              {pricing.title}
+            </h2>
+          )}
+          {pricing.description && (
+            <p className="mx-auto mt-6 max-w-2xl text-center text-lg leading-8 text-gray-600">
+              {pricing.description}
+            </p>
+          )}
         </div>
-        <div className="flex flex-col items-center gap-2">
-          {pricing.groups && pricing.groups.length > 0 && (
-            <div className="flex h-12 mb-12 items-center rounded-md bg-muted p-1 text-lg">
+        <div className="mx-auto mt-16 max-w-4xl">
+          {pricing.groups && pricing.groups.length > 1 && (
+            <div className="mx-auto max-w-md">
               <RadioGroup
-                value={group}
-                className={`h-full grid-cols-${pricing.groups.length}`}
-                onValueChange={(value) => {
-                  setGroup(value);
-                }}
+                defaultValue={pricing.groups[0].name}
+                onValueChange={setGroup}
+                className="grid grid-cols-2 gap-x-1 rounded-full bg-white/5 p-1 text-center text-xs font-semibold leading-5 ring-1 ring-inset ring-white/10"
               >
                 {pricing.groups.map((item, i) => {
                   return (
@@ -151,13 +216,7 @@ export default function Pricing({ pricing }: { pricing: PricingType }) {
               </RadioGroup>
             </div>
           )}
-          <div
-            className={`md:min-w-96 mt-0 grid gap-6 md:grid-cols-${
-              pricing.items?.filter(
-                (item) => !item.group || item.group === group
-              )?.length
-            }`}
-          >
+          <div className="isolate mx-auto mt-10 grid max-w-md grid-cols-1 gap-8 lg:mx-0 lg:max-w-none lg:grid-cols-3">
             {pricing.items?.map((item, index) => {
               if (item.group && item.group !== group) {
                 return null;
@@ -166,124 +225,126 @@ export default function Pricing({ pricing }: { pricing: PricingType }) {
               return (
                 <div
                   key={index}
-                  className={`rounded-lg p-6 ${
+                  className={`flex flex-col justify-between rounded-3xl bg-white p-8 ring-1 xl:p-10 ${
                     item.is_featured
-                      ? "border-primary border-2 bg-card text-card-foreground"
-                      : "border-muted border"
+                      ? "ring-2 ring-primary"
+                      : "ring-gray-200"
                   }`}
                 >
-                  <div className="flex h-full flex-col justify-between gap-5">
-                    <div>
-                      <div className="flex items-center gap-2 mb-4">
-                        {item.title && (
-                          <h3 className="text-xl font-semibold">
-                            {item.title}
-                          </h3>
-                        )}
-                        <div className="flex-1"></div>
-                        {item.label && (
-                          <Badge
-                            variant="outline"
-                            className="border-primary bg-primary px-1.5 text-primary-foreground"
-                          >
-                            {item.label}
-                          </Badge>
-                        )}
-                      </div>
-                      <div className="flex items-end gap-2 mb-4">
-                        {item.original_price && (
-                          <span className="text-xl text-muted-foreground font-semibold line-through">
-                            {item.original_price}
-                          </span>
-                        )}
-                        {item.price && (
-                          <span className="text-5xl font-semibold">
-                            {item.price}
-                          </span>
-                        )}
-                        {item.unit && (
-                          <span className="block font-semibold">
-                            {item.unit}
-                          </span>
-                        )}
-                      </div>
-                      {item.description && (
-                        <p className="text-muted-foreground">
-                          {item.description}
-                        </p>
-                      )}
-                      {item.features_title && (
-                        <p className="mb-3 mt-6 font-semibold">
-                          {item.features_title}
-                        </p>
-                      )}
-                      {item.features && (
-                        <ul className="flex flex-col gap-3">
-                          {item.features.map((feature, fi) => {
-                            return (
-                              <li className="flex gap-2" key={`feature-${fi}`}>
-                                <Check className="mt-1 size-4 shrink-0" />
-                                {feature}
-                              </li>
-                            );
-                          })}
-                        </ul>
+                  <div>
+                    <div className="flex items-center justify-between gap-x-4">
+                      <h3
+                        className={`text-lg font-semibold leading-8 ${
+                          item.is_featured
+                            ? "text-primary"
+                            : "text-gray-900"
+                        }`}
+                      >
+                        {item.title}
+                      </h3>
+                      {item.label && (
+                        <Badge
+                          variant="outline"
+                          className="border-primary bg-primary text-primary-foreground"
+                        >
+                          {item.label}
+                        </Badge>
                       )}
                     </div>
-                    <div className="flex flex-col gap-2">
-                      {item.cn_amount && item.cn_amount > 0 ? (
-                        <div className="flex items-center gap-x-2 mt-2">
-                          <span className="text-sm">人民币支付 👉</span>
-                          <div
-                            className="inline-block p-2 hover:cursor-pointer hover:bg-base-200 rounded-md"
-                            onClick={() => {
-                              if (isLoading) {
-                                return;
-                              }
-                              handleCheckout(item, true);
-                            }}
-                          >
-                            <img
-                              src="/imgs/cnpay.png"
-                              alt="cnpay"
-                              className="w-20 h-10 rounded-lg"
-                            />
-                          </div>
-                        </div>
-                      ) : null}
-                      {item.button && (
-                        <Button
-                          className="w-full flex items-center justify-center gap-2 font-semibold"
-                          disabled={isLoading}
+
+                    <div className="flex items-end gap-2 mb-4">
+                      {item.original_price && (
+                        <span className="text-xl text-muted-foreground font-semibold line-through">
+                          {item.original_price}
+                        </span>
+                      )}
+                      {item.price && (
+                        <span className="text-5xl font-semibold">
+                          {item.price}
+                        </span>
+                      )}
+                      {item.unit && (
+                        <span className="block font-semibold">
+                          {item.unit}
+                        </span>
+                      )}
+                    </div>
+                    {item.description && (
+                      <p className="text-muted-foreground">
+                        {item.description}
+                      </p>
+                    )}
+                    {item.features_title && (
+                      <p className="mb-3 mt-6 font-semibold">
+                        {item.features_title}
+                      </p>
+                    )}
+                    {item.features && (
+                      <ul className="flex flex-col gap-3">
+                        {item.features.map((feature, fi) => {
+                          return (
+                            <li className="flex gap-2" key={`feature-${fi}`}>
+                              <Check className="mt-1 size-4 shrink-0" />
+                              {feature}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    )}
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    {item.cn_amount && item.cn_amount > 0 ? (
+                      <div className="flex items-center gap-x-2 mt-2">
+                        <span className="text-sm">人民币支付 👉</span>
+                        <div
+                          className="inline-block p-2 hover:cursor-pointer hover:bg-base-200 rounded-md"
                           onClick={() => {
                             if (isLoading) {
                               return;
                             }
-                            handleCheckout(item);
+                            handleCreemCheckout(item, true);
                           }}
                         >
-                          {(!isLoading ||
-                            (isLoading && productId !== item.product_id)) && (
-                            <p>{item.button.title}</p>
-                          )}
+                          <img
+                            src="/imgs/cnpay.png"
+                            alt="cnpay"
+                            className="w-20 h-10 rounded-lg"
+                          />
+                        </div>
+                      </div>
+                    ) : null}
+                    {item.button && (
+                      <Button
+                        className="w-full flex items-center justify-center gap-2 font-semibold"
+                        disabled={isLoading}
+                        onClick={() => {
+                          if (isLoading) {
+                            return;
+                          }
+                          handleCreemCheckout(item);
+                        }}
+                      >
+                        {(!isLoading ||
+                          (isLoading && productId !== item.product_id)) && (
+                          <p>{item.button.title}</p>
+                        )}
 
-                          {isLoading && productId === item.product_id && (
-                            <p>{item.button.title}</p>
-                          )}
-                          {isLoading && productId === item.product_id && (
-                            <Loader className="mr-2 h-4 w-4 animate-spin" />
-                          )}
-                          {item.button.icon && (
-                            <Icon name={item.button.icon} className="size-4" />
-                          )}
-                        </Button>
-                      )}
-                      {item.tip && (
-                        <p className="text-muted-foreground text-sm mt-2">
-                          {item.tip}
-                        </p>
-                      )}
-                    </div>
+                        {isLoading && productId === item.product_id && (
+                          <p>{item.button.title}</p>
+                        )}
+                        {isLoading && productId === item.product_id && (
+                          <Loader className="mr-2 h-4 w-4 animate-spin" />
+                        )}
+                        {item.button.icon && (
+                          <Icon name={item.button.icon} className="size-4" />
+                        )}
+                      </Button>
+                    )}
+                    {item.tip && (
+                      <p className="text-muted-foreground text-sm mt-2">
+                        {item.tip}
+                      </p>
+                    )}
                   </div>
                 </div>
               );

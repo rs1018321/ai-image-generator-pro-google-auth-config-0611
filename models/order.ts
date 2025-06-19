@@ -97,13 +97,17 @@ export async function updateOrderStatus(
 
 export async function updateOrderSession(
   order_no: string,
-  stripe_session_id: string,
+  session_id: string,
   order_detail: string
 ) {
   const supabase = getSupabaseClient();
+  
   const { data, error } = await supabase
     .from("orders")
-    .update({ stripe_session_id, order_detail })
+    .update({ 
+      stripe_session_id: session_id,
+      order_detail 
+    })
     .eq("order_no", order_no);
 
   if (error) {
@@ -221,6 +225,21 @@ export async function getPaiedOrders(
     .eq("status", "paid")
     .order("created_at", { ascending: false })
     .range((page - 1) * limit, page * limit);
+
+  if (error) {
+    return undefined;
+  }
+
+  return data;
+}
+
+export async function findOrderBySessionId(session_id: string): Promise<Order | undefined> {
+  const supabase = getSupabaseClient();
+  const { data, error } = await supabase
+    .from("orders")
+    .select("*")
+    .eq("stripe_session_id", session_id)
+    .single();
 
   if (error) {
     return undefined;

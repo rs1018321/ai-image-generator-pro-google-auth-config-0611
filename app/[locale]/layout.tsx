@@ -44,12 +44,20 @@ export default async function RootLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale} suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning style={{ 
+      backgroundColor: "#f5f3e8",
+      overscrollBehavior: "none",
+      height: "100%"
+    }}>
       <body
         className={cn(
-          "min-h-screen bg-background font-sans antialiased overflow-x-hidden",
+          "min-h-screen font-sans antialiased overflow-x-hidden",
           fontSans.variable
         )}
+        style={{
+          overscrollBehavior: "none",
+          position: "relative"
+        }}
       >
         <NextIntlClientProvider messages={messages}>
           <NextAuthSessionProvider>
