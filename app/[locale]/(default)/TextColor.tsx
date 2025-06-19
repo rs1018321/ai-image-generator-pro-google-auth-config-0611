@@ -1,9 +1,17 @@
-import React, { useState } from "react";
+"use client"
+
+import React, { useState, useRef } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import axios from "axios";
 import styles from "./page.module.css";
 import { TwitterLogoIcon } from '@radix-ui/react-icons';
 import { FaFacebookF, FaLinkedinIn, FaWhatsapp } from 'react-icons/fa';
+import { Switch } from "@/components/ui/switch";
+import { useSession } from "next-auth/react";
+import SignModal from "@/components/sign/modal";
+import CreditConfirmModal from "@/components/ui/credit-confirm-modal";
+import { toast } from "sonner";
+import { useAppContext } from "@/contexts/app";
 
 type FormData = {
     size: string;
@@ -13,6 +21,8 @@ type FormData = {
 };
 
 const TextColor: React.FC = () => {
+    const { data: session } = useSession();
+    const { setShowSignModal, userCredits, setUserCredits } = useAppContext();
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [selectedPrompt, setSelectedPrompt] = useState<string>(""); // 存储选中的提示文本
     const [selectedSize, setSelectedSize] = useState<string>("Auto");
@@ -21,6 +31,12 @@ const TextColor: React.FC = () => {
     const [generatedImage, setGeneratedImage] = useState<string | null>(null); // 添加生成图片状态
     const [isGenerating, setIsGenerating] = useState<boolean>(false); // 添加生成中状态
     const [promptValue, setPromptValue] = useState<string>(""); // 新增：跟踪文本框内容
+    const [hasWatermark, setHasWatermark] = useState(false); // 新增：水印控制状态
+    
+    // 新增：积分相关状态
+    const [showCreditConfirmModal, setShowCreditConfirmModal] = useState(false);
+    const [pendingFormData, setPendingFormData] = useState<FormData | null>(null);
+    
     const defaultImage = "https://picsum.photos/id/1015/300/200";
     const clearImage = "/imgs/custom/photo.png";
     
@@ -76,6 +92,22 @@ const TextColor: React.FC = () => {
             return;
         }
 
+        // 检查用户是否已登录
+        if (!session) {
+            setShowSignModal(true);
+            return;
+        }
+
+        // 如果用户已登录，显示积分确认弹窗
+        setPendingFormData(data);
+        setShowCreditConfirmModal(true);
+    };
+
+    // 处理积分确认后的实际生成逻辑
+    const handleConfirmGenerate = async () => {
+        if (!pendingFormData) return;
+
+        const data = pendingFormData;
         setIsGenerating(true);
         setGeneratedImage(null);
 
@@ -99,11 +131,13 @@ const TextColor: React.FC = () => {
             formData.append('prompt', data.prompt.trim());
             formData.append('size', apiSize);
             formData.append('style', selectedStyle);
+            formData.append('watermark', hasWatermark.toString()); // 新增：水印参数
             
             console.log(`🎯 发送请求到 generate-text-to-image API:`);
             console.log(`📝 用户描述: ${data.prompt.trim()}`);
             console.log(`📐 Size: ${selectedSize} -> ${apiSize}`);
             console.log(`🎨 Style: ${selectedStyle}`);
+            console.log(`💧 Watermark: ${hasWatermark}`); // 新增：水印日志
 
             const response = await axios.post("/api/generate-text-to-image", formData, {
                 headers: {
@@ -118,6 +152,10 @@ const TextColor: React.FC = () => {
                 console.log("🖼️ 生成的涂色书图片已准备就绪");
                 setGeneratedImage(response.data.image);
                 setIsCleared(false); // 重置清除状态，确保显示生成的图片
+                
+                // 更新用户积分
+                setUserCredits(prev => Math.max(0, prev - 2));
+                toast.success("图片生成成功！已消耗2个积分");
             } else {
                 alert("生成失败：未收到有效的图片数据");
             }
@@ -127,6 +165,7 @@ const TextColor: React.FC = () => {
             alert(`生成失败: ${error.response?.data?.error || error.message}`);
         } finally {
             setIsGenerating(false);
+            setPendingFormData(null);
         }
     };
 
@@ -219,6 +258,7 @@ const TextColor: React.FC = () => {
     };
 
     return (
+        <>
         <div
             style={{
                 display: "flex",
@@ -611,34 +651,77 @@ const TextColor: React.FC = () => {
                     {/* 底部：Generate按钮 - 在第二张龙猫图片正下方 */}
                     <div style={{ 
                         display: "flex", 
+                        alignItems: "center",
+                        gap: "20px",
                         marginTop: "190px" /*调整generate按钮上下位移*/
                     }}>
                         {/* 左侧空白区域，对应左侧文本框的宽度 */}
                         <div style={{ flex: "0.8" }}></div>
                         
                         {/* 右侧区域，对应Size和Style区域 */}
-                        <div style={{ flex: "1", display: "flex", justifyContent: "center" }}>
-                            <button
-                                type="submit"
-                                className={styles.borderHandDrown}
-                                style={{
-                                    // @ts-ignore
-                                    '--border-width': '3px',
-                                    '--border-style': 'solid',
-                                    '--border-color': '#679fb5',
-                                    '--border-radius': '25px',
-                                    fontSize: "26px",
-                                    backgroundColor: "#679fb5",
-                                    color: "#FFF",
-                                    padding: "12px 40px",
-                                    fontWeight: "bold",
-                                    fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
-                                    borderRadius: "25px",
-                                    border: "none"
-                                }}
-                            >
-                                Generate
-                            </button>
+                        <div style={{ flex: "1", display: "flex", alignItems: "center", gap: "20px" }}>
+                            {/* 水印控制开关 - 与style按钮左边垂直对齐 */}
+                            <div style={{ 
+                                display: "flex", 
+                                alignItems: "center", 
+                                gap: "8px",
+                                fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                                fontSize: "16px",
+                                color: "#679fb5"
+                            }}>
+                                <Switch
+                                    checked={hasWatermark}
+                                    onCheckedChange={setHasWatermark}
+                                    className="data-[state=checked]:bg-[#679fb5]"
+                                />
+                                <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: "8px" }}>
+                                    <span style={{ 
+                                        fontSize: "18px", 
+                                        fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                                        color: "#679fb5",
+                                        fontWeight: "bold"
+                                    }}>
+                                        Remove watermark
+                                    </span>
+                                    <div style={{ 
+                                        fontSize: "12px", 
+                                        fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                                        backgroundColor: '#f7c863',
+                                        borderRadius: '12px',
+                                        color: 'white',
+                                        padding: '4px 12px',
+                                        display: 'inline-block',
+                                        whiteSpace: 'nowrap'
+                                    }}>
+                                        Members only feature
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {/* Generate按钮 - 与第三张style图片右边框对齐 */}
+                            <div style={{ flex: "1", display: "flex", justifyContent: "flex-end" }}>
+                                <button
+                                    type="submit"
+                                    className={styles.borderHandDrown}
+                                    style={{
+                                        // @ts-ignore
+                                        '--border-width': '3px',
+                                        '--border-style': 'solid',
+                                        '--border-color': '#679fb5',
+                                        '--border-radius': '25px',
+                                        fontSize: "26px",
+                                        backgroundColor: "#679fb5",
+                                        color: "#FFF",
+                                        padding: "12px 20px",
+                                        fontWeight: "bold",
+                                        fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                                        borderRadius: "25px",
+                                        border: "none"
+                                    }}
+                                >
+                                    Generate
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -832,6 +915,19 @@ const TextColor: React.FC = () => {
                 </div>
             </div>
         </div>
+        
+        {/* 登录模态框 */}
+        <SignModal />
+        
+        {/* 积分确认模态框 */}
+        <CreditConfirmModal
+            open={showCreditConfirmModal}
+            onOpenChange={setShowCreditConfirmModal}
+            onConfirm={handleConfirmGenerate}
+            credits={2}
+            leftCredits={userCredits}
+        />
+        </>
     );
 };
 

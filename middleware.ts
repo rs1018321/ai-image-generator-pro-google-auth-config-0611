@@ -1,12 +1,15 @@
-import createMiddleware from "next-intl/middleware";
+import { auth } from "@/auth";
+import createIntlMiddleware from "next-intl/middleware";
+import { NextRequest } from "next/server";
 import { routing } from "./i18n/routing";
 
-export default createMiddleware(routing);
+export default auth(function middleware(request: NextRequest) {
+  // Chain the intl middleware after the auth middleware.
+  return createIntlMiddleware(routing)(request);
+});
 
 export const config = {
-  matcher: [
-    "/",
-    "/(en|en-US|zh|zh-CN|zh-TW|zh-HK|zh-MO|ja|ko|ru|fr|de|ar|es|it)/:path*",
-    "/((?!privacy-policy|terms-of-service|api/|_next|_vercel|.*\\..*).*)",
-  ],
+  // This matcher is crucial. It ensures the middleware only runs on pages
+  // and completely ignores API routes, static files, and image optimization files.
+  matcher: ["/((?!api|_next/static|_next/image|.*\\..*).*)", "/"],
 };

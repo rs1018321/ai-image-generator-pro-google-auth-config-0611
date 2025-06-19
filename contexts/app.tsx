@@ -36,6 +36,7 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
 
   const [showSignModal, setShowSignModal] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
+  const [userCredits, setUserCredits] = useState<number>(0);
 
   const [showFeedback, setShowFeedback] = useState<boolean>(false);
 
@@ -55,6 +56,9 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
       }
 
       setUser(data);
+      if (data.credits) {
+        setUserCredits(data.credits.left_credits);
+      }
 
       updateInvite(data);
     } catch (e) {
@@ -80,6 +84,7 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
           }
         };
         setUser(fallbackUser);
+        setUserCredits(0);
         console.log("Using fallback user info from session:", fallbackUser);
       }
     }
@@ -131,6 +136,9 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
       }
 
       setUser(data);
+      if (data.credits) {
+        setUserCredits(data.credits.left_credits);
+      }
       cacheRemove(CacheKey.InviteCode);
     } catch (e) {
       console.log("update invite failed: ", e);
@@ -152,6 +160,8 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
         setShowSignModal,
         user,
         setUser,
+        userCredits,
+        setUserCredits,
         showFeedback,
         setShowFeedback,
       }}

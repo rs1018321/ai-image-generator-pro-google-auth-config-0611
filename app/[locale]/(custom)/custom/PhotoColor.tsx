@@ -4,6 +4,7 @@ import axios from "axios";
 import styles from "./page.module.css";
 import { TwitterLogoIcon } from '@radix-ui/react-icons';
 import { FaFacebookF, FaLinkedinIn, FaWhatsapp } from 'react-icons/fa';
+import { Switch } from "@/components/ui/switch";
 
 type FormData = {
     size: string;
@@ -15,6 +16,7 @@ const PhotoColor: React.FC = () => {
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [selectedSize, setSelectedSize] = useState<string>("Auto");
     const [selectedStyle, setSelectedStyle] = useState<string>("");
+    const [hasWatermark, setHasWatermark] = useState<boolean>(false);
     const defaultImage = "https://picsum.photos/id/237/100/100";
     const clearImage = "/imgs/custom/photo.png"; // 新的默认图片URL
     const {
@@ -29,12 +31,14 @@ const PhotoColor: React.FC = () => {
             return;
         }
 
+        console.log(`💧 Watermark: ${hasWatermark}`); // 新增：水印日志
         axios
             .post("/your-backend-api-url", {
                 size: selectedSize,
                 style: selectedStyle,
                 age: data.age,
                 selectedImage: selectedImage || defaultImage,
+                watermark: hasWatermark, // 新增：水印参数
             })
             .then((response) => {
                 console.log("请求成功，后端返回：", response.data);
@@ -557,21 +561,36 @@ const PhotoColor: React.FC = () => {
                         >
                             clear
                         </button>
-                        <button
-                            type="submit"
-                            style={{
-                                fontSize: "22px",
-                                backgroundColor: "#679fb5",
-                                color: "#FFF",
-                                padding: "0 25px",
-                                fontWeight: "bold",
-                                fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
-                                borderRadius: "25px",
-                                border: "none"
-                            }}
-                        >
-                            generate
-                        </button>
+                        <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+                            <button
+                                type="submit"
+                                style={{
+                                    fontSize: "22px",
+                                    backgroundColor: "#679fb5",
+                                    color: "#FFF",
+                                    padding: "0 25px",
+                                    fontWeight: "bold",
+                                    fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                                    borderRadius: "25px",
+                                    border: "none"
+                                }}
+                            >
+                                generate
+                            </button>
+                            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px" }}>
+                                <Switch
+                                    checked={hasWatermark}
+                                    onCheckedChange={setHasWatermark}
+                                />
+                                <span style={{ 
+                                    fontSize: "12px", 
+                                    fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                                    color: "#666"
+                                }}>
+                                    Watermark
+                                </span>
+                            </div>
+                        </div>
                     </div>
                 </form>
             </div>

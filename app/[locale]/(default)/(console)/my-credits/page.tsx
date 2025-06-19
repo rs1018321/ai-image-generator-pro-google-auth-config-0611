@@ -48,6 +48,17 @@ export default async function () {
       {
         title: t("my_credits.table.credits"),
         name: "credits",
+        callback: (v: any) => {
+          const credits = v.credits || 0;
+          return credits > 0 ? `+${credits}` : `${credits}`;
+        },
+      },
+      {
+        title: t("my_credits.table.balance"),
+        name: "balance",
+        callback: (v: any) => {
+          return v.balance || 0;
+        },
       },
       {
         title: t("my_credits.table.updated_at"),

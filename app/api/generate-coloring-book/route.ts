@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Replicate from 'replicate'
+import { auth } from '@/auth'
+import { decreaseCredits, CreditsTransType } from '@/services/credit'
 
 // ------ 新增：获取最新 version 哈希 ------
 // async function getLatestVersionId() {
@@ -34,17 +36,37 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "API 配置错误，请联系管理员" }, { status: 500 })
   }
 
-  try {
-    console.log("🚀 开始处理图片生成请求")
+  // 检查用户认证
+  const session = await auth()
+  if (!session?.user?.uuid) {
+    return NextResponse.json({ error: "请先登录" }, { status: 401 })
+  }
 
-    // 在重试循环外读取 formData（只能读取一次）
+  try {
+    console.log("🚀 开始处理涂色书生成请求")
+
     const formData = await request.formData()
     const file = formData.get('image') as File
     const size = formData.get('size') as string || '1024x1024'
     const style = formData.get('style') as string || 'medium'
 
     if (!file) {
-      return NextResponse.json({ error: "未上传图片" }, { status: 400 })
+      return NextResponse.json({ error: "未提供图片文件" }, { status: 400 })
+    }
+
+    // 扣除积分
+    try {
+      await decreaseCredits({
+        user_uuid: session.user.uuid,
+        trans_type: CreditsTransType.GenerateImage, // 使用专门的生成图片类型
+        credits: 2
+      })
+      console.log("✅ 积分扣除成功")
+    } catch (error: any) {
+      console.error("❌ 积分扣除失败:", error)
+      return NextResponse.json({ 
+        error: error.message || "积分不足或扣除失败" 
+      }, { status: 400 })
     }
 
     // 转换图片为 base64（只需要做一次）

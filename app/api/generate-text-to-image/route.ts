@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Replicate from 'replicate'
+import { auth } from '@/auth'
+import { decreaseCredits, CreditsTransType } from '@/services/credit'
 
 const replicate = new Replicate({
   auth: process.env.REPLICATE_TEXT_API_TOKEN!,  // 使用文生图专用的 API Token
@@ -15,6 +17,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "API 配置错误，请联系管理员" }, { status: 500 })
   }
 
+  // 检查用户认证
+  const session = await auth()
+  if (!session?.user?.uuid) {
+    return NextResponse.json({ error: "请先登录" }, { status: 401 })
+  }
+
   try {
     console.log("🚀 开始处理文生图请求")
 
@@ -26,6 +34,21 @@ export async function POST(request: NextRequest) {
 
     if (!userPrompt) {
       return NextResponse.json({ error: "未提供描述文字" }, { status: 400 })
+    }
+
+    // 扣除积分
+    try {
+      await decreaseCredits({
+        user_uuid: session.user.uuid,
+        trans_type: CreditsTransType.GenerateImage, // 使用专门的生成图片类型
+        credits: 2
+      })
+      console.log("✅ 积分扣除成功")
+    } catch (error: any) {
+      console.error("❌ 积分扣除失败:", error)
+      return NextResponse.json({ 
+        error: error.message || "积分不足或扣除失败" 
+      }, { status: 400 })
     }
 
     // Style prompt 映射
