@@ -34,21 +34,40 @@
   },
   "my_orders": {
     "title": "My Orders",
-    "description": "orders paid with Coloring Page.",
+    "description": "View your order history and subscription information",
+    "orders_title": "Order History",
+    "orders_description": "View your order history records",
     "no_orders": "No orders found",
-    "tip": "",
-    "activate_order": "Activate Order",
-    "actived": "Activated",
-    "join_discord": "Join Discord",
     "read_docs": "Read Docs",
+    "join_discord": "Join Discord",
     "table": {
       "order_no": "Order No",
       "email": "Email",
       "product_name": "Product Name",
       "amount": "Amount",
-      "paid_at": "Paid At",
-      "github_username": "GitHub Username",
-      "status": "Status"
+      "paid_at": "Paid At"
+    },
+    "membership": {
+      "title": "Membership Status",
+      "description": "Manage your subscription and membership benefits",
+      "starter": "Starter",
+      "standard": "Standard",
+      "premium": "Premium",
+      "non_member": "Non-member",
+      "expires_at": "Expires at: {date}",
+      "monthly_credits": "Monthly credits: {credits}",
+      "will_expire": "Subscription will expire at the end of the current billing period",
+      "no_subscription": "You don't have an active subscription",
+      "subscribe_now": "Subscribe Now",
+      "upgrade": "Upgrade Plan",
+      "cancel_subscription": "Cancel Subscription",
+      "cancel_confirm_title": "Confirm Subscription Cancellation",
+      "cancel_confirm_description": "After cancellation, your subscription will expire at the end of the current billing period. You can still use the service until the expiration date.",
+      "cancel_yes": "Confirm Cancel",
+      "cancel_no": "Keep Subscription",
+      "canceling": "Cancelling...",
+      "cancel_success": "Subscription cancelled successfully, will expire at the end of current period",
+      "cancel_error": "Failed to cancel subscription, please try again later"
     }
   },
   "my_credits": {

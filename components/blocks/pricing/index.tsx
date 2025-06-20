@@ -12,17 +12,72 @@ import { Label } from "@/components/ui/label";
 // import { loadStripe } from "@stripe/stripe-js"; // 注释掉Stripe
 import { toast } from "sonner";
 import { useAppContext } from "@/contexts/app";
+import { useLocale } from "next-intl";
+import { useSession } from "next-auth/react";
+
+interface UserSubscription {
+  id?: string;
+  user_uuid: string;
+  product_id: string;
+  status: string;
+}
 
 export default function Pricing({ pricing }: { pricing: PricingType }) {
-  if (pricing.disabled) {
-    return null;
-  }
-
   const { user, setShowSignModal } = useAppContext();
+  const locale = useLocale();
 
   const [group, setGroup] = useState(pricing.groups?.[0]?.name);
   const [isLoading, setIsLoading] = useState(false);
   const [productId, setProductId] = useState<string | null>(null);
+  const [userSubscription, setUserSubscription] = useState<UserSubscription | null>(null);
+  const [subscriptionLoading, setSubscriptionLoading] = useState(false);
+
+  // 获取用户订阅状态
+  useEffect(() => {
+    async function fetchUserSubscription() {
+      if (!user) return;
+
+      setSubscriptionLoading(true);
+      try {
+        const response = await fetch('/api/get-user-subscription');
+        if (response.ok) {
+          const data = await response.json();
+          setUserSubscription(data.subscription);
+        } else {
+          console.error('Failed to fetch user subscription');
+          setUserSubscription(null);
+        }
+      } catch (error) {
+        console.error('Error fetching subscription:', error);
+        setUserSubscription(null);
+      } finally {
+        setSubscriptionLoading(false);
+      }
+    }
+
+    fetchUserSubscription();
+  }, [user]);
+
+  if (pricing.disabled) {
+    return <></>;
+  }
+
+  // 检查用户是否已订阅特定产品
+  const isUserSubscribed = (productId: string) => {
+    return userSubscription?.product_id === productId && userSubscription?.status === 'active';
+  };
+
+  // 获取按钮状态
+  const getButtonState = (item: PricingItem) => {
+    const isSubscribed = isUserSubscribed(item.product_id);
+    if (subscriptionLoading) {
+      return { text: "检查订阅状态...", disabled: true };
+    }
+    if (isSubscribed) {
+      return { text: "您已是该等级会员", disabled: true };
+    }
+    return { text: item.button?.text || "选择套餐", disabled: false };
+  };
 
   // 使用Creem支付的处理函数
   const handleCreemCheckout = async (item: PricingItem, cn_pay: boolean = false) => {
@@ -32,6 +87,15 @@ export default function Pricing({ pricing }: { pricing: PricingType }) {
         return;
       }
 
+      // 检查是否已经订阅了该产品
+      if (isUserSubscribed(item.product_id)) {
+        toast.error("您已经是该等级的会员了！");
+        return;
+      }
+
+      const success_url = `${window.location.origin}/${locale}/my-orders?success=true`;
+      const cancel_url = `${window.location.origin}/${locale}/pricing`;
+
       const params = {
         product_id: item.product_id,
         product_name: item.product_name,
@@ -40,6 +104,8 @@ export default function Pricing({ pricing }: { pricing: PricingType }) {
         amount: cn_pay ? item.cn_amount : item.amount,
         currency: cn_pay ? "cny" : item.currency,
         valid_months: item.valid_months,
+        success_url,
+        cancel_url,
       };
 
       setIsLoading(true);
@@ -222,6 +288,9 @@ export default function Pricing({ pricing }: { pricing: PricingType }) {
                 return null;
               }
 
+              const buttonState = getButtonState(item);
+              const isSubscribed = isUserSubscribed(item.product_id);
+
               return (
                 <div
                   key={index}
@@ -229,7 +298,7 @@ export default function Pricing({ pricing }: { pricing: PricingType }) {
                     item.is_featured
                       ? "ring-2 ring-primary"
                       : "ring-gray-200"
-                  }`}
+                  } ${isSubscribed ? "bg-green-50 ring-green-200" : ""}`}
                 >
                   <div>
                     <div className="flex items-center justify-between gap-x-4">
@@ -242,14 +311,21 @@ export default function Pricing({ pricing }: { pricing: PricingType }) {
                       >
                         {item.title}
                       </h3>
-                      {item.label && (
-                        <Badge
-                          variant="outline"
-                          className="border-primary bg-primary text-primary-foreground"
-                        >
-                          {item.label}
-                        </Badge>
-                      )}
+                      <div className="flex gap-2">
+                        {item.label && (
+                          <Badge
+                            variant="outline"
+                            className="border-primary bg-primary text-primary-foreground"
+                          >
+                            {item.label}
+                          </Badge>
+                        )}
+                        {isSubscribed && (
+                          <Badge variant="default" className="bg-green-600">
+                            当前套餐
+                          </Badge>
+                        )}
+                      </div>
                     </div>
 
                     <div className="flex items-end gap-2 mb-4">
@@ -293,13 +369,17 @@ export default function Pricing({ pricing }: { pricing: PricingType }) {
                     )}
                   </div>
                   <div className="flex flex-col gap-2">
-                    {item.cn_amount && item.cn_amount > 0 ? (
+                    {item.cn_amount && item.cn_amount > 0 && !isSubscribed ? (
                       <div className="flex items-center gap-x-2 mt-2">
                         <span className="text-sm">人民币支付 👉</span>
                         <div
-                          className="inline-block p-2 hover:cursor-pointer hover:bg-base-200 rounded-md"
+                          className={`inline-block p-2 rounded-md ${
+                            buttonState.disabled 
+                              ? "opacity-50 cursor-not-allowed" 
+                              : "hover:cursor-pointer hover:bg-base-200"
+                          }`}
                           onClick={() => {
-                            if (isLoading) {
+                            if (isLoading || buttonState.disabled) {
                               return;
                             }
                             handleCreemCheckout(item, true);
@@ -316,26 +396,27 @@ export default function Pricing({ pricing }: { pricing: PricingType }) {
                     {item.button && (
                       <Button
                         className="w-full flex items-center justify-center gap-2 font-semibold"
-                        disabled={isLoading}
+                        disabled={isLoading || buttonState.disabled}
                         onClick={() => {
-                          if (isLoading) {
+                          if (isLoading || buttonState.disabled) {
                             return;
                           }
                           handleCreemCheckout(item);
                         }}
+                        variant={isSubscribed ? "secondary" : "default"}
                       >
                         {(!isLoading ||
                           (isLoading && productId !== item.product_id)) && (
-                          <p>{item.button.title}</p>
+                          <p>{buttonState.text}</p>
                         )}
 
                         {isLoading && productId === item.product_id && (
-                          <p>{item.button.title}</p>
+                          <p>{buttonState.text}</p>
                         )}
                         {isLoading && productId === item.product_id && (
                           <Loader className="mr-2 h-4 w-4 animate-spin" />
                         )}
-                        {item.button.icon && (
+                        {item.button.icon && !isSubscribed && (
                           <Icon name={item.button.icon} className="size-4" />
                         )}
                       </Button>

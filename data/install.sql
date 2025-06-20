@@ -102,3 +102,19 @@ CREATE TABLE feedbacks (
     content TEXT,
     rating INT
 );
+
+CREATE TABLE subscriptions (
+    id VARCHAR(255) PRIMARY KEY,
+    user_uuid VARCHAR(255) NOT NULL,
+    product_id VARCHAR(50) NOT NULL,
+    plan_name VARCHAR(100) NOT NULL,
+    status VARCHAR(20) NOT NULL,
+    credits_monthly INT NOT NULL,
+    creem_subscription_id VARCHAR(255),
+    current_period_start timestamptz,
+    current_period_end timestamptz,
+    cancel_at_period_end BOOLEAN DEFAULT false,
+    canceled_at timestamptz,
+    created_at timestamptz DEFAULT NOW(),
+    updated_at timestamptz DEFAULT NOW()
+);

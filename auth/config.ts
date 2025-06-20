@@ -115,6 +115,7 @@ export const providerMap = providers
   .filter((provider) => provider.id !== "google-one-tap");
 
 export const authOptions: NextAuthConfig = {
+  session: { strategy: "jwt" },
   providers,
   pages: {
     signIn: "/auth/signin",
@@ -140,7 +141,15 @@ export const authOptions: NextAuthConfig = {
     },
     async session({ session, token, user }) {
       if (token && token.user) {
-        session.user = token.user;
+        session.user = token.user as any;
+        if (
+          session.user &&
+          typeof session.user === "object" &&
+          !("id" in (session.user as Record<string, unknown>)) &&
+          "uuid" in (session.user as Record<string, unknown>)
+        ) {
+          (session.user as any).id = (session.user as any).uuid;
+        }
       }
       return session;
     },
@@ -181,6 +190,15 @@ export const authOptions: NextAuthConfig = {
               created_at: dbUser.created_at,
             };
           }
+        }
+        // 确保 token.user 拥有 id 字段供 API 路由使用
+        if (
+          token.user &&
+          typeof token.user === "object" &&
+          !("id" in (token.user as Record<string, unknown>)) &&
+          "uuid" in (token.user as Record<string, unknown>)
+        ) {
+          (token.user as any).id = (token.user as any).uuid;
         }
         return token;
       } catch (e) {

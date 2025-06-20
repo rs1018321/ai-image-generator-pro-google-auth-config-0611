@@ -22,13 +22,11 @@
           "url": "/#pricing",
           "icon": "MdPayment"
         },
-
         {
           "title": "Blog",
           "url": "/posts",
           "icon": "MdPayment"
         },
-
         {
           "title": "Showcase",
           "url": "/#showcase",
@@ -63,39 +61,28 @@
     ],
     "show_sign": true,
     "show_theme": true,
-    "show_locale": true
+    "show_locale": true,
+    "name": "AI Coloring Page Generator",
+    "title": "AI Coloring Page Generator - Create Beautiful Coloring Pages Instantly",
+    "description": "Generate high-quality coloring pages using AI technology. Support multiple styles and themes, perfect for children's education and creative development.",
+    "navItems": [
+      { "name": "Home", "url": "/" },
+      { "name": "Features", "url": "/#feature" },
+      { "name": "Pricing", "url": "/#pricing" },
+      { "name": "Blog", "url": "/blog" }
+    ],
+    "signInBtn": "Sign In",
+    "startBtn": "Get Started"
   },
   "hero": {
-    "title": "Create Printable Coloring Pages in Seconds",
-    "highlight_text": "AI Coloring Page Generator",
-    "description": "Turn your photos or text into beautiful, printable coloring pages instantly with AI.",
-    "announcement": {
-      "label": "2025",
-      "title": "🎉 Happy New Year",
-      "url": "/#pricing"
-    },
-    "tip": "Free and easy to use — no signup required",
-    "buttons": [
-      {
-        "title": "Try It Free",
-        "icon": "RiFlashlightFill",
-        "url": "/#feature",
-        "target": "_self",
-        "variant": "default"
-      },
-      {
-        "title": "Learn More",
-        "icon": "RiDiscordFill",
-        "url": "https://mimi-panda.com/",
-        "target": "_blank",
-        "variant": "outline"
-      }
-    ],
-    "show_happy_users": true,
-    "show_badge": false
+    "title": "Create Unlimited Creative Coloring Pages with AI",
+    "description": "Unleash your child's creativity! Our AI coloring page generator can quickly create high-quality, creative coloring pages, providing endless fun and learning opportunities for children.",
+    "startBtn": "Start Free",
+    "viewBtn": "Watch Demo"
   },
   "branding": {
-    "title": "Powered by OpenAI, Next.js, and TailwindCSS",
+    "title": "Trusted by Users Worldwide",
+    "description": "Thousands of users are already using our AI coloring page generator",
     "items": [
       {
         "title": "Next.js",
@@ -234,38 +221,28 @@
   },
   "feature": {
     "name": "feature",
-    "title": "Key Features of Our Generator",
-    "description": "Powerful AI tools for seamless coloring page creation.",
+    "title": "Powerful Features",
+    "description": "Providing the best AI coloring page generation experience",
     "items": [
       {
-        "title": "Next.js Boilerplate",
-        "description": "Production-ready Next.js templates with SEO-friendly structure and i18n support.",
-        "icon": "RiNextjsFill"
+        "icon": "RiPaletteLine",
+        "title": "AI Smart Generation",
+        "description": "Advanced AI algorithms for quickly generating high-quality coloring pages"
       },
       {
-        "title": "Authentication & Payments",
-        "description": "Integrated Google OAuth, one-tap login, and Stripe payment processing.",
-        "icon": "RiKey2Fill"
+        "icon": "RiImageLine",
+        "title": "Diverse Styles",
+        "description": "Support cartoon, realistic, abstract and other artistic styles"
       },
       {
-        "title": "Data Infrastructure",
-        "description": "Built-in Supabase integration for reliable and scalable data storage.",
-        "icon": "RiDatabase2Line"
+        "icon": "RiDownloadLine",
+        "title": "HD Downloads",
+        "description": "Support high-resolution PDF and PNG format downloads"
       },
       {
-        "title": "One-Click Deployment",
-        "description": "Seamless deployment to Vercel or Cloudflare with automated setup.",
-        "icon": "RiCloudy2Fill"
-      },
-      {
-        "title": "Business Analytics",
-        "description": "Integrated Google Analytics and Search Console for tracking growth.",
-        "icon": "RiBarChart2Line"
-      },
-      {
-        "title": "AI-Ready Infrastructure",
-        "description": "Pre-configured AI integration with built-in credits system and API sales.",
-        "icon": "RiRobot2Line"
+        "icon": "RiCustomerServiceLine",
+        "title": "24/7 Support",
+        "description": "Professional team provides technical support around the clock"
       }
     ]
   },
@@ -360,131 +337,102 @@
   "stats": {
     "name": "stats",
     "label": "Stats",
-    "title": "Loved by Coloring Enthusiasts",
-    "description": "Join thousands of users generating AI coloring pages.",
+    "title": "Numbers Speak",
+    "description": "Showing our achievements with data",
     "icon": "FaRegHeart",
     "items": [
-      {
-        "title": "Trusted by",
-        "label": "99+",
-        "description": "Customers"
-      },
-      {
-        "title": "Built in",
-        "label": "20+",
-        "description": "Components"
-      },
-      {
-        "title": "Ship Fast in",
-        "label": "5",
-        "description": "Minutes"
-      }
+      { "title": "Active Users", "value": "10,000+", "description": "active users" },
+      { "title": "Generations", "value": "100,000+", "description": "coloring pages generated" },
+      { "title": "Satisfaction", "value": "98%", "description": "user satisfaction" },
+      { "title": "Countries", "value": "50+", "description": "service coverage" }
     ]
   },
   "pricing": {
     "name": "pricing",
     "label": "Pricing",
-    "title": "Pricing",
-    "description": "Choose a plan to unlock advanced features for your coloring page generator.",
+    "title": "Choose Your Perfect Plan",
+    "description": "Flexible monthly subscription plans, cancel anytime",
     "groups": [],
     "items": [
       {
         "title": "Starter",
-        "description": "Get started with your first SaaS startup.",
-        "features_title": "Includes",
-        "features": [
-          "100 credits, valid for 1 month",
-          "NextJS boilerplate",
-          "SEO-friendly structure",
-          "Payment with Stripe",
-          "Data storage with Supabase",
-          "Google Oauth & One-Tap Login",
-          "i18n support"
-        ],
-        "interval": "one-time",
-        "amount": 9900,
-        "cn_amount": 69900,
-        "currency": "USD",
-        "price": "$99",
-        "original_price": "$199",
-        "unit": "USD",
-        "is_featured": false,
-        "tip": "Pay once. Build unlimited projects!",
-        "button": {
-          "title": "Choose Plan",
-          "url": "/#pricing",
-          "icon": "RiFlashlightFill"
-        },
+        "description": "Perfect for individuals to start experiencing AI coloring page generation",
+        "price": 14,
+        "currency": "usd",
+        "unit": "/month",
+        "interval": "month",
+        "valid_months": 1,
+        "credits": 50,
+        "cn_amount": 9900,
+        "amount": 1400,
         "product_id": "starter",
-        "product_name": "Coloring Page Boilerplate Starter",
-        "credits": 100,
-        "valid_months": 1
+        "product_name": "AI Coloring Page Generator Starter",
+        "features": [
+          "50 credits per month",
+          "High-quality AI generation",
+          "Basic coloring page templates",
+          "PNG format download",
+          "Email support"
+        ],
+        "button": {
+          "text": "Subscribe Now",
+          "link": ""
+        }
       },
       {
         "title": "Standard",
-        "description": "Ship Fast with your SaaS Startups.",
-        "label": "Popular",
-        "features_title": "Everything in Starter, plus",
-        "features": [
-          "200 credits, valid for 3 month",
-          "Deploy with Vercel or Cloudflare",
-          "Generation of Privacy & Terms",
-          "Google Analytics Integration",
-          "Google Search Console Integration",
-          "Discord community",
-          "Technical support for your first ship",
-          "Lifetime updates"
-        ],
-        "interval": "one-time",
-        "amount": 19900,
-        "cn_amount": 139900,
-        "currency": "USD",
-        "price": "$199",
-        "original_price": "$299",
-        "unit": "USD",
-        "is_featured": true,
-        "tip": "Pay once. Build unlimited projects!",
-        "button": {
-          "title": "Choose Plan",
-          "url": "/#pricing",
-          "icon": "RiFlashlightFill"
-        },
-        "product_id": "standard",
-        "product_name": "Coloring Page Boilerplate Standard",
+        "description": "Perfect for teachers and parents, more creative choices",
+        "price": 28,
+        "currency": "usd",
+        "unit": "/month",
+        "interval": "month",
+        "valid_months": 1,
         "credits": 200,
-        "valid_months": 3
+        "cn_amount": 19900,
+        "amount": 2800,
+        "product_id": "standard",
+        "product_name": "AI Coloring Page Generator Standard",
+        "label": "Most Popular",
+        "is_featured": true,
+        "features": [
+          "200 credits per month",
+          "Advanced AI generation algorithms",
+          "Multiple artistic styles",
+          "PDF + PNG formats",
+          "Priority email support",
+          "Batch generation feature"
+        ],
+        "button": {
+          "text": "Subscribe Now",
+          "link": ""
+        }
       },
       {
         "title": "Premium",
-        "description": "Ship Any AI SaaS Startups.",
-        "features_title": "Everything in Standard, plus",
-        "features": [
-          "300 credits, valid for 1 year",
-          "Business Functions with AI",
-          "User Center",
-          "Credits System",
-          "API Sales for your SaaS",
-          "Admin System",
-          "Priority Technical Support"
-        ],
-        "interval": "one-time",
-        "amount": 29900,
-        "cn_amount": 199900,
-        "currency": "USD",
-        "price": "$299",
-        "original_price": "$399",
-        "unit": "USD",
-        "is_featured": false,
-        "tip": "Pay once. Build unlimited projects!",
-        "button": {
-          "title": "Choose Plan",
-          "url": "/#pricing",
-          "icon": "RiFlashlightFill"
-        },
+        "description": "Perfect for educational institutions and professional users",
+        "price": 56,
+        "currency": "usd",
+        "unit": "/month",
+        "interval": "month",
+        "valid_months": 1,
+        "credits": 500,
+        "cn_amount": 39900,
+        "amount": 5600,
         "product_id": "premium",
-        "product_name": "Coloring Page Boilerplate Premium",
-        "credits": 300,
-        "valid_months": 12
+        "product_name": "AI Coloring Page Generator Premium",
+        "features": [
+          "500 credits per month",
+          "Top-tier AI generation engine",
+          "All artistic styles",
+          "High-resolution output",
+          "API access",
+          "Dedicated customer support",
+          "Commercial use license"
+        ],
+        "button": {
+          "text": "Subscribe Now",
+          "link": ""
+        }
       }
     ]
   },

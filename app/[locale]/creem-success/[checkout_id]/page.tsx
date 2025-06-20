@@ -2,14 +2,14 @@ import { getCreemSessionById, handleCreemOrderSession } from "@/services/creem-o
 import { redirect } from "next/navigation";
 
 interface CreemSuccessPageProps {
-  params: {
+  params: Promise<{
     checkout_id: string;
     locale: string;
-  };
+  }>;
 }
 
 export default async function CreemSuccessPage({ params }: CreemSuccessPageProps) {
-  const { checkout_id, locale } = params;
+  const { checkout_id, locale } = await params;
 
   try {
     console.log("Processing Creem success page for checkout:", checkout_id);
@@ -27,7 +27,8 @@ export default async function CreemSuccessPage({ params }: CreemSuccessPageProps
     
     if (success) {
       console.log("Creem order processed successfully");
-      redirect(`/${locale}/payment-success`);
+      // 重定向到我的订单页面，显示订阅状态
+      redirect(`/${locale}/my-orders?success=true`);
     } else {
       console.error("Failed to process Creem order");
       redirect(`/${locale}/payment-failed`);

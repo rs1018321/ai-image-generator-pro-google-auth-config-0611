@@ -2,6 +2,8 @@ import {
   findCreditByOrderNo,
   getUserValidCredits,
   insertCredit,
+  findCreditByTransNo,
+  getCreditsByUserUuid,
 } from "@/models/credit";
 
 import { Credit } from "@/types/credit";
@@ -18,6 +20,7 @@ export enum CreditsTransType {
   SystemAdd = "system_add", // system add credits
   Ping = "ping", // cost for ping api
   GenerateImage = "generate_image", // cost for generating images
+  SubscriptionPayment = "subscription_payment", // monthly subscription payment
 }
 
 export enum CreditsAmount {
@@ -119,6 +122,14 @@ export async function increaseCredits({
   order_no?: string;
 }) {
   try {
+    // 若传入 order_no，则先检查是否已记录，避免重复增加积分
+    if (order_no) {
+      const exist = await findCreditByOrderNo(order_no);
+      if (exist) {
+        console.log(`increaseCredits skipped: credits for order ${order_no} already recorded.`);
+        return;
+      }
+    }
     const new_credit: Credit = {
       trans_no: getSnowId(),
       created_at: getIsoTimestr(),

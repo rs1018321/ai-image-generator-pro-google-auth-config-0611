@@ -11,8 +11,8 @@ export interface PricingItem {
   title?: string;
   description?: string;
   label?: string;
-  price?: string;
-  original_price?: string;
+  price?: number;
+  original_price?: number;
   currency?: string;
   unit?: string;
   features_title?: string;

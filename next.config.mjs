@@ -44,6 +44,9 @@ const nextConfig = {
   async redirects() {
     return [];
   },
+  experimental: {
+    allowedDevOrigins: [process.env.NEXTAUTH_URL || ""].filter(Boolean),
+  },
 };
 
 // Make sure experimental mdx flag is enabled
@@ -51,6 +54,8 @@ const configWithMDX = {
   ...nextConfig,
   experimental: {
     mdxRs: true,
+    // 直接硬编码 allowedDevOrigins 确保它不会被覆盖
+    allowedDevOrigins: ["https://85d2-38-98-191-20.ngrok-free.app"],
   },
 };
 

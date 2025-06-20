@@ -144,7 +144,8 @@ export async function POST(req: Request) {
         currency: currency,
         original_product_id: product_id,
       },
-      successUrl: `${success_url}/{CHECKOUT_ID}`,
+      /*successUrl: `${success_url}/{CHECKOUT_ID}`,*/
+      successUrl: success_url,
       cancelUrl: cancel_url,
     });
 

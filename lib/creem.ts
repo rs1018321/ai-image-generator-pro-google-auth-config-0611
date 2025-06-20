@@ -76,7 +76,15 @@ export async function createCreemCheckout({
       };
     }
 
-    // 添加成功和取消URL到metadata中
+    // Creem API 需要顶层 successUrl / cancelUrl 字段实现自动跳转
+    if (successUrl) {
+      createCheckoutRequest.successUrl = successUrl;
+    }
+    if (cancelUrl) {
+      createCheckoutRequest.cancelUrl = cancelUrl;
+    }
+
+    // 仍然把 URL 写入 metadata 便于 webhook 调试排查
     if (successUrl || cancelUrl) {
       createCheckoutRequest.metadata = {
         ...createCheckoutRequest.metadata,

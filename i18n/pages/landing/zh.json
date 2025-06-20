@@ -56,76 +56,28 @@
     ],
     "show_sign": true,
     "show_theme": true,
-    "show_locale": true
+    "show_locale": true,
+    "name": "AI涂色页生成器",
+    "title": "AI涂色页生成器 - 快速生成精美的涂色页",
+    "description": "使用AI技术快速生成高质量的涂色页。支持多种风格和主题，完美适合儿童教育和创意发展。",
+    "navItems": [
+      { "name": "首页", "url": "/" },
+      { "name": "功能", "url": "/#feature" },
+      { "name": "定价", "url": "/#pricing" },
+      { "name": "博客", "url": "/blog" }
+    ],
+    "signInBtn": "登录",
+    "startBtn": "立即开始"
   },
   "hero": {
-    "title": "几秒钟内创建可打印的填色页",
-    "highlight_text": "AI 填色页生成器",
-    "description": "使用 AI 将您的照片或文字瞬间转换成可打印的填色页。",
-    "announcement": {
-      "label": "2025",
-      "title": "🎉 新年快乐",
-      "url": "/#pricing"
-    },
-    "tip": "免费且易于使用 — 无需注册",
-    "buttons": [
-      {
-        "title": "免费试用",
-        "icon": "RiFlashlightFill",
-        "url": "/#feature",
-        "target": "_self",
-        "variant": "default"
-      },
-      {
-        "title": "了解更多",
-        "icon": "RiDiscordFill",
-        "url": "https://mimi-panda.com/zh",
-        "target": "_blank",
-        "variant": "outline"
-      }
-    ],
-    "show_happy_users": true,
-    "show_badge": false
+    "title": "用AI创造无限创意涂色页",
+    "description": "释放孩子的创造力！我们的AI涂色页生成器能够快速生成高质量、富有创意的涂色页，为孩子们提供无穷的乐趣和学习机会。",
+    "startBtn": "免费开始",
+    "viewBtn": "观看演示"
   },
   "branding": {
-    "title": "由 OpenAI、Next.js 和 TailwindCSS 驱动",
-    "items": [
-      {
-        "title": "Next.js",
-        "image": {
-          "src": "/imgs/logos/nextjs.svg",
-          "alt": "Next.js"
-        }
-      },
-      {
-        "title": "React",
-        "image": {
-          "src": "/imgs/logos/react.svg",
-          "alt": "React"
-        }
-      },
-      {
-        "title": "TailwindCSS",
-        "image": {
-          "src": "/imgs/logos/tailwindcss.svg",
-          "alt": "TailwindCSS"
-        }
-      },
-      {
-        "title": "Shadcn/UI",
-        "image": {
-          "src": "/imgs/logos/shadcn.svg",
-          "alt": "Shadcn/UI"
-        }
-      },
-      {
-        "title": "Vercel",
-        "image": {
-          "src": "/imgs/logos/vercel.svg",
-          "alt": "Vercel"
-        }
-      }
-    ]
+    "title": "受到全球用户信赖",
+    "description": "已有数千名用户使用我们的AI涂色页生成器"
   },
   "introduce": {
     "name": "introduce",
@@ -227,38 +179,28 @@
   },
   "feature": {
     "name": "feature",
-    "title": "生成器核心功能",
-    "description": "强大的 AI 工具，实现无缝填色页生成。",
+    "title": "强大的功能特性",
+    "description": "为您提供最佳的AI涂色页生成体验",
     "items": [
       {
-        "title": "Next.js 模板",
-        "description": "生产就绪的 Next.js 模板，支持 SEO 友好结构和国际化。",
-        "icon": "RiNextjsFill"
+        "icon": "RiPaletteLine",
+        "title": "AI智能生成",
+        "description": "先进的AI算法，快速生成高质量涂色页"
       },
       {
-        "title": "身份验证和支付",
-        "description": "集成 Google OAuth、一键登录和 Stripe 支付处理。",
-        "icon": "RiKey2Fill"
+        "icon": "RiImageLine",
+        "title": "多样化风格",
+        "description": "支持卡通、现实、抽象等多种艺术风格"
       },
       {
-        "title": "数据基础设施",
-        "description": "内置 Supabase 集成，提供可靠和可扩展的数据存储。",
-        "icon": "RiDatabase2Line"
+        "icon": "RiDownloadLine",
+        "title": "高清下载",
+        "description": "支持高分辨率PDF和PNG格式下载"
       },
       {
-        "title": "一键部署",
-        "description": "无缝部署到 Vercel 或 Cloudflare，自动化设置。",
-        "icon": "RiCloudy2Fill"
-      },
-      {
-        "title": "业务分析",
-        "description": "集成 Google Analytics 和 Search Console 追踪增长。",
-        "icon": "RiBarChart2Line"
-      },
-      {
-        "title": "AI 就绪基础设施",
-        "description": "预配置 AI 集成，内置积分系统和 API 销售。",
-        "icon": "RiRobot2Line"
+        "icon": "RiCustomerServiceLine",
+        "title": "24/7支持",
+        "description": "专业团队全天候为您提供技术支持"
       }
     ]
   },
@@ -353,131 +295,102 @@
   "stats": {
     "name": "stats",
     "label": "统计",
-    "title": "深受填色爱好者喜爱",
-    "description": "加入数千名生成 AI 填色页的用户。",
+    "title": "数据说话",
+    "description": "用数字展示我们的成就",
     "icon": "FaRegHeart",
     "items": [
-      {
-        "title": "信任",
-        "label": "99+",
-        "description": "客户"
-      },
-      {
-        "title": "内置",
-        "label": "20+",
-        "description": "组件"
-      },
-      {
-        "title": "快速发布",
-        "label": "5",
-        "description": "分钟"
-      }
+      { "title": "用户数量", "value": "10,000+", "description": "活跃用户" },
+      { "title": "生成次数", "value": "100,000+", "description": "涂色页生成" },
+      { "title": "满意度", "value": "98%", "description": "用户满意度" },
+      { "title": "国家/地区", "value": "50+", "description": "服务覆盖" }
     ]
   },
   "pricing": {
     "name": "pricing",
     "label": "定价",
-    "title": "定价",
-    "description": "选择套餐，解锁高级填色页生成功能。",
+    "title": "选择适合您的方案",
+    "description": "灵活的月度订阅方案，随时可以取消",
     "groups": [],
     "items": [
       {
         "title": "入门版",
-        "description": "开始您的第一个 SaaS 创业项目。",
-        "features_title": "包含",
-        "features": [
-          "100 积分，有效期 1 个月",
-          "NextJS 模板",
-          "SEO 友好结构",
-          "Stripe 支付",
-          "Supabase 数据存储",
-          "Google OAuth 和一键登录",
-          "国际化支持"
-        ],
-        "interval": "one-time",
-        "amount": 9900,
-        "cn_amount": 69900,
-        "currency": "USD",
-        "price": "$99",
-        "original_price": "$199",
-        "unit": "USD",
-        "is_featured": false,
-        "tip": "一次付费，无限项目！",
-        "button": {
-          "title": "选择套餐",
-          "url": "/#pricing",
-          "icon": "RiFlashlightFill"
-        },
+        "description": "适合个人用户开始体验AI涂色页生成",
+        "price": 99,
+        "currency": "cny",
+        "unit": "/月",
+        "interval": "month",
+        "valid_months": 1,
+        "credits": 50,
+        "cn_amount": 9900,
+        "amount": 1400,
         "product_id": "starter",
-        "product_name": "Coloring Page 模板入门版",
-        "credits": 100,
-        "valid_months": 1
+        "product_name": "AI涂色页生成器 入门版",
+        "features": [
+          "每月50个积分",
+          "高质量AI生成",
+          "基础涂色页模板",
+          "PNG格式下载",
+          "邮件支持"
+        ],
+        "button": {
+          "text": "立即订阅",
+          "link": ""
+        }
       },
       {
         "title": "标准版",
-        "description": "快速启动您的 SaaS 创业项目。",
-        "label": "热门",
-        "features_title": "包含入门版所有功能，另加",
-        "features": [
-          "200 积分，有效期 3 个月",
-          "Vercel 或 Cloudflare 部署",
-          "隐私和条款生成",
-          "Google Analytics 集成",
-          "Google Search Console 集成",
-          "Discord 社区",
-          "首次发布技术支持",
-          "终身更新"
-        ],
-        "interval": "one-time",
-        "amount": 19900,
-        "cn_amount": 139900,
-        "currency": "USD",
-        "price": "$199",
-        "original_price": "$299",
-        "unit": "USD",
-        "is_featured": true,
-        "tip": "一次付费，无限项目！",
-        "button": {
-          "title": "选择套餐",
-          "url": "/#pricing",
-          "icon": "RiFlashlightFill"
-        },
-        "product_id": "standard",
-        "product_name": "Coloring Page 模板标准版",
+        "description": "适合教师和家长，更多创意选择",
+        "price": 199,
+        "currency": "cny",
+        "unit": "/月",
+        "interval": "month",
+        "valid_months": 1,
         "credits": 200,
-        "valid_months": 3
+        "cn_amount": 19900,
+        "amount": 2800,
+        "product_id": "standard",
+        "product_name": "AI涂色页生成器 标准版",
+        "label": "热门选择",
+        "is_featured": true,
+        "features": [
+          "每月200个积分",
+          "高级AI生成算法",
+          "多种艺术风格",
+          "PDF + PNG格式",
+          "优先邮件支持",
+          "批量生成功能"
+        ],
+        "button": {
+          "text": "立即订阅",
+          "link": ""
+        }
       },
       {
         "title": "高级版",
-        "description": "构建任何 AI SaaS 创业项目。",
-        "features_title": "包含标准版所有功能，另加",
-        "features": [
-          "300 积分，有效期 1 年",
-          "AI 业务功能",
-          "用户中心",
-          "积分系统",
-          "SaaS API 销售",
-          "管理系统",
-          "优先技术支持"
-        ],
-        "interval": "one-time",
-        "amount": 29900,
-        "cn_amount": 199900,
-        "currency": "USD",
-        "price": "$299",
-        "original_price": "$399",
-        "unit": "USD",
-        "is_featured": false,
-        "tip": "一次付费，无限项目！",
-        "button": {
-          "title": "选择套餐",
-          "url": "/#pricing",
-          "icon": "RiFlashlightFill"
-        },
+        "description": "适合教育机构和专业用户",
+        "price": 399,
+        "currency": "cny",
+        "unit": "/月",
+        "interval": "month",
+        "valid_months": 1,
+        "credits": 500,
+        "cn_amount": 39900,
+        "amount": 5600,
         "product_id": "premium",
-        "product_name": "Coloring Page 模板高级版",
-        "credits": 300,
-        "valid_months": 12
+        "product_name": "AI涂色页生成器 高级版",
+        "features": [
+          "每月500个积分",
+          "顶级AI生成引擎",
+          "所有艺术风格",
+          "高分辨率输出",
+          "API访问权限",
+          "专属客服支持",
+          "商业使用许可"
+        ],
+        "button": {
+          "text": "立即订阅",
+          "link": ""
+        }
       }
     ]
   },
