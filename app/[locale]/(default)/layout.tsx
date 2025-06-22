@@ -8,6 +8,7 @@ import Feedback from "@/components/feedback";
 import HeaderSignButton from "@/components/sign/header-sign-button";
 import Link from "next/link";
 import styles from './page.module.css';
+import DashboardButton from "@/components/navigation/dashboard-button";
 
 // 定义背景样式
 const backgroundStyle = {
@@ -123,25 +124,8 @@ export default async function DefaultLayout({
               textDecoration: 'none'
             }} className={clsx("hover:bg-[#64bd9b] hover:text-white hover:scale-105 transition-all", styles.headerCircle)}>Blog</a> */}
             
-            <a href={`/${locale}/my-orders`} style={{
-              // @ts-ignore
-              '--border-width': '6px',
-              '--border-style': 'solid',
-              '--border-color': '#f8ed8c',
-              '--border-radius': '25px',
-              fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
-              color: '#69b08b',
-              fontSize: '23px',
-              fontWeight: 'bold',
-              backgroundColor: '#fcf4a3',
-              borderRadius: '25px',
-              padding: '8px 16px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              textAlign: 'center',
-              textDecoration: 'none'
-            }} className={clsx("hover:bg-[#64bd9b] hover:text-white hover:scale-105 transition-all", styles.headerCircle)}>Dashboard</a>
+            {/* Dashboard按钮 - 处理登录状态 */}
+            <DashboardButton locale={locale} />
             
             <a href={`/${locale}/pricing`} style={{
               // @ts-ignore

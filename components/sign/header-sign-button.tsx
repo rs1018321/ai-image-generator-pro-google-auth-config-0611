@@ -13,6 +13,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
+import { useLocale } from "next-intl";
 
 interface HeaderSignButtonProps {
   locale: string;
@@ -20,6 +23,7 @@ interface HeaderSignButtonProps {
 
 export default function HeaderSignButton({ locale }: HeaderSignButtonProps) {
   const t = useTranslations();
+  const currentLocale = useLocale();
   const { setShowSignModal, user } = useAppContext();
   const router = useRouter();
 
@@ -30,6 +34,22 @@ export default function HeaderSignButton({ locale }: HeaderSignButtonProps) {
   const handleAdminClick = () => {
     window.open("/admin/users", "_blank");
   };
+
+  const handleSignOut = async () => {
+    await signOut({ 
+      callbackUrl: `/${locale || currentLocale}`,
+      redirect: true 
+    });
+  };
+
+  if (user === undefined) {
+    return (
+      <Button variant="outline" disabled>
+        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+        {t("common.loading")}
+      </Button>
+    );
+  }
 
   if (user) {
     // 用户已登录，显示头像和下拉菜单
@@ -79,7 +99,7 @@ export default function HeaderSignButton({ locale }: HeaderSignButtonProps) {
           <DropdownMenuSeparator />
           <DropdownMenuItem
             className="cursor-pointer"
-            onClick={() => signOut()}
+            onClick={handleSignOut}
           >
             {t("user.sign_out")}
           </DropdownMenuItem>
@@ -90,18 +110,21 @@ export default function HeaderSignButton({ locale }: HeaderSignButtonProps) {
 
   // 用户未登录，显示登录按钮
   return (
-    <button 
+    <button
       onClick={() => setShowSignModal(true)}
-      className="px-4 py-1 text-white rounded cursor-pointer hover:opacity-80 transition-colors"
       style={{
         fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
-        fontSize: '23px',
+        fontSize: '18px',
         fontWeight: 'bold',
         backgroundColor: '#f7c863',
+        color: 'white',
         borderRadius: '25px',
         border: 'none',
-        transform: 'translateY(7px)'
+        padding: '8px 16px',
+        transform: 'translateY(7px)',
+        cursor: 'pointer'
       }}
+      className="hover:opacity-80 transition-opacity"
     >
       {t("user.sign_in")}
     </button>

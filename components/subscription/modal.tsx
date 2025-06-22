@@ -1,15 +1,13 @@
 "use client";
 
 import * as React from "react";
-
+import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
-  DialogOverlay,
   DialogPortal,
 } from "@/components/ui/dialog";
 import {
@@ -20,21 +18,16 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
-  DrawerTrigger,
   DrawerPortal,
-  DrawerOverlay,
 } from "@/components/ui/drawer";
-import { SiGithub, SiGmail, SiGoogle } from "react-icons/si";
-
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { signIn } from "next-auth/react";
 import { useAppContext } from "@/contexts/app";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useTranslations } from "next-intl";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
 import { Drawer as DrawerPrimitive } from "vaul";
+import { cn } from "@/lib/utils";
 
 // 自定义磨砂玻璃效果的 Overlay 组件
 const GlassOverlay = React.forwardRef<
@@ -112,97 +105,64 @@ const GlassDrawerContent = React.forwardRef<
 ));
 GlassDrawerContent.displayName = "GlassDrawerContent";
 
-export default function SignModal() {
+export default function SubscriptionModal() {
   const t = useTranslations();
-  const { showSignModal, setShowSignModal } = useAppContext();
-
-  const [open, setOpen] = React.useState(false);
+  const router = useRouter();
+  const { showSubscriptionModal, setShowSubscriptionModal } = useAppContext();
   const isDesktop = useMediaQuery("(min-width: 768px)");
+
+  const handleViewPlans = () => {
+    setShowSubscriptionModal(false);
+    router.push('/pricing');
+  };
 
   if (isDesktop) {
     return (
-      <Dialog open={showSignModal} onOpenChange={setShowSignModal}>
+      <Dialog open={showSubscriptionModal} onOpenChange={setShowSubscriptionModal}>
         <GlassDialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>{t("sign_modal.sign_in_title")}</DialogTitle>
+            <DialogTitle>升级会员</DialogTitle>
             <DialogDescription>
-              {t("sign_modal.sign_in_description")}
+              此功能需要会员权限，请升级您的会员套餐以解锁更多功能。
             </DialogDescription>
           </DialogHeader>
-          <ProfileForm />
+          <div className="grid gap-4 py-4">
+            <Button onClick={handleViewPlans} className="w-full">
+              查看会员套餐
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={() => setShowSubscriptionModal(false)}
+              className="w-full"
+            >
+              取消
+            </Button>
+          </div>
         </GlassDialogContent>
       </Dialog>
     );
   }
 
   return (
-    <Drawer open={showSignModal} onOpenChange={setShowSignModal}>
+    <Drawer open={showSubscriptionModal} onOpenChange={setShowSubscriptionModal}>
       <GlassDrawerContent>
         <DrawerHeader className="text-left">
-          <DrawerTitle>{t("sign_modal.sign_in_title")}</DrawerTitle>
+          <DrawerTitle>升级会员</DrawerTitle>
           <DrawerDescription>
-            {t("sign_modal.sign_in_description")}
+            此功能需要会员权限，请升级您的会员套餐以解锁更多功能。
           </DrawerDescription>
         </DrawerHeader>
-        <ProfileForm className="px-4" />
-        <DrawerFooter className="pt-4">
+        <div className="px-4 pb-4">
+          <Button onClick={handleViewPlans} className="w-full mb-2">
+            查看会员套餐
+          </Button>
+        </div>
+        <DrawerFooter className="pt-2">
           <DrawerClose asChild>
-            <Button variant="outline">{t("sign_modal.cancel_title")}</Button>
+            <Button variant="outline">取消</Button>
           </DrawerClose>
         </DrawerFooter>
       </GlassDrawerContent>
     </Drawer>
   );
-}
-
-function ProfileForm({ className }: React.ComponentProps<"form">) {
-  const t = useTranslations();
-  const { pendingRedirect } = useAppContext();
-
-  return (
-    <div className={cn("grid items-start gap-4", className)}>
-      {/* <div className="grid gap-2">
-        <Label htmlFor="email">{t("sign_modal.email_title")}</Label>
-        <Input type="email" id="email" placeholder="xxx@xxx.com" />
-      </div>
-      <div className="grid gap-2">
-        <Label htmlFor="password">{t("sign_modal.password_title")}</Label>
-        <Input id="password" type="password" />
-      </div>
-      <Button type="submit" className="w-full flex items-center gap-2">
-        <SiGmail className="w-4 h-4" />
-        {t("sign_modal.email_sign_in")}
-      </Button> */}
-
-      {process.env.NEXT_PUBLIC_AUTH_GOOGLE_ENABLED === "true" && (
-        <Button
-          variant="outline"
-          className="w-full flex items-center gap-2"
-          onClick={() => {
-            signIn("google", { 
-              callbackUrl: pendingRedirect || window.location.href 
-            });
-          }}
-        >
-          <SiGoogle className="w-4 h-4" />
-          {t("sign_modal.google_sign_in")}
-        </Button>
-      )}
-
-      {process.env.NEXT_PUBLIC_AUTH_GITHUB_ENABLED === "true" && (
-        <Button
-          variant="outline"
-          className="w-full flex items-center gap-2"
-          onClick={() => {
-            signIn("github", { 
-              callbackUrl: pendingRedirect || window.location.href 
-            });
-          }}
-        >
-          <SiGithub className="w-4 h-4" />
-          {t("sign_modal.github_sign_in")}
-        </Button>
-      )}
-    </div>
-  );
-}
+} 

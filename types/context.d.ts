@@ -12,4 +12,8 @@ export interface ContextValue {
   setUserCredits: (credits: number | ((prev: number) => number)) => void;
   showFeedback: boolean;
   setShowFeedback: (show: boolean) => void;
+  showSubscriptionModal: boolean;
+  setShowSubscriptionModal: (show: boolean) => void;
+  pendingRedirect: string | null;
+  setPendingRedirect: (url: string | null) => void;
 }

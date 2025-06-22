@@ -17,10 +17,12 @@ import { User } from "@/types/user";
 import { signOut } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+import { useLocale } from "next-intl";
 
 export default function SignUser({ user }: { user: User }) {
   const t = useTranslations();
   const router = useRouter();
+  const locale = useLocale();
 
   const handleUserCenterClick = () => {
     router.push("/my-orders");
@@ -28,6 +30,13 @@ export default function SignUser({ user }: { user: User }) {
 
   const handleAdminClick = () => {
     window.open("/admin/users", "_blank");
+  };
+
+  const handleSignOut = async () => {
+    await signOut({ 
+      callbackUrl: `/${locale}`,
+      redirect: true 
+    });
   };
 
   return (
@@ -61,7 +70,7 @@ export default function SignUser({ user }: { user: User }) {
 
         <DropdownMenuItem
           className="flex justify-center cursor-pointer"
-          onClick={() => signOut()}
+          onClick={handleSignOut}
         >
           {t("user.sign_out")}
         </DropdownMenuItem>

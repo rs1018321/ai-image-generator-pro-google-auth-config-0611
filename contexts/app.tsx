@@ -37,8 +37,10 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
   const [showSignModal, setShowSignModal] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
   const [userCredits, setUserCredits] = useState<number>(0);
+  const [pendingRedirect, setPendingRedirect] = useState<string | null>(null);
 
   const [showFeedback, setShowFeedback] = useState<boolean>(false);
+  const [showSubscriptionModal, setShowSubscriptionModal] = useState<boolean>(false);
 
   const fetchUserInfo = async function () {
     try {
@@ -148,8 +150,22 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (session && session.user) {
       fetchUserInfo();
+    } else {
+      // 当session为null时，重置用户状态
+      setUser(null);
+      setUserCredits(0);
+      setPendingRedirect(null);
     }
   }, [session]);
+
+  // 处理登录成功后的跳转
+  useEffect(() => {
+    if (user && pendingRedirect) {
+      // 关闭登录模态框并清除pendingRedirect状态，因为NextAuth会通过callbackUrl处理跳转
+      setShowSignModal(false);
+      setPendingRedirect(null);
+    }
+  }, [user, pendingRedirect]);
 
   return (
     <AppContext.Provider
@@ -164,6 +180,10 @@ export const AppContextProvider = ({ children }: { children: ReactNode }) => {
         setUserCredits,
         showFeedback,
         setShowFeedback,
+        showSubscriptionModal,
+        setShowSubscriptionModal,
+        pendingRedirect,
+        setPendingRedirect,
       }}
     >
       {children}

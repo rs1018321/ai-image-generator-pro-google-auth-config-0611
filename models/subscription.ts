@@ -110,6 +110,9 @@ export async function cancelSubscription(user_uuid: string) {
     })
     .eq("user_uuid", user_uuid)
     .eq("status", "active")
+    .eq("cancel_at_period_end", false)
+    .order("created_at", { ascending: false })
+    .limit(1)
     .select()
     .single();
   
@@ -191,7 +194,6 @@ export async function getActiveSubscriptionByUserId(user_uuid: string): Promise<
     .select("*")
     .eq("user_uuid", user_uuid)
     .eq("status", "active")
-    .eq("cancel_at_period_end", false)
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();

@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import axios from "axios";
 import styles from "./page.module.css";
@@ -21,7 +21,7 @@ type FormData = {
 
 const PhotoColor: React.FC = () => {
     const { data: session } = useSession();
-    const { setShowSignModal, userCredits, setUserCredits } = useAppContext();
+    const { setShowSignModal, userCredits, setUserCredits, setShowSubscriptionModal } = useAppContext();
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [uploadedImage, setUploadedImage] = useState<string | null>(null);
     const [generatedImage, setGeneratedImage] = useState<string | null>(null);
@@ -29,7 +29,10 @@ const PhotoColor: React.FC = () => {
     const [selectedSize, setSelectedSize] = useState<string>("Auto");
     const [selectedStyle, setSelectedStyle] = useState<string>("medium");
     const [imageDimensions, setImageDimensions] = useState<{width: number, height: number, imageWidth: number, imageHeight: number} | null>(null);
-    const [hasWatermark, setHasWatermark] = useState(false); // 新增：水印控制状态
+    const [hasWatermark, setHasWatermark] = useState(true);
+    const [showPlanModal, setShowPlanModal] = useState(false);
+    const [subscription, setSubscription] = useState<any | null>(null);
+    const [subLoading, setSubLoading] = useState(false);
     
     // 新增：积分相关状态
     const [showCreditConfirmModal, setShowCreditConfirmModal] = useState(false);
@@ -49,6 +52,36 @@ const PhotoColor: React.FC = () => {
         setUploadedImage(defaultUploadImage);
         setGeneratedImage(defaultResultImage);
     }, []);
+
+    // 组件挂载后加载订阅信息（仅一次）
+    useEffect(() => {
+        async function loadSub() {
+            try {
+                setSubLoading(true);
+                const resp = await fetch("/api/get-user-subscription");
+                if (resp.ok) {
+                    const data = await resp.json();
+                    setSubscription(data.subscription);
+                }
+            } finally {
+                setSubLoading(false);
+            }
+        }
+        loadSub();
+    }, []);
+
+    // 新增：监听订阅状态变化，自动设置水印状态
+    useEffect(() => {
+        if (subscription) {
+            // 如果用户有订阅（无论是否已取消，只要还在有效期内），就自动关闭水印
+            setHasWatermark(false);
+            console.log("🎯 用户有有效订阅，自动关闭水印");
+        } else if (subscription === null && !subLoading) {
+            // 如果明确没有订阅且不在加载中，则显示水印
+            setHasWatermark(true);
+            console.log("🎯 用户无有效订阅，显示水印");
+        }
+    }, [subscription, subLoading]);
 
     const {
         register,
@@ -354,6 +387,28 @@ const PhotoColor: React.FC = () => {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+    };
+
+    const handleWatermarkToggle = (checked: boolean) => {
+        // 如果用户未登录，显示登录模态框
+        if (!session?.user) {
+            setShowSignModal(true);
+            return;
+        }
+
+        if (!checked) {
+            // 关闭水印，直接设置
+            setHasWatermark(true);
+        } else {
+            // 开启水印，需要检查订阅状态
+            if (subscription) {
+                // 有订阅（无论是否已取消，只要还在有效期内），可以去除水印
+                setHasWatermark(false);
+            } else {
+                // 无订阅，显示订阅模态框
+                setShowSubscriptionModal(true);
+            }
+        }
     };
 
     return (
@@ -912,8 +967,8 @@ const PhotoColor: React.FC = () => {
                                 color: "#679fb5"
                             }}>
                                 <Switch
-                                    checked={hasWatermark}
-                                    onCheckedChange={setHasWatermark}
+                                    checked={!hasWatermark}
+                                    onCheckedChange={handleWatermarkToggle}
                                     className="data-[state=checked]:bg-[#679fb5]"
                                 />
                                 <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: "8px" }}>

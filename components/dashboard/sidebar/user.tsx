@@ -32,12 +32,21 @@ import { User } from "@/types/user";
 import { signOut } from "next-auth/react";
 import { useAppContext } from "@/contexts/app";
 import { useTranslations } from "next-intl";
+import { useLocale } from "next-intl";
 
 export default function () {
   const t = useTranslations();
+  const locale = useLocale();
 
   const { user, setShowSignModal } = useAppContext();
   const { isMobile, open } = useSidebar();
+
+  const handleSignOut = async () => {
+    await signOut({ 
+      callbackUrl: `/${locale}`,
+      redirect: true 
+    });
+  };
 
   return (
     <>
@@ -96,7 +105,7 @@ export default function () {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   className="cursor-pointer"
-                  onClick={() => signOut()}
+                  onClick={handleSignOut}
                 >
                   <LogOut />
                   {t("user.sign_out")}

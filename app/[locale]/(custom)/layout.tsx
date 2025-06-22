@@ -5,6 +5,7 @@ import { Globe, Moon, Sun } from 'lucide-react'; // 假设使用 lucide-react �
 import styles from './custom/page.module.css';
 import HeaderSignButton from "@/components/sign/header-sign-button";
 import Link from "next/link";
+import DashboardButton from "@/components/navigation/dashboard-button";
 
 // 定义背景样式
 const backgroundStyle = {
@@ -136,25 +137,8 @@ export default function CustomLayout({
                            }}
                            className={clsx("hover:text-purple-600", styles.headerCircle)}  >Blog</a> */}
 
-                        <a href={`/${locale}/my-orders`}
-                           style={{
-                               // @ts-ignore
-                               '--border-width': '6px',
-                               '--border-style': 'solid',
-                               '--border-color': '#f8ed8c',
-                               '--border-radius': '25px',
-                               fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
-                               color: '#69b08b',
-                               fontSize: '23px',
-                               fontWeight: 'bold',
-                               backgroundColor: '#fcf4a3',
-                               borderRadius: '25px',
-                               display: 'flex',
-                               alignItems: 'center',
-                               justifyContent: 'center',
-                               textAlign: 'center'
-                           }}
-                           className={clsx("hover:text-purple-600", styles.headerCircle)}  >Dashboard</a>
+                        {/* Dashboard按钮 - 处理登录状态 */}
+                        <DashboardButton locale={locale} />
                         <a href="#contact"
                            style={{
                                // @ts-ignore

@@ -20,9 +20,11 @@ interface UserSubscription {
   user_uuid: string;
   product_id: string;
   status: string;
+  cancel_at_period_end?: boolean;
+  current_period_end?: string;
 }
 
-export default function Pricing({ pricing }: { pricing: PricingType }) {
+export default function Pricing({ pricing, variant = "full" }: { pricing: PricingType; variant?: "full" | "minimal" }) {
   const { user, setShowSignModal } = useAppContext();
   const locale = useLocale();
 
@@ -67,15 +69,67 @@ export default function Pricing({ pricing }: { pricing: PricingType }) {
     return userSubscription?.product_id === productId && userSubscription?.status === 'active';
   };
 
+  // 获取套餐等级权重（用于比较）
+  const getPlanWeight = (productId: string): number => {
+    switch (productId) {
+      case 'starter': return 1;
+      case 'standard': return 2;
+      case 'premium': return 3;
+      default: return 0;
+    }
+  };
+
+  // 检查用户当前会员等级
+  const getCurrentMembershipLevel = (): number => {
+    if (!userSubscription || userSubscription.status !== 'active') {
+      return 0; // 非会员
+    }
+    return getPlanWeight(userSubscription.product_id);
+  };
+
+  // 检查套餐是否可订阅
+  const isPlanAvailable = (item: PricingItem): boolean => {
+    const currentLevel = getCurrentMembershipLevel();
+    const targetLevel = getPlanWeight(item.product_id);
+    
+    // 如果是当前套餐且已设置取消，允许重新订阅
+    if (isUserSubscribed(item.product_id) && userSubscription?.cancel_at_period_end) {
+      return true;
+    }
+    
+    // 如果是当前套餐且未设置取消，不允许重复订阅
+    if (isUserSubscribed(item.product_id) && !userSubscription?.cancel_at_period_end) {
+      return false;
+    }
+    
+    // 允许订阅同等级或更高等级的套餐
+    return targetLevel >= currentLevel;
+  };
+
   // 获取按钮状态
   const getButtonState = (item: PricingItem) => {
-    const isSubscribed = isUserSubscribed(item.product_id);
     if (subscriptionLoading) {
       return { text: "检查订阅状态...", disabled: true };
     }
+    
+    const isSubscribed = isUserSubscribed(item.product_id);
+    const isAvailable = isPlanAvailable(item);
+    
+    // 当前套餐且已设置取消
+    if (isSubscribed && userSubscription?.cancel_at_period_end) {
+      return { text: "重新订阅", disabled: false };
+    }
+    
+    // 当前套餐且未设置取消
     if (isSubscribed) {
       return { text: "您已是该等级会员", disabled: true };
     }
+    
+    // 低于当前等级的套餐
+    if (!isAvailable) {
+      return { text: "等级过低", disabled: true };
+    }
+    
     return { text: item.button?.text || "选择套餐", disabled: false };
   };
 
@@ -87,8 +141,8 @@ export default function Pricing({ pricing }: { pricing: PricingType }) {
         return;
       }
 
-      // 检查是否已经订阅了该产品
-      if (isUserSubscribed(item.product_id)) {
+      // 检查是否已经订阅了该产品且未设置取消
+      if (isUserSubscribed(item.product_id) && !userSubscription?.cancel_at_period_end) {
         toast.error("您已经是该等级的会员了！");
         return;
       }
@@ -229,22 +283,25 @@ export default function Pricing({ pricing }: { pricing: PricingType }) {
   }, [pricing.items]);
 
   return (
-    <section className="py-24">
+    <section className={variant === "full" ? "py-12" : "py-8"}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-2xl text-center">
-          {pricing.title && (
-            <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-              {pricing.title}
-            </h2>
-          )}
-          {pricing.description && (
-            <p className="mx-auto mt-6 max-w-2xl text-center text-lg leading-8 text-gray-600">
-              {pricing.description}
-            </p>
-          )}
-        </div>
-        <div className="mx-auto mt-16 max-w-4xl">
-          {pricing.groups && pricing.groups.length > 1 && (
+        {variant === "full" && (
+          <div className="mx-auto max-w-2xl text-center">
+            {pricing.title && (
+              <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+                {pricing.title}
+              </h2>
+            )}
+            {pricing.description && (
+              <p className="mx-auto mt-6 max-w-2xl text-center text-lg leading-8 text-gray-600">
+                {pricing.description}
+              </p>
+            )}
+          </div>
+        )}
+
+        <div className={`mx-auto ${variant === "full" ? "mt-8" : "mt-4"} max-w-6xl`}>
+          {variant === "full" && pricing.groups && pricing.groups.length > 1 && (
             <div className="mx-auto max-w-md">
               <RadioGroup
                 defaultValue={pricing.groups[0].name}
@@ -282,7 +339,8 @@ export default function Pricing({ pricing }: { pricing: PricingType }) {
               </RadioGroup>
             </div>
           )}
-          <div className="isolate mx-auto mt-10 grid max-w-md grid-cols-1 gap-8 lg:mx-0 lg:max-w-none lg:grid-cols-3">
+
+          <div className="isolate mx-auto mt-10 grid max-w-md grid-cols-1 gap-8 lg:mx-0 lg:max-w-none lg:grid-cols-3 xl:gap-12">
             {pricing.items?.map((item, index) => {
               if (item.group && item.group !== group) {
                 return null;
@@ -290,20 +348,33 @@ export default function Pricing({ pricing }: { pricing: PricingType }) {
 
               const buttonState = getButtonState(item);
               const isSubscribed = isUserSubscribed(item.product_id);
+              const isAvailable = isPlanAvailable(item);
+              const isCanceled = isSubscribed && userSubscription?.cancel_at_period_end;
 
               return (
                 <div
                   key={index}
-                  className={`flex flex-col justify-between rounded-3xl bg-white p-8 ring-1 xl:p-10 ${
+                  className={`flex flex-col justify-between rounded-3xl p-8 ring-1 xl:p-10 min-h-[600px] ${
+                    !isAvailable && !isSubscribed
+                      ? "bg-gray-50 ring-gray-100 opacity-60"
+                      : isCanceled
+                      ? "bg-orange-50 ring-orange-200"
+                      : isSubscribed
+                      ? "bg-green-50 ring-green-200"
+                      : "bg-white ring-gray-200"
+                  } ${
                     item.is_featured
                       ? "ring-2 ring-primary"
-                      : "ring-gray-200"
-                  } ${isSubscribed ? "bg-green-50 ring-green-200" : ""}`}
+                      : ""
+                  }`}
                 >
-                  <div>
+                  <div className="flex-grow">
                     <div className="flex items-center justify-between gap-x-4">
                       <h3
                         className={`text-lg font-semibold leading-8 ${
+                          !isAvailable && !isSubscribed
+                            ? "text-gray-400"
+                            : 
                           item.is_featured
                             ? "text-primary"
                             : "text-gray-900"
@@ -311,7 +382,7 @@ export default function Pricing({ pricing }: { pricing: PricingType }) {
                       >
                         {item.title}
                       </h3>
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 flex-wrap">
                         {item.label && (
                           <Badge
                             variant="outline"
@@ -320,15 +391,25 @@ export default function Pricing({ pricing }: { pricing: PricingType }) {
                             {item.label}
                           </Badge>
                         )}
-                        {isSubscribed && (
+                        {isSubscribed && !isCanceled && (
                           <Badge variant="default" className="bg-green-600">
                             当前套餐
+                          </Badge>
+                        )}
+                        {isCanceled && (
+                          <Badge variant="outline" className="border-orange-500 text-orange-600">
+                            已设置取消
+                          </Badge>
+                        )}
+                        {!isAvailable && !isSubscribed && (
+                          <Badge variant="outline" className="border-gray-400 text-gray-500">
+                            等级过低
                           </Badge>
                         )}
                       </div>
                     </div>
 
-                    <div className="flex items-end gap-2 mb-4">
+                    <div className="flex items-end gap-2 mb-4 mt-4">
                       {item.original_price && (
                         <span className="text-xl text-muted-foreground font-semibold line-through">
                           {item.original_price}
@@ -346,31 +427,31 @@ export default function Pricing({ pricing }: { pricing: PricingType }) {
                       )}
                     </div>
                     {item.description && (
-                      <p className="text-muted-foreground">
+                      <p className="text-muted-foreground mb-6 leading-relaxed">
                         {item.description}
                       </p>
                     )}
                     {item.features_title && (
-                      <p className="mb-3 mt-6 font-semibold">
+                      <p className="mb-4 mt-6 font-semibold text-lg">
                         {item.features_title}
                       </p>
                     )}
                     {item.features && (
-                      <ul className="flex flex-col gap-3">
+                      <ul className="flex flex-col gap-4 mb-6">
                         {item.features.map((feature, fi) => {
                           return (
-                            <li className="flex gap-2" key={`feature-${fi}`}>
-                              <Check className="mt-1 size-4 shrink-0" />
-                              {feature}
+                            <li className="flex gap-3 items-start" key={`feature-${fi}`}>
+                              <Check className="mt-1 size-4 shrink-0 text-green-600" />
+                              <span className="leading-relaxed">{feature}</span>
                             </li>
                           );
                         })}
                       </ul>
                     )}
                   </div>
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-3 mt-auto pt-4">
                     {item.cn_amount && item.cn_amount > 0 && !isSubscribed ? (
-                      <div className="flex items-center gap-x-2 mt-2">
+                      <div className="flex items-center gap-x-2">
                         <span className="text-sm">人民币支付 👉</span>
                         <div
                           className={`inline-block p-2 rounded-md ${
@@ -395,7 +476,7 @@ export default function Pricing({ pricing }: { pricing: PricingType }) {
                     ) : null}
                     {item.button && (
                       <Button
-                        className="w-full flex items-center justify-center gap-2 font-semibold"
+                        className="w-full flex items-center justify-center gap-2 font-semibold py-3"
                         disabled={isLoading || buttonState.disabled}
                         onClick={() => {
                           if (isLoading || buttonState.disabled) {
@@ -403,7 +484,15 @@ export default function Pricing({ pricing }: { pricing: PricingType }) {
                           }
                           handleCreemCheckout(item);
                         }}
-                        variant={isSubscribed ? "secondary" : "default"}
+                        variant={
+                          isCanceled 
+                            ? "default" 
+                            : isSubscribed 
+                            ? "secondary" 
+                            : !isAvailable && !isSubscribed
+                            ? "outline"
+                            : "default"
+                        }
                       >
                         {(!isLoading ||
                           (isLoading && productId !== item.product_id)) && (
@@ -422,7 +511,7 @@ export default function Pricing({ pricing }: { pricing: PricingType }) {
                       </Button>
                     )}
                     {item.tip && (
-                      <p className="text-muted-foreground text-sm mt-2">
+                      <p className="text-muted-foreground text-sm mt-2 leading-relaxed">
                         {item.tip}
                       </p>
                     )}
