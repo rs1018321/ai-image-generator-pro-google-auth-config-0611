@@ -41,6 +41,8 @@ const TextColor: React.FC = () => {
     const [showPlanModal, setShowPlanModal] = useState(false);
     const [subscription, setSubscription] = useState<any | null>(null);
     const [subLoading, setSubLoading] = useState(false);
+    const [showTooltip, setShowTooltip] = useState(false);
+    const [tooltipMessage, setTooltipMessage] = useState("");
 
     const defaultImage = "https://picsum.photos/id/1015/300/200";
     const clearImage = "/imgs/custom/photo.png";
@@ -315,6 +317,85 @@ const TextColor: React.FC = () => {
         }
     }, [subscription, subLoading]);
 
+    // 处理添加书签的函数
+    const handleBookmark = async () => {
+        try {
+            // 现代浏览器的收藏API
+            if ('bookmarks' in navigator) {
+                try {
+                    // @ts-ignore - Bookmarks API仍在实验阶段
+                    await navigator.bookmarks.create({
+                        title: document.title,
+                        url: window.location.href
+                    });
+                    setTooltipMessage("Website successfully added to bookmarks!");
+                    setShowTooltip(true);
+                    setTimeout(() => setShowTooltip(false), 3000);
+                    return;
+                } catch (error) {
+                    console.log('Bookmarks API unavailable, trying other methods');
+                }
+            }
+
+            // 检测用户代理并提供适当的指导
+            const userAgent = navigator.userAgent.toLowerCase();
+            let shortcutKey = '';
+            let message = '';
+
+            if (userAgent.includes('mac')) {
+                shortcutKey = 'Cmd + D';
+                message = `Please press ${shortcutKey} to add this page to bookmarks`;
+            } else if (userAgent.includes('windows') || userAgent.includes('linux')) {
+                shortcutKey = 'Ctrl + D';
+                message = `Please press ${shortcutKey} to add this page to bookmarks`;
+            } else if (userAgent.includes('android')) {
+                message = 'Please click "Add to Bookmarks" option in your browser menu';
+            } else if (userAgent.includes('iphone') || userAgent.includes('ipad')) {
+                message = 'Please click the share button, then select "Add to Bookmarks"';
+            } else {
+                message = 'Please use your browser\'s bookmark feature to add this page to bookmarks';
+            }
+
+            // 尝试传统的IE方法（仅限IE浏览器）
+            if ((window as any).external && (window as any).external.AddFavorite) {
+                try {
+                    (window as any).external.AddFavorite(window.location.href, document.title);
+                    setTooltipMessage("Website successfully added to bookmarks!");
+                    setShowTooltip(true);
+                    setTimeout(() => setShowTooltip(false), 3000);
+                    return;
+                } catch (error) {
+                    console.log('IE bookmark method failed');
+                }
+            }
+
+            // 尝试Firefox的方法
+            if (window.sidebar && (window.sidebar as any).addPanel) {
+                try {
+                    (window.sidebar as any).addPanel(document.title, window.location.href, "");
+                    setTooltipMessage("Website successfully added to bookmarks!");
+                    setShowTooltip(true);
+                    setTimeout(() => setShowTooltip(false), 3000);
+                    return;
+                } catch (error) {
+                    console.log('Firefox bookmark method failed');
+                }
+            }
+
+            // 如果所有自动方法都失败，显示指导信息
+            setTooltipMessage(message);
+            setShowTooltip(true);
+            setTimeout(() => setShowTooltip(false), 5000);
+
+        } catch (error) {
+            console.error('Failed to add bookmark:', error);
+            setTooltipMessage("Please use browser shortcut Ctrl+D (Windows) or Cmd+D (Mac) to add bookmark");
+            setShowTooltip(true);
+            setTimeout(() => setShowTooltip(false), 3000);
+        }
+    };
+
+
     return (
         <>
             <div className={clsx(styles.flexColorContainer)}>
@@ -330,7 +411,7 @@ const TextColor: React.FC = () => {
                     }}
                     className={clsx(styles.flexGroup, styles.group1, styles.borderHandDrown)}>
                     <h3 style={{
-                        margin: "0 0 10px 0",
+                        margin: "30px 0 10px 0",
                         fontFamily: "dk_cool_crayonregular",
                         color: "#786312",
                         textAlign: "center"
@@ -340,6 +421,63 @@ const TextColor: React.FC = () => {
                         <div style={{padding: "20px"  }} className={clsx(styles.contentItem1)}>
                             {/* 左侧：文本框 */}
                             <div >
+                                <div className={clsx("")} style={{
+
+                                }}
+                                >
+                                    <div
+                                        onClick={handleBookmark}
+                                        style={{
+                                            fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+
+                                            fontWeight: 'bold',
+                                            backgroundColor: '#fcf4a3',
+                                            color: '#6fd4c2',
+                                            padding: "5px 12px",
+                                            borderRadius: "25px",
+                                            border: 'none',
+                                            display: 'flex',
+                                            alignItems: 'flex-start',
+                                            justifyContent: 'center',
+                                            textAlign: 'center',
+                                            gap: '2px',
+                                            paddingTop: '3px',
+                                            width:"120px",
+                                            marginBottom: '10px',
+                                            marginTop:"-30px"
+                                        }}
+                                        className={clsx("text-xs lg:text-xl md:text-sm rounded cursor-pointer hover:text-purple-600 transition-colors")}
+                                    >
+                                        <img
+                                            className={clsx("w-3 lg:w-5 md:w-4 ")}
+                                            src="/imgs/icons/bookmark-icon.png"
+                                            alt="Bookmark"
+                                            style={{
+
+                                                objectFit: 'contain',
+                                                marginTop: '5px'
+                                            }}
+                                        />
+                                        Bookmark
+                                    </div>
+                                    {showTooltip && (
+                                        <div style={{
+                                            position: 'absolute',
+                                            top: '70px',
+                                            right: '0',
+                                            backgroundColor: '#333',
+                                            color: 'white',
+                                            padding: '8px 12px',
+                                            borderRadius: '4px',
+                                            fontSize: '14px',
+                                            whiteSpace: 'nowrap',
+                                            zIndex: 1000
+                                        }}>
+                                            {tooltipMessage}
+                                        </div>
+                                    )}
+                                </div>
+
                                 <div
                                     className={clsx("", styles.borderHandDrown)}
                                     style={{
@@ -714,7 +852,8 @@ const TextColor: React.FC = () => {
                                 flexDirection:"row",
                                 alignItems: "center",
                                 justifyContent: "space-between",
-                                marginTop: "15px",
+                                marginTop: "30px",
+                                marginBottom: "10px"
                             }}>
                                 {/* 水印控制开关 - 与style按钮左边垂直对齐 */}
                                 <div style={{
@@ -734,13 +873,14 @@ const TextColor: React.FC = () => {
                                         display: "flex",
                                         flexDirection: "column",
                                         alignItems: "flex-start",
-                                        gap: "2px"
+                                        gap: "5px"
                                     }}>
                                     <span className={clsx("text-xs lg:text-xl md:text-sm")} style={{
                                         // fontSize: "18px",
                                         fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
                                         color: "#679fb5",
-                                        fontWeight: "bold"
+                                        fontWeight: "bold",
+                                        whiteSpace: "nowrap",
                                     }}>
                                         Remove watermark
                                     </span>
@@ -760,7 +900,9 @@ const TextColor: React.FC = () => {
                                 </div>
 
                                 {/* Generate按钮 - 与第三张style图片右边框对齐 */}
-                                <div >
+                                <div style={{
+                                    paddingRight: "10px",
+                                }}>
                                     <button
                                         type="submit"
                                         className={clsx("text-xs lg:text-xl md:text-sm",styles.borderHandDrown) }
@@ -804,7 +946,7 @@ const TextColor: React.FC = () => {
                     className={clsx(styles.flexGroup, styles.group2, styles.borderHandDrown)}>
 
                     <h3 style={{
-                        margin: "0 0 10px 0",
+                        margin: "30px 0 10px 0",
                         fontFamily: "dk_cool_crayonregular",
                         color: "#786312",
                         textAlign: "center"
@@ -819,7 +961,7 @@ const TextColor: React.FC = () => {
                                     '--border-style': 'dashed',
                                     '--border-color': '#000',
                                     '--border-radius': '15px',
-                                    width: "100%",
+                                    // width: "100%",
                                     padding:"10px",
                                     // height: "650px",
                                     margin: "10px auto",
@@ -837,25 +979,26 @@ const TextColor: React.FC = () => {
                                         生成中...
                                     </div>
                                 ) : generatedImage ? (
-                                    <ImageCompare
-                                        // @ts-ignore
-                                        leftImage={generatedImage}
-                                        rightImage={generatedImage}
-                                        leftLabel="Original cityscape"
-                                        rightLabel="Ghibli-style transformation"
-                                    />
-
-
-                                    // <img
-                                    //     src={generatedImage}
-                                    //     alt="Generated Coloring Book"
-                                    //     style={{
-                                    //         width: "100%",
-                                    //         height: "100%",
-                                    //         padding: "10px",
-                                    //         objectFit: "contain",
-                                    //     }}
+                                    // <ImageCompare
+                                    //     // @ts-ignore
+                                    //     leftImage={generatedImage}
+                                    //     rightImage={generatedImage}
+                                    //     leftLabel="Original cityscape"
+                                    //     rightLabel="Ghibli-style transformation"
                                     // />
+
+
+                                    <img
+                                        src={generatedImage}
+                                        alt="Generated Coloring Book"
+                                        style={{
+                                            width: "80%",
+                                            padding: "10px",
+                                            // height: "100%",
+                                            padding: "5px",
+                                            objectFit: "contain",
+                                        }}
+                                    />
                                 ) : (
                                     <div style={{
                                         color: "#666",
@@ -874,7 +1017,7 @@ const TextColor: React.FC = () => {
                                 marginTop: "1px",
                                 justifyContent: "space-between",
                                 // width: "80%",
-                                margin: "1px auto 10px auto"
+                                margin: "15px auto 10px auto"
                             }}>
                                 <button
                                     className={clsx("text-xs lg:text-sm md:text-xs",styles.borderHandDrown) }
