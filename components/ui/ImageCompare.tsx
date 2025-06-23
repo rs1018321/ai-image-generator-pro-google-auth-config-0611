@@ -94,7 +94,7 @@ const ImageCompare: React.FC<ImageCompareProps> = ({
 
             <div
                 ref={containerRef}
-                className="relative w-full h-[400px] md:h-[500px] overflow-hidden rounded-lg border border-gray-200 shadow-md"
+                className="relative w-full h-[350px] md:h-[350px] overflow-hidden rounded-lg border border-gray-200 shadow-md"
             >
                 {/* 左侧图片 */}
                 <img

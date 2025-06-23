@@ -34,7 +34,7 @@
     font-family: "'Comic Sans MS', 'Marker Felt', cursive";
     position: relative;
     display: inline-block;
-    padding: 24px 8px;
+    /*padding: 24px 8px;*/
     text-decoration: none;
     z-index: 1;
     min-height: 0;
@@ -243,6 +243,71 @@
     object-fit: cover;
 }
 
+
+/* Gallery of AI-Generated Coloring Pages 单独页面的样式 */
+.keyFeatureContentCard {
+    flex: 1 1 calc(50% - 16px); /* 一行三列，计算间距 */
+    background-color: #f9f3e8; /* 浅米色背景 */
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    min-width: 260px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+
+    font-family: 'dk_cool_crayonregular';
+    position: relative;
+}
+
+.keyFeatureContentCard::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    filter: url(#hand-drawn);
+    pointer-events: none;
+    z-index: -1;
+
+    /* 使用CSS变量控制所有边框属性 */
+    border-width: var(--border-width, 2px);
+    border-style: var(--border-style, solid);
+    border-color: var(--border-color, #f8e71c);
+    border-radius: var(--border-radius, 0px);
+
+    box-sizing: border-box;
+}
+
+.keyFeatureContentCard:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* 图片容器 */
+.featureContentImageContainer {
+    width: 100%;
+    height: 0;
+    padding-bottom: 66.67%; /* 保持宽高比，如图片是 3:2 比例，这里用 2/3 的值，可根据实际图片比例调整 */
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+.featureContentImage {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    object-fit: cover;
+}
+
+
 /* 功能内容区域 */
 .featureContent {
     flex: 1;
@@ -407,7 +472,7 @@
     font-size: 1.25rem;
     color: #333;
     text-align: center;
-    margin: 0 auto 1rem auto;
+    margin: 0 auto ;
     font-family: "Comic Sans MS", "Marker Felt", "Apple Chancery", cursive !important;
 }
 
@@ -524,22 +589,22 @@
         grid-template-columns: 1fr;
         gap: 20px;
     }
-    
+
     .keyFeatureCard,
     .testimonialCard {
         padding: 20px;
     }
-    
+
     .testimonialContentWrapper {
         flex-direction: column;
         text-align: center;
     }
-    
+
     .accordionTitle {
         font-size: 1.75rem;
         font-family: "Comic Sans MS", "Marker Felt", "Apple Chancery", cursive !important;
     }
-    
+
     .accordionContainerWrapper .accordionContainer .trigger,
     .accordionContainer .trigger {
         padding: 45px 60px;
@@ -548,7 +613,7 @@
         font-weight: normal !important;
         min-height: 90px;
     }
-    
+
     .content {
         padding: 0 20px 0 20px;
         display: flex;
@@ -557,7 +622,7 @@
         overflow: hidden;
         transition: max-height 0.3s ease;
     }
-    
+
     .content p {
         padding: 0 6rem;
         font-size: 0.9rem;
@@ -602,7 +667,7 @@
     .accordionContainer {
         width: 80vw;
     }
-    
+
     .accordionTip {
         width: 50vw;
     }
@@ -612,16 +677,16 @@
     .accordionContainer {
         width: 90vw;
     }
-    
+
     .accordionTip {
         width: 70vw;
     }
-    
+
     .accordionTitle {
         font-size: 1.25rem;
         font-family: "Comic Sans MS", "Marker Felt", "Apple Chancery", cursive !important;
     }
-    
+
     .accordionContainerWrapper .accordionContainer .trigger,
     .accordionContainer .trigger {
         padding: 1.7rem 2.25rem;
@@ -630,11 +695,103 @@
         font-weight: normal !important;
         min-height: 77px;
     }
-    
+
     .content p {
         padding: 0.375rem 6rem;
         font-size: 0.9rem;
         min-height: 60px;
         line-height: 2.4;
     }
-} 
+}
+
+/*
+重新布局 PHOTO/Text TO COLORING PAGE
+*/
+.flexColorContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap:30px;
+    max-width:80vw;
+    margin:0 auto;
+}
+.flexGroup{
+    display: flex;
+    flex-direction: column;
+}
+
+.group1{
+    flex:5 0 calc(5/8*100% - 25px);
+    /*border: 1px solid #4a90e2;*/
+    /*background: #71bc93;*/
+}
+.groupTitle{
+    text-align: center;
+}
+
+.groupContent {
+    display: flex;
+    flex-wrap: nowrap;/* 初始不换行 */
+    gap: 15px;
+    /*padding: 15px;*/
+    justify-content: center;
+}
+.contentItem1  {
+    flex: 1 1 calc(3/8*100%- 10px); /* 左右各50%，减去间距 */
+    /*padding: 16px;*/
+    /*background-color: white;*/
+    border-radius: 6px;
+    /*box-shadow: 0 2px 4px rgba(0,0,0,0.05);*/
+}
+.contentItem2  {
+    flex: 1 1 calc(5/8*100% - 10px); /* 左右各50%，减去间距 */
+    /*padding: 16px;*/
+    /*background-color: white;*/
+    border-radius: 6px;
+    /*box-shadow: 0 2px 4px rgba(0,0,0,0.05);*/
+}
+
+
+
+.group2{
+    flex: 3 0 calc(3/8*100% - 8px);
+
+}
+/* 优先让group-2换行的媒体查询 */
+@media (max-width: 1024px) {
+    .group2 {
+        flex: 1 0 100%; /* group-2先换行 */
+    }
+
+    .group1 {
+        flex: 1 0 calc(100% - 16px); /* 调整group-1宽度 */
+    }
+}
+
+/* 再让content-item换行的媒体查询 */
+@media (max-width: 768px) {
+    .groupContent {
+        flex-wrap: wrap; /* content-item开始换行 */
+    }
+
+    .contentItem1 {
+        flex: 1 1 calc(4/8*100%- 10px);
+    }
+    .contentItem2  {
+        flex: 1 1 calc(4/8*100% - 10px);
+
+    }
+}
+
+
+/* 响应式优化 */
+@media (max-width: 640px) {
+    .flexGroup {
+        flex: 1 0 100%;
+    }
+
+    .contentItem {
+        flex: 1 1 100%; /* 小屏幕下单列显示 */
+    }
+}
+
+
