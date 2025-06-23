@@ -597,7 +597,7 @@ export default function LandingPage({page, locale}: LandingPageProps) {
 
             {/* 标题 - 绝对定位，独立移动不影响其他元素 */}
             <div style={{
-                marginTop:"0.8rem"
+                marginTop:"4vh"
             }}>
                 <h1 style={{
                     fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
@@ -610,9 +610,9 @@ export default function LandingPage({page, locale}: LandingPageProps) {
             {/* 为下面的内容添加固定的上边距，确保不被标题遮挡 */}
             <div style={{marginTop: '2rem'}}>
                 {/* 书签按钮 - 独立定位在Text Color按钮右边，Result步骤框上方 */}
-                <div className={clsx("top-52 lg:top-52 md:top-50")} style={{
+                <div className={clsx("")} style={{
                     position: 'absolute',
-
+                    display: 'none',
                     right: `${bookmarkPositionRight}vw`,
                     left: bookmarkPositionLeft,
                     bottom: bookmarkPositionBottom,
@@ -673,7 +673,11 @@ export default function LandingPage({page, locale}: LandingPageProps) {
                 {/* 两个切换按钮和组件显示区域 */}
                 <div className=" mx-auto mb-12">
                     {/* 按钮容器 */}
-                    <div className="max-w-4xl mx-auto flex mb-6">
+                    <div className={clsx("",styles.flexButtonContainer)}
+                        style={{
+                            marginBottom: '20px',
+                        }}
+                    >
                         <button
                             onClick={() => handleComponentChange("photo")}
                             style={{
@@ -683,55 +687,41 @@ export default function LandingPage({page, locale}: LandingPageProps) {
                                 padding: "0 8px",
                                 height: "45px",
                                 backgroundColor: activeComponent === "photo" ? '#64bc99' : '#d6f5de',
-
-                                // @ts-ignore
                                 '--border-width': '3px',
                                 '--border-style': 'solid',
-                                '--border-color': activeComponent === "photo"
-                                    ? '#64bc99' : '#d6f5de',
+                                '--border-color': activeComponent === "photo" ? '#64bc99' : '#d6f5de',
                                 '--border-radius': '0px'
                             }}
                             className={clsx(`
-                            w-1/2
-                            flex items-center justify-center
-                            text-sm md:text-xs lg:text-2xl photo-button flex-1 
-                            py-6 px-4 font-medium transition-colors duration-200 rounded-t-lg ${
-                                activeComponent === "photo"
-                                    ? "hover:opacity-80"
-                                    : "hover:opacity-80"
-                            }`, styles.buttonBorder)}
+      
+      text-sm md:text-xs lg:text-2xl photo-button flex-1 
+      py-6 px-4 font-medium transition-colors duration-200 rounded-t-lg ${
+                                activeComponent === "photo" ? "hover:opacity-80" : "hover:opacity-80"
+                            }`, styles.buttonBorder,styles.buttonGroup)}
                         >
                             PHOTO TO COLORING PAGE
                         </button>
                         <button
                             onClick={() => handleComponentChange("text")}
-
                             style={{
                                 border: "none",
                                 fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
-
                                 color: activeComponent === "text" ? "white" : "#718096",
                                 padding: "0 16px",
                                 height: "45px",
                                 backgroundColor: activeComponent === "text" ? '#64bc99' : '#d6f5de',
-                                // @ts-ignore
                                 '--border-width': '3px',
                                 '--border-style': 'solid',
-                                '--border-color': activeComponent === "text"
-                                    ? '#64bc99' : '#d6f5de',
+                                '--border-color': activeComponent === "text" ? '#64bc99' : '#d6f5de',
                                 '--border-radius': '0px'
                             }}
-
                             className={clsx(`
-                            
-                              w-1/2
-                            flex items-center justify-center
-                            text-sm md:text-xs lg:text-2xl
-                            text-button flex-1 py-6 px-4 font-medium transition-colors duration-200 rounded-t-lg ${
-                                activeComponent === "text"
-                                    ? "hover:opacity-80"
-                                    : "hover:opacity-80"
-                            }`, styles.buttonBorder)}
+    
+     
+      text-sm md:text-xs lg:text-2xl
+      text-button flex-1 py-6 px-4 font-medium transition-colors duration-200 rounded-t-lg ${
+                                activeComponent === "text" ? "hover:opacity-80" : "hover:opacity-80"
+                            }`, styles.buttonBorder,styles.buttonGroup)}
                         >
                             TEXT TO COLORING PAGE
                         </button>
@@ -781,7 +771,7 @@ export default function LandingPage({page, locale}: LandingPageProps) {
 
             {/* Gallery of AI-Generated Coloring Pages 标题部份 */}
             <div>
-                <h3 className={styles.accordionTitle}>Gallery of AI-Generated Coloring Pages</h3>
+                <h3 className={clsx("lg:mt-[20vh] md:mt-[15vh] mt-[10vh]",styles.accordionTitle) }>Gallery of AI-Generated Coloring Pages</h3>
                 <p className={styles.accordionTip}>Explore magical worlds created with AI coloring page generator.</p>
             </div>
 

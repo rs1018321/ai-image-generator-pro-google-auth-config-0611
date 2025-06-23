@@ -40,6 +40,8 @@ const PhotoColor: React.FC = () => {
     const [showPlanModal, setShowPlanModal] = useState(false);
     const [subscription, setSubscription] = useState<any | null>(null);
     const [subLoading, setSubLoading] = useState(false);
+    const [showTooltip, setShowTooltip] = useState(false);
+    const [tooltipMessage, setTooltipMessage] = useState("");
 
     // 新增：积分相关状态
     const [showCreditConfirmModal, setShowCreditConfirmModal] = useState(false);
@@ -419,6 +421,85 @@ const PhotoColor: React.FC = () => {
         }
     };
 
+    // 处理添加书签的函数
+    const handleBookmark = async () => {
+        try {
+            // 现代浏览器的收藏API
+            if ('bookmarks' in navigator) {
+                try {
+                    // @ts-ignore - Bookmarks API仍在实验阶段
+                    await navigator.bookmarks.create({
+                        title: document.title,
+                        url: window.location.href
+                    });
+                    setTooltipMessage("Website successfully added to bookmarks!");
+                    setShowTooltip(true);
+                    setTimeout(() => setShowTooltip(false), 3000);
+                    return;
+                } catch (error) {
+                    console.log('Bookmarks API unavailable, trying other methods');
+                }
+            }
+
+            // 检测用户代理并提供适当的指导
+            const userAgent = navigator.userAgent.toLowerCase();
+            let shortcutKey = '';
+            let message = '';
+
+            if (userAgent.includes('mac')) {
+                shortcutKey = 'Cmd + D';
+                message = `Please press ${shortcutKey} to add this page to bookmarks`;
+            } else if (userAgent.includes('windows') || userAgent.includes('linux')) {
+                shortcutKey = 'Ctrl + D';
+                message = `Please press ${shortcutKey} to add this page to bookmarks`;
+            } else if (userAgent.includes('android')) {
+                message = 'Please click "Add to Bookmarks" option in your browser menu';
+            } else if (userAgent.includes('iphone') || userAgent.includes('ipad')) {
+                message = 'Please click the share button, then select "Add to Bookmarks"';
+            } else {
+                message = 'Please use your browser\'s bookmark feature to add this page to bookmarks';
+            }
+
+            // 尝试传统的IE方法（仅限IE浏览器）
+            if ((window as any).external && (window as any).external.AddFavorite) {
+                try {
+                    (window as any).external.AddFavorite(window.location.href, document.title);
+                    setTooltipMessage("Website successfully added to bookmarks!");
+                    setShowTooltip(true);
+                    setTimeout(() => setShowTooltip(false), 3000);
+                    return;
+                } catch (error) {
+                    console.log('IE bookmark method failed');
+                }
+            }
+
+            // 尝试Firefox的方法
+            if (window.sidebar && (window.sidebar as any).addPanel) {
+                try {
+                    (window.sidebar as any).addPanel(document.title, window.location.href, "");
+                    setTooltipMessage("Website successfully added to bookmarks!");
+                    setShowTooltip(true);
+                    setTimeout(() => setShowTooltip(false), 3000);
+                    return;
+                } catch (error) {
+                    console.log('Firefox bookmark method failed');
+                }
+            }
+
+            // 如果所有自动方法都失败，显示指导信息
+            setTooltipMessage(message);
+            setShowTooltip(true);
+            setTimeout(() => setShowTooltip(false), 5000);
+
+        } catch (error) {
+            console.error('Failed to add bookmark:', error);
+            setTooltipMessage("Please use browser shortcut Ctrl+D (Windows) or Cmd+D (Mac) to add bookmark");
+            setShowTooltip(true);
+            setTimeout(() => setShowTooltip(false), 3000);
+        }
+    };
+
+
     // @ts-ignore
     return (
         <>
@@ -434,7 +515,7 @@ const PhotoColor: React.FC = () => {
                     }}
                     className={clsx(styles.flexGroup, styles.group1, styles.borderHandDrown)}>
                     <h3 style={{
-                        margin: "20px 0 10px 0",
+                        margin: "30px 0 10px 0",
                         fontFamily: "dk_cool_crayonregular",
                         color: "#786312",
                         textAlign: "center"
@@ -442,6 +523,63 @@ const PhotoColor: React.FC = () => {
                     <form onSubmit={handleSubmit(onSubmit)} className={clsx(styles.groupContent)}>
                         <div style={{padding: "20px"  }} className={clsx(styles.contentItem1)}>
                             <div >
+                                <div className={clsx("")} style={{
+
+                                }}
+                                >
+                                    <div
+                                        onClick={handleBookmark}
+                                        style={{
+                                            fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+
+                                            fontWeight: 'bold',
+                                            backgroundColor: '#fcf4a3',
+                                            color: '#6fd4c2',
+                                            padding: "5px 12px",
+                                            borderRadius: "25px",
+                                            border: 'none',
+                                            display: 'flex',
+                                            alignItems: 'flex-start',
+                                            justifyContent: 'center',
+                                            textAlign: 'center',
+                                            gap: '2px',
+                                            paddingTop: '3px',
+                                            width:"120px",
+                                            marginBottom: '10px',
+                                            marginTop:"-30px"
+                                        }}
+                                        className={clsx("text-xs lg:text-xl md:text-sm rounded cursor-pointer hover:text-purple-600 transition-colors")}
+                                    >
+                                        <img
+                                            className={clsx("w-3 lg:w-5 md:w-4 ")}
+                                            src="/imgs/icons/bookmark-icon.png"
+                                            alt="Bookmark"
+                                            style={{
+
+                                                objectFit: 'contain',
+                                                marginTop: '5px'
+                                            }}
+                                        />
+                                        Bookmark
+                                    </div>
+                                    {showTooltip && (
+                                        <div style={{
+                                            position: 'absolute',
+                                            top: '70px',
+                                            right: '0',
+                                            backgroundColor: '#333',
+                                            color: 'white',
+                                            padding: '8px 12px',
+                                            borderRadius: '4px',
+                                            fontSize: '14px',
+                                            whiteSpace: 'nowrap',
+                                            zIndex: 1000
+                                        }}>
+                                            {tooltipMessage}
+                                        </div>
+                                    )}
+                                </div>
+
                                 <div
                                     className={styles.borderHandDrown}
                                     style={{
@@ -853,6 +991,8 @@ const PhotoColor: React.FC = () => {
                                 flexDirection:"row",
                                 alignItems: "center",
                                 justifyContent: "space-between",
+                                marginTop: "20px",
+                                marginBottom: "15px"
                             }}>
                                 {/* 水印控制开关 - 与style按钮左边垂直对齐 */}
                                 <div style={{
@@ -898,7 +1038,9 @@ const PhotoColor: React.FC = () => {
                                 </div>
 
                                 {/* Generate按钮 - 与第三张style图片右边框对齐 */}
-                                <div style={{}}>
+                                <div style={{
+                                    paddingRight: "10px",
+                                }}>
                                     <button
                                         type="submit"
                                         className={clsx("text-xs lg:text-xl md:text-sm",styles.borderHandDrown) }
@@ -915,7 +1057,8 @@ const PhotoColor: React.FC = () => {
                                             fontWeight: "bold",
                                             fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
                                             borderRadius: "25px",
-                                            border: "none"
+                                            border: "none",
+
                                         }}
                                     >
                                         Generate
@@ -1011,7 +1154,7 @@ const PhotoColor: React.FC = () => {
                                 marginTop: "1px",
                                 justifyContent: "space-between",
                                 // width: "80%",
-                                margin: "1px auto 10px auto"
+                                margin: "15px auto 10px auto"
                             }}>
                                 <button
                                     className={clsx("text-xs lg:text-sm md:text-xs",styles.borderHandDrown) }
@@ -1138,7 +1281,7 @@ const PhotoColor: React.FC = () => {
                             '--border-color': '#fae0b3',
                             '--border-radius': '15px',
                             padding: "10px",
-                            margin: "-10px 5px 5px -55px", // 调整左边距使左边框与"Coloring Page"的"C"对齐
+                            // margin: "-10px 5px 5px -55px", // 调整左边距使左边框与"Coloring Page"的"C"对齐
                             flex: "2",
                             display: "flex",
                             flexDirection: "column",
@@ -1230,18 +1373,18 @@ const PhotoColor: React.FC = () => {
                         '--border-color': '#c8f1c5',
                         '--border-radius': '15px',
                         padding: "20px",
-                        margin: "-10px 15px 5px -55px", // 增加右边距从5px到15px
+                        // margin: "0px 15px 5px -55px", // 增加右边距从5px到15px
                         flex: "5", // flex: "2" + flex: "3" = flex: "5"，占据两个区域的空间
                         display: "flex",
                         flexDirection: "column",
                         backgroundColor: "#f4f9c7", // 添加填充颜色
                         borderRadius: "15px", // 添加圆角使背景色与边框一致
-                        height: "565px", // 设置固定高度，与Select Photo区域一致
-                        overflow: "hidden", // 隐藏超出部分
+                        // height: "565px", // 设置固定高度，与Select Photo区域一致
+                        // overflow: "hidden", // 隐藏超出部分
                     }}
                 >
                     <h3 style={{
-                        margin: "0 0 10px 0",
+                        margin: "30px 0 10px 0",
                         fontSize: "40px",
                         fontFamily: "dk_cool_crayonregular",
                         color: "#786312",
