@@ -1,17 +1,19 @@
 "use client"
 
-import React, { useState, useRef, useEffect } from "react";
-import { useForm, SubmitHandler } from "react-hook-form";
+import React, {useState, useRef, useEffect} from "react";
+import {useForm, SubmitHandler} from "react-hook-form";
 import axios from "axios";
 import styles from "./page.module.css";
-import { TwitterLogoIcon } from '@radix-ui/react-icons';
-import { FaFacebookF, FaLinkedinIn, FaWhatsapp } from 'react-icons/fa';
-import { Switch } from "@/components/ui/switch";
-import { useSession } from "next-auth/react";
+import {TwitterLogoIcon} from '@radix-ui/react-icons';
+import {FaFacebookF, FaLinkedinIn, FaWhatsapp} from 'react-icons/fa';
+import {Switch} from "@/components/ui/switch";
+import {useSession} from "next-auth/react";
 import SignModal from "@/components/sign/modal";
 import CreditConfirmModal from "@/components/ui/credit-confirm-modal";
-import { toast } from "sonner";
-import { useAppContext } from "@/contexts/app";
+import {toast} from "sonner";
+import {useAppContext} from "@/contexts/app";
+import clsx from "clsx";
+import ImageCompare from "@/components/ui/ImageCompare";
 
 type FormData = {
     size: string;
@@ -21,8 +23,8 @@ type FormData = {
 };
 
 const TextColor: React.FC = () => {
-    const { data: session } = useSession();
-    const { setShowSignModal, userCredits, setUserCredits, setShowSubscriptionModal } = useAppContext();
+    const {data: session} = useSession();
+    const {setShowSignModal, userCredits, setUserCredits, setShowSubscriptionModal} = useAppContext();
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [selectedPrompt, setSelectedPrompt] = useState<string>(""); // 存储选中的提示文本
     const [selectedSize, setSelectedSize] = useState<string>("Auto");
@@ -32,20 +34,20 @@ const TextColor: React.FC = () => {
     const [isGenerating, setIsGenerating] = useState<boolean>(false); // 添加生成中状态
     const [promptValue, setPromptValue] = useState<string>(""); // 新增：跟踪文本框内容
     const [hasWatermark, setHasWatermark] = useState(true); // 默认显示水印
-    
+
     // 新增：积分相关状态
     const [showCreditConfirmModal, setShowCreditConfirmModal] = useState(false);
     const [pendingFormData, setPendingFormData] = useState<FormData | null>(null);
     const [showPlanModal, setShowPlanModal] = useState(false);
     const [subscription, setSubscription] = useState<any | null>(null);
     const [subLoading, setSubLoading] = useState(false);
-    
+
     const defaultImage = "https://picsum.photos/id/1015/300/200";
     const clearImage = "/imgs/custom/photo.png";
-    
+
     // 默认结果图片 - 在 result 虚线框中显示
     const defaultResultImage = "/imgs/custom/textcolor-default-result.png"; // 您需要准备这张图片
-    
+
     // 初始化时设置默认结果图片
     React.useEffect(() => {
         setGeneratedImage(defaultResultImage);
@@ -62,7 +64,7 @@ const TextColor: React.FC = () => {
     const {
         register,
         handleSubmit,
-        formState: { errors },
+        formState: {errors},
         setValue,
         watch,
     } = useForm<FormData>({
@@ -117,7 +119,7 @@ const TextColor: React.FC = () => {
         try {
             // 创建 FormData 对象
             const formData = new FormData();
-            
+
             // 将 Size 比例值映射为 API 期望的像素尺寸
             const sizeMapping: { [key: string]: string } = {
                 "Auto": "1024x1024",      // 默认正方形
@@ -127,15 +129,15 @@ const TextColor: React.FC = () => {
                 "16:9": "1248x832",       // 横版 3:2 (接近16:9)
                 "9:16": "832x1248",       // 竖版 2:3 (接近9:16)
             };
-            
+
             const apiSize = sizeMapping[selectedSize] || "1024x1024";
-            
+
             // 直接传递用户输入的描述，固定的黑白线稿 prompt 在 API 中处理
             formData.append('prompt', data.prompt.trim());
             formData.append('size', apiSize);
             formData.append('style', selectedStyle);
             formData.append('watermark', hasWatermark.toString()); // 新增：水印参数
-            
+
             console.log(`🎯 发送请求到 generate-text-to-image API:`);
             console.log(`📝 用户描述: ${data.prompt.trim()}`);
             console.log(`📐 Size: ${selectedSize} -> ${apiSize}`);
@@ -147,22 +149,22 @@ const TextColor: React.FC = () => {
                     'Content-Type': 'multipart/form-data',
                 },
             });
-            
+
             console.log("✅ API 请求成功，后端返回：", response.data);
-            
+
             // 处理返回的结果，显示生成的图片
             if (response.data.success && response.data.image) {
                 console.log("🖼️ 生成的涂色书图片已准备就绪");
                 setGeneratedImage(response.data.image);
                 setIsCleared(false); // 重置清除状态，确保显示生成的图片
-                
+
                 // 更新用户积分
                 setUserCredits(prev => Math.max(0, prev - 2));
                 toast.success("图片生成成功！已消耗2个积分");
             } else {
                 alert("生成失败：未收到有效的图片数据");
             }
-            
+
         } catch (error: any) {
             console.error("❌ API 请求失败：", error);
             alert(`生成失败: ${error.response?.data?.error || error.message}`);
@@ -173,23 +175,23 @@ const TextColor: React.FC = () => {
     };
 
     const sizeOptions = [
-        { value: "Auto", label: "Auto", ratio: "auto" },
-        { value: "1:1", label: "1:1", ratio: "1/1" },
-        { value: "4:3", label: "4:3", ratio: "4/3" },
-        { value: "3:4", label: "3:4", ratio: "3/4" },
-        { value: "16:9", label: "16:9", ratio: "16/9" },
-        { value: "9:16", label: "9:16", ratio: "9/16" },
+        {value: "Auto", label: "Auto", ratio: "auto"},
+        {value: "1:1", label: "1:1", ratio: "1/1"},
+        {value: "4:3", label: "4:3", ratio: "4/3"},
+        {value: "3:4", label: "3:4", ratio: "3/4"},
+        {value: "16:9", label: "16:9", ratio: "16/9"},
+        {value: "9:16", label: "9:16", ratio: "9/16"},
     ];
 
     const ageOptions = [
-        { value: "1-2", label: "1-2" },
-        { value: "3-4", label: "3-4" },
-        { value: "5-8", label: "5-8" },
+        {value: "1-2", label: "1-2"},
+        {value: "3-4", label: "3-4"},
+        {value: "5-8", label: "5-8"},
     ];
     const pagesOptions = [
-        { value: "1", label: "1" },
-        { value: "2", label: "2" },
-        { value: "4", label: "4" },
+        {value: "1", label: "1"},
+        {value: "2", label: "2"},
+        {value: "4", label: "4"},
     ];
 
     const photoOptions = [
@@ -296,6 +298,7 @@ const TextColor: React.FC = () => {
                 setSubLoading(false);
             }
         }
+
         loadSub();
     }, []);
 
@@ -314,68 +317,49 @@ const TextColor: React.FC = () => {
 
     return (
         <>
-        <div
-            style={{
-                display: "flex",
-                width: "78vw",
-                margin: "0 auto",
-            }}
-        >
-            {/* Describe 区域 - 调整为占据相当于PhotoColor中Upload区域的空间 */}
-            <div
-                className={styles.borderHandDrown}
-                style={{
-                    // @ts-ignore
-                    '--border-width': '7px',
-                    '--border-style': 'solid',
-                    '--border-color': '#c8f1c5',
-                    '--border-radius': '15px',
-                    padding: "20px",
-                    margin: "-10px 15px 5px -55px", // 与PhotoColor的Upload区域保持一致
-                    flex: "5", // 与PhotoColor的Upload区域保持一致
-                    display: "flex",
-                    flexDirection: "column",
-                    backgroundColor: "#f4f9c7",
-                    borderRadius: "15px",
-                    height: "565px",
-                    overflow: "hidden",
-                }}
-            >
-                <h3 style={{ 
-                    margin: "0 0 10px 0", 
-                    fontSize: "40px",
-                    fontFamily: "dk_cool_crayonregular",
-                    color: "#786312",
-                    textAlign: "center"
-                }}>Describe</h3>
-                <form
-                    onSubmit={handleSubmit(onSubmit)}
-                    style={{ flex: "1", display: "flex", flexDirection: "column", height: "100%", paddingTop: "10px" }}
-                >
-                    {/* 上半部分：文本框 + Size选项 */}
-                    <div style={{ display: "flex", gap: "20px", marginBottom: "20px", height: "200px" }}>
-                        {/* 左侧：文本框 */}
-                        <div style={{ flex: "0.8", position: "relative", zIndex: 1 }}>
-                            <div
-                                className={styles.borderHandDrown}
-                                style={{
-                                    // @ts-ignore
-                                    '--border-width': '2px',
-                                    '--border-style': 'dashed',
-                                    '--border-color': '#000',
-                                    '--border-radius': '8px',
-                                    width: "340px",
-                                    height: "160px", /*调整describe文本框的高度*/
-                                    display: "flex",
-                                    justifyContent: "center",
-                                    alignItems: "center",
-                                    cursor: "pointer",
-                                    position: "relative",
-                                    margin: "0 auto",
-                                }}
-                            >
+            <div className={clsx(styles.flexColorContainer)}>
+                <div
+                    style={{
+                        // @ts-ignore
+                        '--border-width': '7px',
+                        '--border-style': 'solid',
+                        '--border-color': '#c8f1c5',
+                        '--border-radius': '15px',
+                        // padding: "20px",
+                        backgroundColor: "#f4f9c7", // 添加填充颜色
+                    }}
+                    className={clsx(styles.flexGroup, styles.group1, styles.borderHandDrown)}>
+                    <h3 style={{
+                        margin: "0 0 10px 0",
+                        fontFamily: "dk_cool_crayonregular",
+                        color: "#786312",
+                        textAlign: "center"
+                    }} className={clsx("lg:text-5xl md:text-3xl text-xl", styles.groupTitle)}>Describe</h3>
+                    <form
+                          onSubmit={handleSubmit(onSubmit)} className={clsx(styles.groupContent)}>
+                        <div style={{padding: "20px"  }} className={clsx(styles.contentItem1)}>
+                            {/* 左侧：文本框 */}
+                            <div >
+                                <div
+                                    className={clsx("", styles.borderHandDrown)}
+                                    style={{
+                                        // @ts-ignore
+                                        '--border-width': '2px',
+                                        '--border-style': 'dashed',
+                                        '--border-color': '#000',
+                                        '--border-radius': '8px',
+
+                                        minWidth:"250px",
+                                        height: "160px", /*调整describe文本框的高度*/
+                                        display: "flex",
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                        cursor: "pointer",
+                                        margin: "0 auto",
+                                    }}
+                                >
                                 <textarea
-                                    {...register("prompt", { required: true })}
+                                    {...register("prompt", {required: true})}
                                     style={{
                                         width: "100%",
                                         height: "100%",
@@ -392,187 +376,130 @@ const TextColor: React.FC = () => {
                                     }}
                                     placeholder="Enter description text..."
                                 />
-                                {/* 添加清空按钮 - 只在有内容时显示 */}
-                                {promptValue && promptValue.trim() && (
-                                    <button
-                                        onClick={handleClearDescribe}
-                                        type="button"
-                                        style={{
-                                            position: "absolute",
-                                            top: "5px",
-                                            right: "5px",
-                                            width: "20px",
-                                            height: "20px",
-                                            borderRadius: "50%",
-                                            backgroundColor: "rgba(255, 0, 0, 0.8)",
-                                            color: "white",
-                                            border: "none",
-                                            cursor: "pointer",
-                                            fontSize: "12px",
-                                            fontWeight: "bold",
-                                            display: "flex",
-                                            alignItems: "center",
-                                            justifyContent: "center",
-                                            zIndex: 1,
-                                            lineHeight: "1",
-                                        }}
-                                        title="清空文本"
-                                    >
-                                        ×
-                                    </button>
-                                )}
-                            </div>
-                            
-                            {/* 在虚线框下方添加提示文字 */}
-                            <div style={{
-                                marginTop: "10px",
-                                textAlign: "left",
-                                fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
-                                fontSize: "16px",
-                                color: "#70c09d",
-                                lineHeight: "1.2",
-                                width: "340px",
-                                margin: "10px auto 0 auto",
-                                pointerEvents: "none"
-                            }}>
-                                <div>Need inspiration?</div>
-                                <div>Try one of these examples:</div>
-                            </div>
-                            
-                            {/* 3个示例文本链接纵向排列 */}
-                            <div style={{
-                                display: "flex",
-                                flexDirection: "column",
-                                gap: "5px",
-                                width: "340px",
-                                margin: "10px auto 0 auto",
-                                position: "relative",
-                                zIndex: 10
-                            }}>
-                                {photoOptions.map((option, index) => (
-                                    <div
-                                        key={index}
-                                        className={styles.borderHandDrown}
-                                        style={{
-                                            // @ts-ignore
-                                            '--border-width': '2px',
-                                            '--border-style': 'solid',
-                                            '--border-color': selectedPrompt === option.title ? '#1890ff' : '#c8f1c5',
-                                            '--border-radius': '8px',
-                                            cursor: "pointer",
-                                            transition: "all 0.2s",
-                                            padding: "8px 12px",
-                                            backgroundColor: selectedPrompt === option.title ? "#e6f7ff" : "transparent",
-                                            position: "relative",
-                                            zIndex: 11,
-                                            borderRadius: "8px"
-                                        }}
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            e.stopPropagation();
-                                            handleImageClick(option);
-                                        }}
-                                    >
-                                        <div style={{
-                                            fontSize: "14px",
-                                            fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
-                                            color: "#666",
-                                            lineHeight: "1.2",
-                                            pointerEvents: "none",
-                                            textAlign: "justify"
-                                        }}>
-                                            {option.title}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
+                                    {/* 添加清空按钮 - 只在有内容时显示 */}
+                                    {promptValue && promptValue.trim() && (
+                                        <button
+                                            onClick={handleClearDescribe}
+                                            type="button"
+                                            style={{
+                                                position: "absolute",
+                                                top: "5px",
+                                                right: "5px",
+                                                width: "20px",
+                                                height: "20px",
+                                                borderRadius: "50%",
+                                                backgroundColor: "rgba(255, 0, 0, 0.8)",
+                                                color: "white",
+                                                border: "none",
+                                                cursor: "pointer",
+                                                fontSize: "12px",
+                                                fontWeight: "bold",
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: "center",
+                                                zIndex: 1,
+                                                lineHeight: "1",
+                                            }}
+                                            title="清空文本"
+                                        >
+                                            ×
+                                        </button>
+                                    )}
+                                </div>
 
-                        {/* 右侧：Size选项 */}
-                        <div style={{ flex: "1", display: "flex", flexDirection: "column" }}>
-                            <label style={{ 
-                                fontSize: "18px", 
-                                fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
-                                backgroundColor: '#f7c863',
-                                borderRadius: '25px',
-                                color: 'white',
-                                padding: '8px 16px',
-                                display: 'inline-block',
-                                alignSelf: 'flex-start',
-                                marginBottom: '15px'
-                            }}>Size</label>
-                            
-                            {/* Size选项按钮 - 改为一行排列 */}
-                            <div style={{
-                                display: "flex",
-                                justifyContent: "space-between",
-                                gap: "5px",
-                                marginBottom: "20px"
-                            }}>
-                                {sizeOptions.map((option) => (
-                                    <div key={option.value} style={{ 
-                                        display: "flex", 
-                                        flexDirection: "column", 
-                                        alignItems: "center",
-                                        cursor: "pointer",
-                                        flex: "1"
-                                    }}>
+                                {/* 在虚线框下方添加提示文字 */}
+                                <div style={{
+                                    marginTop: "10px",
+                                    textAlign: "left",
+                                    fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                                    fontSize: "16px",
+                                    color: "#70c09d",
+                                    lineHeight: "1.2",
+                                    // width: "340px",
+                                    margin: "10px auto 0 auto",
+                                    pointerEvents: "none"
+                                }}>
+                                    <div>Need inspiration?</div>
+                                    <div>Try one of these examples:</div>
+                                </div>
+
+                                {/* 3个示例文本链接纵向排列 */}
+                                <div style={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    gap: "5px",
+                                    // width: "340px",
+                                    margin: "10px auto 0 auto",
+                                    position: "relative",
+                                    zIndex: 10
+                                }}>
+                                    {photoOptions.map((option, index) => (
                                         <div
+                                            key={index}
                                             className={styles.borderHandDrown}
-                                            onClick={() => handleSizeSelect(option.value)}
                                             style={{
                                                 // @ts-ignore
                                                 '--border-width': '2px',
-                                                '--border-style': 'dashed',
-                                                '--border-color': '#000',
+                                                '--border-style': 'solid',
+                                                '--border-color': selectedPrompt === option.title ? '#1890ff' : '#c8f1c5',
                                                 '--border-radius': '8px',
-                                                width: option.value === "Auto" ? "42px" : 
-                                                       option.value === "1:1" ? "42px" :
-                                                       option.value === "4:3" ? "56px" :
-                                                       option.value === "3:4" ? "42px" :
-                                                       option.value === "16:9" ? "65px" :
-                                                       option.value === "9:16" ? "39px" : "42px",
-                                                height: option.value === "Auto" ? "42px" :
-                                                        option.value === "1:1" ? "42px" :
-                                                        option.value === "4:3" ? "42px" :
-                                                        option.value === "3:4" ? "56px" :
-                                                        option.value === "16:9" ? "39px" :
-                                                        option.value === "9:16" ? "65px" : "42px",
-                                                display: "flex",
-                                                flexDirection: "column",
-                                                justifyContent: "center",
-                                                alignItems: "center",
-                                                borderRadius: "4px",
                                                 cursor: "pointer",
-                                                backgroundColor: selectedSize === option.value ? "#e6f7ff" : "transparent",
                                                 transition: "all 0.2s",
-                                                flexShrink: 0,
-                                                minWidth: "unset",
-                                                minHeight: "unset",
-                                                padding: "0",
-                                                boxSizing: "border-box",
-                                                marginBottom: "5px"
+                                                padding: "8px 12px",
+                                                backgroundColor: selectedPrompt === option.title ? "#e6f7ff" : "transparent",
+                                                position: "relative",
+                                                zIndex: 11,
+                                                borderRadius: "8px"
+                                            }}
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                handleImageClick(option);
                                             }}
                                         >
+                                            <div style={{
+                                                fontSize: "14px",
+                                                fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                                                color: "#666",
+                                                lineHeight: "1.2",
+                                                pointerEvents: "none",
+                                                textAlign: "justify"
+                                            }}>
+                                                {option.title}
+                                            </div>
                                         </div>
-                                        <div style={{ 
-                                            fontSize: "12px", 
-                                            marginTop: "3px", 
-                                            textAlign: "center",
-                                            fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
-                                            whiteSpace: "nowrap"
-                                        }}>
-                                            {option.label}
-                                        </div>
-                                    </div>
-                                ))}
+                                    ))}
+                                </div>
                             </div>
+                            {/* Style必填项错误提示 */}
+                            {!selectedStyle && (
+                                <span style={{
+                                    color: "red",
+                                    fontSize: "12px",
+                                    marginTop: "-15px",
+                                    marginBottom: "15px",
+                                    display: "block",
+                                    fontFamily: "'Comic Sans MS', 'Marker Felt', cursive"
+                                }}>
+                            Style 是必填项
+                        </span>
+                            )}
 
-                            {/* Style区域移到Size区域内部 */}
-                            <div style={{ display: "flex", flexDirection: "column" }}>
+                            {errors.prompt && (
+                                <span style={{color: "red", fontSize: "12px", marginLeft: "25px"}}>
+                            描述文字是必填项
+                        </span>
+                            )}
+
+                        </div>
+                        <div style={{
+                            padding: "10px"
+                        }}
+                             className={clsx(styles.contentItem2)}>
+                            <div style={{}}>
                                 <label style={{
-                                    fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
                                     fontSize: "18px",
+                                    fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
                                     backgroundColor: '#f7c863',
                                     borderRadius: '25px',
                                     color: 'white',
@@ -580,408 +507,1177 @@ const TextColor: React.FC = () => {
                                     display: 'inline-block',
                                     alignSelf: 'flex-start',
                                     marginBottom: '15px'
-                                }}>Style</label>
+                                }}>Size</label>
 
-                                {/* Style选项区域 - 三个龙猫图片水平排列 */}
-                                <div style={{ 
-                                    display: "flex", 
-                                    justifyContent: "space-between", 
-                                    gap: "10px"
+                                {/* Size选项按钮 - 改为一行排列 */}
+                                <div style={{
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    gap: "5px",
+                                    marginBottom: "20px"
                                 }}>
-                                    {/* Simplified (for kids) */}
-                                    <div 
-                                        style={{ 
-                                            display: "flex", 
-                                            flexDirection: "column", 
+                                    {sizeOptions.map((option) => (
+                                        <div key={option.value} style={{
+                                            display: "flex",
+                                            flexDirection: "column",
                                             alignItems: "center",
-                                            flex: "1",
                                             cursor: "pointer",
-                                            padding: "8px",
-                                            borderRadius: "8px",
-                                            backgroundColor: selectedStyle === "simplified" ? "#e6f7ff" : "transparent",
-                                            transition: "all 0.2s",
-                                            border: selectedStyle === "simplified" ? "2px solid #1890ff" : "2px solid transparent"
-                                        }}
-                                        onClick={() => handleStyleSelect("simplified")}
-                                    >
-                                        <img
-                                            src="/imgs/custom/totoro-simple.png"
-                                            alt="Simplified style"
-                                            style={{
-                                                width: "150px",
-                                                height: "150px",
-                                                objectFit: "contain",
-                                                marginBottom: "8px"
-                                            }}
-                                        />
-                                        <div style={{
-                                            fontSize: "10px",
-                                            fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
-                                            textAlign: "center",
-                                            lineHeight: "1.2",
-                                            color: "#000"
+                                            flex: "1"
                                         }}>
-                                            Simplified (for kids)
+                                            <div
+                                                className={styles.borderHandDrown}
+                                                onClick={() => handleSizeSelect(option.value)}
+                                                style={{
+                                                    // @ts-ignore
+                                                    '--border-width': '2px',
+                                                    '--border-style': 'dashed',
+                                                    '--border-color': '#000',
+                                                    '--border-radius': '8px',
+                                                    width: option.value === "Auto" ? "42px" :
+                                                        option.value === "1:1" ? "42px" :
+                                                            option.value === "4:3" ? "56px" :
+                                                                option.value === "3:4" ? "42px" :
+                                                                    option.value === "16:9" ? "65px" :
+                                                                        option.value === "9:16" ? "39px" : "42px",
+                                                    height: option.value === "Auto" ? "42px" :
+                                                        option.value === "1:1" ? "42px" :
+                                                            option.value === "4:3" ? "42px" :
+                                                                option.value === "3:4" ? "56px" :
+                                                                    option.value === "16:9" ? "39px" :
+                                                                        option.value === "9:16" ? "65px" : "42px",
+                                                    display: "flex",
+                                                    flexDirection: "column",
+                                                    justifyContent: "center",
+                                                    alignItems: "center",
+                                                    borderRadius: "4px",
+                                                    cursor: "pointer",
+                                                    backgroundColor: selectedSize === option.value ? "#e6f7ff" : "transparent",
+                                                    transition: "all 0.2s",
+                                                    flexShrink: 0,
+                                                    minWidth: "unset",
+                                                    minHeight: "unset",
+                                                    padding: "0",
+                                                    boxSizing: "border-box",
+                                                    marginBottom: "5px"
+                                                }}
+                                            >
+                                            </div>
+                                            <div style={{
+                                                fontSize: "12px",
+                                                marginTop: "3px",
+                                                textAlign: "center",
+                                                fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                                                whiteSpace: "nowrap",
+                                                color:"black"
+                                            }}>
+                                                {option.label}
+                                            </div>
                                         </div>
-                                    </div>
+                                    ))}
+                                </div>
 
-                                    {/* Medium detailed (for kids) */}
-                                    <div 
-                                        style={{ 
-                                            display: "flex", 
-                                            flexDirection: "column", 
-                                            alignItems: "center",
-                                            flex: "1",
-                                            cursor: "pointer",
-                                            padding: "8px",
-                                            borderRadius: "8px",
-                                            backgroundColor: selectedStyle === "medium" ? "#e6f7ff" : "transparent",
-                                            transition: "all 0.2s",
-                                            border: selectedStyle === "medium" ? "2px solid #1890ff" : "2px solid transparent"
-                                        }}
-                                        onClick={() => handleStyleSelect("medium")}
-                                    >
-                                        <img
-                                            src="/imgs/custom/totoro-medium.png"
-                                            alt="Medium detailed style"
+                                {/* Style区域移到Size区域内部 */}
+                                <div style={{display: "flex", flexDirection: "column"}}>
+                                    <label style={{
+                                        fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                                        fontSize: "18px",
+                                        backgroundColor: '#f7c863',
+                                        borderRadius: '25px',
+                                        color: 'white',
+                                        padding: '8px 16px',
+                                        display: 'inline-block',
+                                        alignSelf: 'flex-start',
+                                        marginBottom: '15px'
+                                    }}>Style</label>
+
+                                    {/* Style选项区域 - 三个龙猫图片水平排列 */}
+                                    <div style={{
+                                        display: "flex",
+                                        justifyContent: "space-between",
+                                        gap: "10px"
+                                    }}>
+                                        {/* Simplified (for kids) */}
+                                        <div
                                             style={{
-                                                width: "150px",
-                                                height: "150px",
-                                                objectFit: "contain",
-                                                marginBottom: "8px"
+                                                display: "flex",
+                                                flexDirection: "column",
+                                                alignItems: "center",
+                                                flex: "1",
+                                                cursor: "pointer",
+                                                padding: "8px",
+                                                borderRadius: "8px",
+                                                backgroundColor: selectedStyle === "simplified" ? "#e6f7ff" : "transparent",
+                                                transition: "all 0.2s",
+                                                border: selectedStyle === "simplified" ? "2px solid #1890ff" : "2px solid transparent"
                                             }}
-                                        />
-                                        <div style={{
-                                            fontSize: "10px",
-                                            fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
-                                            textAlign: "center",
-                                            lineHeight: "1.2",
-                                            color: "#000"
-                                        }}>
-                                            Medium detailed (for kids)
+                                            onClick={() => handleStyleSelect("simplified")}
+                                        >
+                                            <img
+                                                src="/imgs/custom/totoro-simple.png"
+                                                alt="Simplified style"
+                                                style={{
+                                                    width: "150px",
+                                                    height: "150px",
+                                                    objectFit: "contain",
+                                                    marginBottom: "8px"
+                                                }}
+                                            />
+                                            <div style={{
+                                                fontSize: "10px",
+                                                fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                                                textAlign: "center",
+                                                lineHeight: "1.2",
+                                                color: "#000"
+                                            }}>
+                                                Simplified (for kids)
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    {/* Detailed (for adults) */}
-                                    <div 
-                                        style={{ 
-                                            display: "flex", 
-                                            flexDirection: "column", 
-                                            alignItems: "center",
-                                            flex: "1",
-                                            cursor: "pointer",
-                                            padding: "8px",
-                                            borderRadius: "8px",
-                                            backgroundColor: selectedStyle === "detailed" ? "#e6f7ff" : "transparent",
-                                            transition: "all 0.2s",
-                                            border: selectedStyle === "detailed" ? "2px solid #1890ff" : "2px solid transparent"
-                                        }}
-                                        onClick={() => handleStyleSelect("detailed")}
-                                    >
-                                        <img
-                                            src="/imgs/custom/totoro-detailed.png"
-                                            alt="Detailed style"
+                                        {/* Medium detailed (for kids) */}
+                                        <div
                                             style={{
-                                                width: "150px",
-                                                height: "150px",
-                                                objectFit: "contain",
-                                                marginBottom: "8px"
+                                                display: "flex",
+                                                flexDirection: "column",
+                                                alignItems: "center",
+                                                flex: "1",
+                                                cursor: "pointer",
+                                                padding: "8px",
+                                                borderRadius: "8px",
+                                                backgroundColor: selectedStyle === "medium" ? "#e6f7ff" : "transparent",
+                                                transition: "all 0.2s",
+                                                border: selectedStyle === "medium" ? "2px solid #1890ff" : "2px solid transparent"
                                             }}
-                                        />
-                                        <div style={{
-                                            fontSize: "10px",
-                                            fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
-                                            textAlign: "center",
-                                            lineHeight: "1.2",
-                                            color: "#000"
-                                        }}>
-                                            Detailed (for adults)
+                                            onClick={() => handleStyleSelect("medium")}
+                                        >
+                                            <img
+                                                src="/imgs/custom/totoro-medium.png"
+                                                alt="Medium detailed style"
+                                                style={{
+                                                    width: "150px",
+                                                    height: "150px",
+                                                    objectFit: "contain",
+                                                    marginBottom: "8px"
+                                                }}
+                                            />
+                                            <div style={{
+                                                fontSize: "10px",
+                                                fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                                                textAlign: "center",
+                                                lineHeight: "1.2",
+                                                color: "#000"
+                                            }}>
+                                                Medium detailed (for kids)
+                                            </div>
+                                        </div>
+
+                                        {/* Detailed (for adults) */}
+                                        <div
+                                            style={{
+                                                display: "flex",
+                                                flexDirection: "column",
+                                                alignItems: "center",
+                                                flex: "1",
+                                                cursor: "pointer",
+                                                padding: "8px",
+                                                borderRadius: "8px",
+                                                backgroundColor: selectedStyle === "detailed" ? "#e6f7ff" : "transparent",
+                                                transition: "all 0.2s",
+                                                border: selectedStyle === "detailed" ? "2px solid #1890ff" : "2px solid transparent"
+                                            }}
+                                            onClick={() => handleStyleSelect("detailed")}
+                                        >
+                                            <img
+                                                src="/imgs/custom/totoro-detailed.png"
+                                                alt="Detailed style"
+                                                style={{
+                                                    width: "150px",
+                                                    height: "150px",
+                                                    objectFit: "contain",
+                                                    marginBottom: "8px"
+                                                }}
+                                            />
+                                            <div style={{
+                                                fontSize: "10px",
+                                                fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                                                textAlign: "center",
+                                                lineHeight: "1.2",
+                                                color: "#000"
+                                            }}>
+                                                Detailed (for adults)
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-
-                    {/* 底部：Generate按钮 - 在第二张龙猫图片正下方 */}
-                    <div style={{ 
-                        display: "flex", 
-                        alignItems: "center",
-                        gap: "20px",
-                        marginTop: "190px" /*调整generate按钮上下位移*/
-                    }}>
-                        {/* 左侧空白区域，对应左侧文本框的宽度 */}
-                        <div style={{ flex: "0.8" }}></div>
-                        
-                        {/* 右侧区域，对应Size和Style区域 */}
-                        <div style={{ flex: "1", display: "flex", alignItems: "center", gap: "20px" }}>
-                            {/* 水印控制开关 - 与style按钮左边垂直对齐 */}
-                            <div style={{ 
-                                display: "flex", 
-                                alignItems: "center", 
-                                gap: "8px",
-                                fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
-                                fontSize: "16px",
-                                color: "#679fb5"
+                            <div style={{
+                                display: "flex",
+                                flexDirection:"row",
+                                alignItems: "center",
+                                justifyContent: "space-between",
+                                marginTop: "15px",
                             }}>
-                                <Switch
-                                    checked={!hasWatermark}
-                                    onCheckedChange={handleWatermarkToggle}
-                                    className="data-[state=checked]:bg-[#679fb5]"
-                                />
-                                <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: "8px" }}>
-                                    <span style={{ 
-                                        fontSize: "18px", 
+                                {/* 水印控制开关 - 与style按钮左边垂直对齐 */}
+                                <div style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "8px",
+                                    fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                                    fontSize: "16px",
+                                    color: "#679fb5"
+                                }}>
+                                    <Switch
+                                        checked={!hasWatermark}
+                                        onCheckedChange={handleWatermarkToggle}
+                                        className="data-[state=checked]:bg-[#679fb5]"
+                                    />
+                                    <div style={{
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        alignItems: "flex-start",
+                                        gap: "2px"
+                                    }}>
+                                    <span className={clsx("text-xs lg:text-xl md:text-sm")} style={{
+                                        // fontSize: "18px",
                                         fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
                                         color: "#679fb5",
                                         fontWeight: "bold"
                                     }}>
                                         Remove watermark
                                     </span>
-                                    <div style={{ 
-                                        fontSize: "12px", 
-                                        fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
-                                        backgroundColor: '#f7c863',
-                                        borderRadius: '12px',
-                                        color: 'white',
-                                        padding: '4px 12px',
-                                        display: 'inline-block',
-                                        whiteSpace: 'nowrap'
-                                    }}>
-                                        Members only feature
+                                        <div className={clsx("text-xs lg:text-sm md:text-sm")} style={{
+                                            // fontSize: "12px",
+                                            fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                                            backgroundColor: '#f7c863',
+                                            borderRadius: '12px',
+                                            color: 'white',
+                                            padding: '4px 12px',
+                                            display: 'inline-block',
+                                            whiteSpace: 'nowrap'
+                                        }}>
+                                            Members only feature
+                                        </div>
                                     </div>
                                 </div>
+
+                                {/* Generate按钮 - 与第三张style图片右边框对齐 */}
+                                <div >
+                                    <button
+                                        type="submit"
+                                        className={clsx("text-xs lg:text-xl md:text-sm",styles.borderHandDrown) }
+                                        style={{
+                                            // @ts-ignore
+                                            '--border-width': '3px',
+                                            '--border-style': 'solid',
+                                            '--border-color': '#679fb5',
+                                            '--border-radius': '25px',
+                                            // fontSize: "26px",
+                                            backgroundColor: "#679fb5",
+                                            color: "#FFF",
+                                            padding: "12px 20px",
+                                            fontWeight: "bold",
+                                            fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                                            borderRadius: "25px",
+                                            border: "none"
+                                        }}
+                                    >
+                                        Generate
+                                    </button>
+                                </div>
                             </div>
-                            
-                            {/* Generate按钮 - 与第三张style图片右边框对齐 */}
-                            <div style={{ flex: "1", display: "flex", justifyContent: "flex-end" }}>
+                        </div>
+
+
+                    </form>
+
+
+                </div>
+                <div
+                    style={{
+                        // @ts-ignore
+                        '--border-width': '7px',
+                        '--border-style': 'solid',
+                        '--border-color': '#f9ef94',
+                        '--border-radius': '15px',
+                        padding: "20px",
+                        backgroundColor: "#fbfbca", // 添加填充颜色
+                    }}
+                    className={clsx(styles.flexGroup, styles.group2, styles.borderHandDrown)}>
+
+                    <h3 style={{
+                        margin: "0 0 10px 0",
+                        fontFamily: "dk_cool_crayonregular",
+                        color: "#786312",
+                        textAlign: "center"
+                    }} className={clsx("lg:text-5xl md:text-3xl text-xl", styles.groupTitle)}>Result</h3>
+                    <div className={clsx(styles.groupContent)}>
+                        <div className={clsx(styles.contentItem)}>
+                            <div
+                                className={styles.borderHandDrown}
+                                style={{
+                                    // @ts-ignore
+                                    '--border-width': '2px',
+                                    '--border-style': 'dashed',
+                                    '--border-color': '#000',
+                                    '--border-radius': '15px',
+                                    width: "100%",
+                                    padding:"10px",
+                                    // height: "650px",
+                                    margin: "10px auto",
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                }}
+                            >
+                                {isGenerating ? (
+                                    <div className={clsx("text-xs lg:text-sm md:text-sm")} style={{
+                                        color: "#666",
+                                        // fontSize: "14px",
+                                        fontFamily: "'Comic Sans MS', 'Marker Felt', cursive"
+                                    }}>
+                                        生成中...
+                                    </div>
+                                ) : generatedImage ? (
+                                    <ImageCompare
+                                        // @ts-ignore
+                                        leftImage={generatedImage}
+                                        rightImage={generatedImage}
+                                        leftLabel="Original cityscape"
+                                        rightLabel="Ghibli-style transformation"
+                                    />
+
+
+                                    // <img
+                                    //     src={generatedImage}
+                                    //     alt="Generated Coloring Book"
+                                    //     style={{
+                                    //         width: "100%",
+                                    //         height: "100%",
+                                    //         padding: "10px",
+                                    //         objectFit: "contain",
+                                    //     }}
+                                    // />
+                                ) : (
+                                    <div style={{
+                                        color: "#666",
+                                        fontSize: "14px",
+                                        fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                                        textAlign: "center"
+                                    }}>
+                                        Click Generate to show the result
+                                    </div>
+                                )}
+                            </div>
+                            <div style={{
+                                display: "flex",
+                                gap: "5px",
+                                marginBottom: "10px",
+                                marginTop: "1px",
+                                justifyContent: "space-between",
+                                // width: "80%",
+                                margin: "1px auto 10px auto"
+                            }}>
                                 <button
-                                    type="submit"
-                                    className={styles.borderHandDrown}
+                                    className={clsx("text-xs lg:text-sm md:text-xs",styles.borderHandDrown) }
+                                    onClick={handleDownload}
                                     style={{
                                         // @ts-ignore
                                         '--border-width': '3px',
                                         '--border-style': 'solid',
-                                        '--border-color': '#679fb5',
-                                        '--border-radius': '25px',
-                                        fontSize: "26px",
-                                        backgroundColor: "#679fb5",
-                                        color: "#FFF",
-                                        padding: "12px 20px",
-                                        fontWeight: "bold",
+                                        '--border-color': '#70c09d',
+                                        '--border-radius': '20px',
+
+                                        backgroundColor: "#70c09d",
+                                        color: "#fff",
+                                        padding: "8px 12px",
                                         fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
-                                        borderRadius: "25px",
-                                        border: "none"
-                                    }}
-                                >
-                                    Generate
+                                        borderRadius: "20px",
+                                        border: "none",
+                                        cursor: generatedImage ? "pointer" : "not-allowed",
+                                        opacity: generatedImage ? 1 : 0.5
+                                    }}>
+                                    Download Image
                                 </button>
+
+                                <div style={{
+                                    display: "flex",
+                                    flexDirection: "row",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    gap: "15px"
+                                }}>
+                                    <div className={clsx("text-xs lg:text-xl md:text-sm")} style={{
+
+                                        fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                                        color: "#786312",
+                                        textAlign: "center",
+                                        margin: "0"
+                                    }}>
+                                        Share To
+                                    </div>
+                                    <div style={{display: "flex", gap: "10px", justifyContent: "center", alignItems: "center"}}>
+                                        {/* Twitter Logo */}
+                                        <div style={{
+                                            width: "28px",
+                                            height: "28px",
+                                            borderRadius: "50%",
+                                            backgroundColor: "#1DA1F2",
+                                            display: "flex",
+                                            justifyContent: "center",
+                                            alignItems: "center",
+                                            cursor: "pointer",
+                                            transition: "transform 0.2s"
+                                        }}>
+                                            <TwitterLogoIcon style={{color: "white", fontSize: "14px"}}/>
+                                        </div>
+
+                                        {/* Facebook Logo */}
+                                        <div style={{
+                                            width: "28px",
+                                            height: "28px",
+                                            borderRadius: "50%",
+                                            backgroundColor: "#4267B2",
+                                            display: "flex",
+                                            justifyContent: "center",
+                                            alignItems: "center",
+                                            cursor: "pointer",
+                                            transition: "transform 0.2s"
+                                        }}>
+                                            <FaFacebookF style={{color: "white", fontSize: "14px"}}/>
+                                        </div>
+
+                                        {/* LinkedIn Logo */}
+                                        <div style={{
+                                            width: "28px",
+                                            height: "28px",
+                                            borderRadius: "50%",
+                                            backgroundColor: "#0077B5",
+                                            display: "flex",
+                                            justifyContent: "center",
+                                            alignItems: "center",
+                                            cursor: "pointer",
+                                            transition: "transform 0.2s"
+                                        }}>
+                                            <FaLinkedinIn style={{color: "white", fontSize: "14px"}}/>
+                                        </div>
+
+                                        {/* WhatsApp Logo */}
+                                        <div style={{
+                                            width: "28px",
+                                            height: "28px",
+                                            borderRadius: "50%",
+                                            backgroundColor: "#25D366",
+                                            display: "flex",
+                                            justifyContent: "center",
+                                            alignItems: "center",
+                                            cursor: "pointer",
+                                            transition: "transform 0.2s"
+                                        }}>
+                                            <FaWhatsapp style={{color: "white", fontSize: "14px"}}/>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+
                     </div>
 
-                    {/* Style必填项错误提示 */}
-                    {!selectedStyle && (
-                        <span style={{ 
-                            color: "red", 
-                            fontSize: "12px", 
-                            marginTop: "-15px",
-                            marginBottom: "15px",
-                            display: "block",
-                            fontFamily: "'Comic Sans MS', 'Marker Felt', cursive"
-                        }}>
-                            Style 是必填项
-                        </span>
-                    )}
-
-                    {errors.prompt && (
-                        <span style={{ color: "red", fontSize: "12px", marginLeft: "25px" }}>
-                            描述文字是必填项
-                        </span>
-                    )}
-                </form>
+                </div>
             </div>
 
-            {/* Result 区域 - 调整为与PhotoColor的Result区域保持一致 */}
-            <div
-                className={styles.borderHandDrown}
+            {false && (  <div
                 style={{
-                    // @ts-ignore
-                    '--border-width': '7px',
-                    '--border-style': 'solid',
-                    '--border-color': '#f9ef94',
-                    '--border-radius': '15px',
-                    padding: "20px",
-                    margin: "-10px -55px 5px 15px", // 与PhotoColor的Result区域保持一致
-                    flex: "3", // 与PhotoColor的Result区域保持一致
                     display: "flex",
-                    flexDirection: "column",
-                    backgroundColor: "#fbfbca",
-                    borderRadius: "15px",
-                    height: "565px",
-                    overflow: "hidden",
+                    width: "78vw",
+                    margin: "0 auto",
                 }}
             >
-                <h3 style={{ 
-                    margin: "0 0 10px 0", 
-                    fontSize: "40px",
-                    fontFamily: "dk_cool_crayonregular",
-                    color: "#786312",
-                    textAlign: "center"
-                }}>Result</h3>
+                {/* Describe 区域 - 调整为占据相当于PhotoColor中Upload区域的空间 */}
                 <div
                     className={styles.borderHandDrown}
                     style={{
                         // @ts-ignore
-                        '--border-width': '2px',
-                        '--border-style': 'dashed',
-                        '--border-color': '#000',
+                        '--border-width': '7px',
+                        '--border-style': 'solid',
+                        '--border-color': '#c8f1c5',
                         '--border-radius': '15px',
-                        width: "80%",
-                        height: "650px",
-                        margin: "10px auto",
-                        display: "flex", justifyContent: "center", alignItems: "center",
+                        padding: "20px",
+                        margin: "-10px 15px 5px -55px", // 与PhotoColor的Upload区域保持一致
+                        flex: "5", // 与PhotoColor的Upload区域保持一致
+                        display: "flex",
+                        flexDirection: "column",
+                        backgroundColor: "#f4f9c7",
+                        borderRadius: "15px",
+                        height: "565px",
+                        overflow: "hidden",
                     }}
                 >
-                    {isGenerating ? (
-                        <div style={{ 
-                            color: "#666", 
-                            fontSize: "14px",
-                            fontFamily: "'Comic Sans MS', 'Marker Felt', cursive"
-                        }}>
-                            生成中...
+                    <h3 style={{
+                        margin: "0 0 10px 0",
+                        fontSize: "40px",
+                        fontFamily: "dk_cool_crayonregular",
+                        color: "#786312",
+                        textAlign: "center"
+                    }}>Describe</h3>
+                    <form
+                        onSubmit={handleSubmit(onSubmit)}
+                        style={{
+                            flex: "1",
+                            display: "flex",
+                            flexDirection: "column",
+                            height: "100%",
+                            paddingTop: "10px"
+                        }}
+                    >
+                        {/* 上半部分：文本框 + Size选项 */}
+                        <div style={{display: "flex", gap: "20px", marginBottom: "20px", height: "200px"}}>
+                            {/* 左侧：文本框 */}
+                            <div style={{flex: "0.8", position: "relative", zIndex: 1}}>
+                                <div
+                                    className={styles.borderHandDrown}
+                                    style={{
+                                        // @ts-ignore
+                                        '--border-width': '2px',
+                                        '--border-style': 'dashed',
+                                        '--border-color': '#000',
+                                        '--border-radius': '8px',
+                                        width: "340px",
+                                        height: "160px", /*调整describe文本框的高度*/
+                                        display: "flex",
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                        cursor: "pointer",
+                                        position: "relative",
+                                        margin: "0 auto",
+                                    }}
+                                >
+                                <textarea
+                                    {...register("prompt", {required: true})}
+                                    style={{
+                                        width: "100%",
+                                        height: "100%",
+                                        padding: "12px",
+                                        fontSize: "14px",
+                                        color: "#806a18",
+                                        border: "none",
+                                        outline: "none",
+                                        resize: "none",
+                                        backgroundColor: "transparent",
+                                        fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                                        textAlign: "justify",
+                                        lineHeight: "1.4"
+                                    }}
+                                    placeholder="Enter description text..."
+                                />
+                                    {/* 添加清空按钮 - 只在有内容时显示 */}
+                                    {promptValue && promptValue.trim() && (
+                                        <button
+                                            onClick={handleClearDescribe}
+                                            type="button"
+                                            style={{
+                                                position: "absolute",
+                                                top: "5px",
+                                                right: "5px",
+                                                width: "20px",
+                                                height: "20px",
+                                                borderRadius: "50%",
+                                                backgroundColor: "rgba(255, 0, 0, 0.8)",
+                                                color: "white",
+                                                border: "none",
+                                                cursor: "pointer",
+                                                fontSize: "12px",
+                                                fontWeight: "bold",
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: "center",
+                                                zIndex: 1,
+                                                lineHeight: "1",
+                                            }}
+                                            title="清空文本"
+                                        >
+                                            ×
+                                        </button>
+                                    )}
+                                </div>
+
+                                {/* 在虚线框下方添加提示文字 */}
+                                <div style={{
+                                    marginTop: "10px",
+                                    textAlign: "left",
+                                    fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                                    fontSize: "16px",
+                                    color: "#70c09d",
+                                    lineHeight: "1.2",
+                                    width: "340px",
+                                    margin: "10px auto 0 auto",
+                                    pointerEvents: "none"
+                                }}>
+                                    <div>Need inspiration?</div>
+                                    <div>Try one of these examples:</div>
+                                </div>
+
+                                {/* 3个示例文本链接纵向排列 */}
+                                <div style={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    gap: "5px",
+                                    width: "340px",
+                                    margin: "10px auto 0 auto",
+                                    position: "relative",
+                                    zIndex: 10
+                                }}>
+                                    {photoOptions.map((option, index) => (
+                                        <div
+                                            key={index}
+                                            className={styles.borderHandDrown}
+                                            style={{
+                                                // @ts-ignore
+                                                '--border-width': '2px',
+                                                '--border-style': 'solid',
+                                                '--border-color': selectedPrompt === option.title ? '#1890ff' : '#c8f1c5',
+                                                '--border-radius': '8px',
+                                                cursor: "pointer",
+                                                transition: "all 0.2s",
+                                                padding: "8px 12px",
+                                                backgroundColor: selectedPrompt === option.title ? "#e6f7ff" : "transparent",
+                                                position: "relative",
+                                                zIndex: 11,
+                                                borderRadius: "8px"
+                                            }}
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                handleImageClick(option);
+                                            }}
+                                        >
+                                            <div style={{
+                                                fontSize: "14px",
+                                                fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                                                color: "#666",
+                                                lineHeight: "1.2",
+                                                pointerEvents: "none",
+                                                textAlign: "justify"
+                                            }}>
+                                                {option.title}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* 右侧：Size选项 */}
+                            <div style={{flex: "1", display: "flex", flexDirection: "column"}}>
+                                <label style={{
+                                    fontSize: "18px",
+                                    fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                                    backgroundColor: '#f7c863',
+                                    borderRadius: '25px',
+                                    color: 'white',
+                                    padding: '8px 16px',
+                                    display: 'inline-block',
+                                    alignSelf: 'flex-start',
+                                    marginBottom: '15px'
+                                }}>Size</label>
+
+                                {/* Size选项按钮 - 改为一行排列 */}
+                                <div style={{
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    gap: "5px",
+                                    marginBottom: "20px"
+                                }}>
+                                    {sizeOptions.map((option) => (
+                                        <div key={option.value} style={{
+                                            display: "flex",
+                                            flexDirection: "column",
+                                            alignItems: "center",
+                                            cursor: "pointer",
+                                            flex: "1"
+                                        }}>
+                                            <div
+                                                className={styles.borderHandDrown}
+                                                onClick={() => handleSizeSelect(option.value)}
+                                                style={{
+                                                    // @ts-ignore
+                                                    '--border-width': '2px',
+                                                    '--border-style': 'dashed',
+                                                    '--border-color': '#000',
+                                                    '--border-radius': '8px',
+                                                    width: option.value === "Auto" ? "42px" :
+                                                        option.value === "1:1" ? "42px" :
+                                                            option.value === "4:3" ? "56px" :
+                                                                option.value === "3:4" ? "42px" :
+                                                                    option.value === "16:9" ? "65px" :
+                                                                        option.value === "9:16" ? "39px" : "42px",
+                                                    height: option.value === "Auto" ? "42px" :
+                                                        option.value === "1:1" ? "42px" :
+                                                            option.value === "4:3" ? "42px" :
+                                                                option.value === "3:4" ? "56px" :
+                                                                    option.value === "16:9" ? "39px" :
+                                                                        option.value === "9:16" ? "65px" : "42px",
+                                                    display: "flex",
+                                                    flexDirection: "column",
+                                                    justifyContent: "center",
+                                                    alignItems: "center",
+                                                    borderRadius: "4px",
+                                                    cursor: "pointer",
+                                                    backgroundColor: selectedSize === option.value ? "#e6f7ff" : "transparent",
+                                                    transition: "all 0.2s",
+                                                    flexShrink: 0,
+                                                    minWidth: "unset",
+                                                    minHeight: "unset",
+                                                    padding: "0",
+                                                    boxSizing: "border-box",
+                                                    marginBottom: "5px"
+                                                }}
+                                            >
+                                            </div>
+                                            <div style={{
+                                                fontSize: "12px",
+                                                marginTop: "3px",
+                                                textAlign: "center",
+                                                fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                                                whiteSpace: "nowrap"
+                                            }}>
+                                                {option.label}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Style区域移到Size区域内部 */}
+                                <div style={{display: "flex", flexDirection: "column"}}>
+                                    <label style={{
+                                        fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                                        fontSize: "18px",
+                                        backgroundColor: '#f7c863',
+                                        borderRadius: '25px',
+                                        color: 'white',
+                                        padding: '8px 16px',
+                                        display: 'inline-block',
+                                        alignSelf: 'flex-start',
+                                        marginBottom: '15px'
+                                    }}>Style</label>
+
+                                    {/* Style选项区域 - 三个龙猫图片水平排列 */}
+                                    <div style={{
+                                        display: "flex",
+                                        justifyContent: "space-between",
+                                        gap: "10px"
+                                    }}>
+                                        {/* Simplified (for kids) */}
+                                        <div
+                                            style={{
+                                                display: "flex",
+                                                flexDirection: "column",
+                                                alignItems: "center",
+                                                flex: "1",
+                                                cursor: "pointer",
+                                                padding: "8px",
+                                                borderRadius: "8px",
+                                                backgroundColor: selectedStyle === "simplified" ? "#e6f7ff" : "transparent",
+                                                transition: "all 0.2s",
+                                                border: selectedStyle === "simplified" ? "2px solid #1890ff" : "2px solid transparent"
+                                            }}
+                                            onClick={() => handleStyleSelect("simplified")}
+                                        >
+                                            <img
+                                                src="/imgs/custom/totoro-simple.png"
+                                                alt="Simplified style"
+                                                style={{
+                                                    width: "150px",
+                                                    height: "150px",
+                                                    objectFit: "contain",
+                                                    marginBottom: "8px"
+                                                }}
+                                            />
+                                            <div style={{
+                                                fontSize: "10px",
+                                                fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                                                textAlign: "center",
+                                                lineHeight: "1.2",
+                                                color: "#000"
+                                            }}>
+                                                Simplified (for kids)
+                                            </div>
+                                        </div>
+
+                                        {/* Medium detailed (for kids) */}
+                                        <div
+                                            style={{
+                                                display: "flex",
+                                                flexDirection: "column",
+                                                alignItems: "center",
+                                                flex: "1",
+                                                cursor: "pointer",
+                                                padding: "8px",
+                                                borderRadius: "8px",
+                                                backgroundColor: selectedStyle === "medium" ? "#e6f7ff" : "transparent",
+                                                transition: "all 0.2s",
+                                                border: selectedStyle === "medium" ? "2px solid #1890ff" : "2px solid transparent"
+                                            }}
+                                            onClick={() => handleStyleSelect("medium")}
+                                        >
+                                            <img
+                                                src="/imgs/custom/totoro-medium.png"
+                                                alt="Medium detailed style"
+                                                style={{
+                                                    width: "150px",
+                                                    height: "150px",
+                                                    objectFit: "contain",
+                                                    marginBottom: "8px"
+                                                }}
+                                            />
+                                            <div style={{
+                                                fontSize: "10px",
+                                                fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                                                textAlign: "center",
+                                                lineHeight: "1.2",
+                                                color: "#000"
+                                            }}>
+                                                Medium detailed (for kids)
+                                            </div>
+                                        </div>
+
+                                        {/* Detailed (for adults) */}
+                                        <div
+                                            style={{
+                                                display: "flex",
+                                                flexDirection: "column",
+                                                alignItems: "center",
+                                                flex: "1",
+                                                cursor: "pointer",
+                                                padding: "8px",
+                                                borderRadius: "8px",
+                                                backgroundColor: selectedStyle === "detailed" ? "#e6f7ff" : "transparent",
+                                                transition: "all 0.2s",
+                                                border: selectedStyle === "detailed" ? "2px solid #1890ff" : "2px solid transparent"
+                                            }}
+                                            onClick={() => handleStyleSelect("detailed")}
+                                        >
+                                            <img
+                                                src="/imgs/custom/totoro-detailed.png"
+                                                alt="Detailed style"
+                                                style={{
+                                                    width: "150px",
+                                                    height: "150px",
+                                                    objectFit: "contain",
+                                                    marginBottom: "8px"
+                                                }}
+                                            />
+                                            <div style={{
+                                                fontSize: "10px",
+                                                fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                                                textAlign: "center",
+                                                lineHeight: "1.2",
+                                                color: "#000"
+                                            }}>
+                                                Detailed (for adults)
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    ) : generatedImage && !isCleared ? (
-                        <img
-                            src={generatedImage}
-                            alt="Generated Coloring Book"
-                            style={{
-                                width: "100%",
-                                height: "100%",
-                                objectFit: "contain",
-                            }}
-                        />
-                    ) : (
-                        <div style={{ 
-                            color: "#666", 
-                            fontSize: "14px",
-                            fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
-                            textAlign: "center"
+
+                        {/* 底部：Generate按钮 - 在第二张龙猫图片正下方 */}
+                        <div style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "20px",
+                            marginTop: "190px" /*调整generate按钮上下位移*/
                         }}>
-                            Click Generate to show the result
+                            {/* 左侧空白区域，对应左侧文本框的宽度 */}
+                            <div style={{flex: "0.8"}}></div>
+
+                            {/* 右侧区域，对应Size和Style区域 */}
+                            <div style={{flex: "1", display: "flex", alignItems: "center", gap: "20px"}}>
+                                {/* 水印控制开关 - 与style按钮左边垂直对齐 */}
+                                <div style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "8px",
+                                    fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                                    fontSize: "16px",
+                                    color: "#679fb5"
+                                }}>
+                                    <Switch
+                                        checked={!hasWatermark}
+                                        onCheckedChange={handleWatermarkToggle}
+                                        className="data-[state=checked]:bg-[#679fb5]"
+                                    />
+                                    <div style={{
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        alignItems: "flex-start",
+                                        gap: "8px"
+                                    }}>
+                                    <span style={{
+                                        fontSize: "18px",
+                                        fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                                        color: "#679fb5",
+                                        fontWeight: "bold"
+                                    }}>
+                                        Remove watermark
+                                    </span>
+                                        <div style={{
+                                            fontSize: "12px",
+                                            fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                                            backgroundColor: '#f7c863',
+                                            borderRadius: '12px',
+                                            color: 'white',
+                                            padding: '4px 12px',
+                                            display: 'inline-block',
+                                            whiteSpace: 'nowrap'
+                                        }}>
+                                            Members only feature
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Generate按钮 - 与第三张style图片右边框对齐 */}
+                                <div style={{flex: "1", display: "flex", justifyContent: "flex-end"}}>
+                                    <button
+                                        type="submit"
+                                        className={styles.borderHandDrown}
+                                        style={{
+                                            // @ts-ignore
+                                            '--border-width': '3px',
+                                            '--border-style': 'solid',
+                                            '--border-color': '#679fb5',
+                                            '--border-radius': '25px',
+                                            fontSize: "26px",
+                                            backgroundColor: "#679fb5",
+                                            color: "#FFF",
+                                            padding: "12px 20px",
+                                            fontWeight: "bold",
+                                            fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                                            borderRadius: "25px",
+                                            border: "none"
+                                        }}
+                                    >
+                                        Generate
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                    )}
+
+                        {/* Style必填项错误提示 */}
+                        {!selectedStyle && (
+                            <span style={{
+                                color: "red",
+                                fontSize: "12px",
+                                marginTop: "-15px",
+                                marginBottom: "15px",
+                                display: "block",
+                                fontFamily: "'Comic Sans MS', 'Marker Felt', cursive"
+                            }}>
+                            Style 是必填项
+                        </span>
+                        )}
+
+                        {errors.prompt && (
+                            <span style={{color: "red", fontSize: "12px", marginLeft: "25px"}}>
+                            描述文字是必填项
+                        </span>
+                        )}
+                    </form>
                 </div>
-                <div style={{ display: "flex", gap: "5px", marginBottom: "10px", marginTop: "1px", justifyContent: "space-between", width: "80%", margin: "1px auto 10px auto" }}>
-                    <button  
+
+                {/* Result 区域 - 调整为与PhotoColor的Result区域保持一致 */}
+                <div
+                    className={styles.borderHandDrown}
+                    style={{
+                        // @ts-ignore
+                        '--border-width': '7px',
+                        '--border-style': 'solid',
+                        '--border-color': '#f9ef94',
+                        '--border-radius': '15px',
+                        padding: "20px",
+                        margin: "-10px -55px 5px 15px", // 与PhotoColor的Result区域保持一致
+                        flex: "3", // 与PhotoColor的Result区域保持一致
+                        display: "flex",
+                        flexDirection: "column",
+                        backgroundColor: "#fbfbca",
+                        borderRadius: "15px",
+                        height: "565px",
+                        overflow: "hidden",
+                    }}
+                >
+                    <h3 style={{
+                        margin: "0 0 10px 0",
+                        fontSize: "40px",
+                        fontFamily: "dk_cool_crayonregular",
+                        color: "#786312",
+                        textAlign: "center"
+                    }}>Result</h3>
+                    <div
                         className={styles.borderHandDrown}
-                        onClick={handleDownload}
                         style={{
                             // @ts-ignore
-                            '--border-width': '3px',
-                            '--border-style': 'solid',
-                            '--border-color': '#70c09d',
-                            '--border-radius': '20px',
-                            fontSize: "14px",
-                            backgroundColor: "#70c09d", 
-                            color: "#fff", 
-                            padding: "8px 12px",
-                            fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
-                            borderRadius: "20px",
-                            border: "none",
-                            cursor: generatedImage ? "pointer" : "not-allowed",
-                            opacity: generatedImage ? 1 : 0.5
+                            '--border-width': '2px',
+                            '--border-style': 'dashed',
+                            '--border-color': '#000',
+                            '--border-radius': '15px',
+                            width: "80%",
+                            height: "650px",
+                            margin: "10px auto",
+                            display: "flex", justifyContent: "center", alignItems: "center",
+                        }}
+                    >
+                        {isGenerating ? (
+                            <div style={{
+                                color: "#666",
+                                fontSize: "14px",
+                                fontFamily: "'Comic Sans MS', 'Marker Felt', cursive"
+                            }}>
+                                生成中...
+                            </div>
+                        ) : generatedImage && !isCleared ? (
+                            <img
+                                // @ts-ignore
+                                src={generatedImage}
+                                alt="Generated Coloring Book"
+                                style={{
+                                    width: "100%",
+                                    height: "100%",
+                                    objectFit: "contain",
+                                }}
+                            />
+                        ) : (
+                            <div style={{
+                                color: "#666",
+                                fontSize: "14px",
+                                fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                                textAlign: "center"
+                            }}>
+                                Click Generate to show the result
+                            </div>
+                        )}
+                    </div>
+                    <div style={{
+                        display: "flex",
+                        gap: "5px",
+                        marginBottom: "10px",
+                        marginTop: "1px",
+                        justifyContent: "space-between",
+                        width: "80%",
+                        margin: "1px auto 10px auto"
+                    }}>
+                        <button
+                            className={styles.borderHandDrown}
+                            onClick={handleDownload}
+                            style={{
+                                // @ts-ignore
+                                '--border-width': '3px',
+                                '--border-style': 'solid',
+                                '--border-color': '#70c09d',
+                                '--border-radius': '20px',
+                                fontSize: "14px",
+                                backgroundColor: "#70c09d",
+                                color: "#fff",
+                                padding: "8px 12px",
+                                fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                                borderRadius: "20px",
+                                border: "none",
+                                cursor: generatedImage ? "pointer" : "not-allowed",
+                                opacity: generatedImage ? 1 : 0.5
+                            }}>
+                            Download Image
+                        </button>
+
+                        <div style={{
+                            display: "flex",
+                            flexDirection: "row",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            gap: "15px"
                         }}>
-                        Download Image
-                    </button>
-                    
-                    <div style={{ display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center", gap: "15px" }}>
-                        <div style={{ 
-                            fontSize: "20px",
-                            fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
-                            color: "#786312",
-                            textAlign: "center",
-                            margin: "0"
-                        }}>
-                            Share To
-                        </div>
-                        <div style={{ display: "flex", gap: "10px", justifyContent: "center", alignItems: "center" }}>
-                            {/* Twitter Logo */}
-                            <div style={{ 
-                                width: "28px", 
-                                height: "28px", 
-                                borderRadius: "50%", 
-                                backgroundColor: "#1DA1F2", 
-                                display: "flex", 
-                                justifyContent: "center", 
-                                alignItems: "center",
-                                cursor: "pointer",
-                                transition: "transform 0.2s"
+                            <div style={{
+                                fontSize: "20px",
+                                fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                                color: "#786312",
+                                textAlign: "center",
+                                margin: "0"
                             }}>
-                                <TwitterLogoIcon style={{ color: "white", fontSize: "14px" }} />
+                                Share To
                             </div>
-                            
-                            {/* Facebook Logo */}
-                            <div style={{ 
-                                width: "28px", 
-                                height: "28px", 
-                                borderRadius: "50%", 
-                                backgroundColor: "#4267B2", 
-                                display: "flex", 
-                                justifyContent: "center", 
-                                alignItems: "center",
-                                cursor: "pointer",
-                                transition: "transform 0.2s"
-                            }}>
-                                <FaFacebookF style={{ color: "white", fontSize: "14px" }} />
-                            </div>
-                            
-                            {/* LinkedIn Logo */}
-                            <div style={{ 
-                                width: "28px", 
-                                height: "28px", 
-                                borderRadius: "50%", 
-                                backgroundColor: "#0077B5", 
-                                display: "flex", 
-                                justifyContent: "center", 
-                                alignItems: "center",
-                                cursor: "pointer",
-                                transition: "transform 0.2s"
-                            }}>
-                                <FaLinkedinIn style={{ color: "white", fontSize: "14px" }} />
-                            </div>
-                            
-                            {/* WhatsApp Logo */}
-                            <div style={{ 
-                                width: "28px", 
-                                height: "28px", 
-                                borderRadius: "50%", 
-                                backgroundColor: "#25D366", 
-                                display: "flex", 
-                                justifyContent: "center", 
-                                alignItems: "center",
-                                cursor: "pointer",
-                                transition: "transform 0.2s"
-                            }}>
-                                <FaWhatsapp style={{ color: "white", fontSize: "14px" }} />
+                            <div style={{display: "flex", gap: "10px", justifyContent: "center", alignItems: "center"}}>
+                                {/* Twitter Logo */}
+                                <div style={{
+                                    width: "28px",
+                                    height: "28px",
+                                    borderRadius: "50%",
+                                    backgroundColor: "#1DA1F2",
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    cursor: "pointer",
+                                    transition: "transform 0.2s"
+                                }}>
+                                    <TwitterLogoIcon style={{color: "white", fontSize: "14px"}}/>
+                                </div>
+
+                                {/* Facebook Logo */}
+                                <div style={{
+                                    width: "28px",
+                                    height: "28px",
+                                    borderRadius: "50%",
+                                    backgroundColor: "#4267B2",
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    cursor: "pointer",
+                                    transition: "transform 0.2s"
+                                }}>
+                                    <FaFacebookF style={{color: "white", fontSize: "14px"}}/>
+                                </div>
+
+                                {/* LinkedIn Logo */}
+                                <div style={{
+                                    width: "28px",
+                                    height: "28px",
+                                    borderRadius: "50%",
+                                    backgroundColor: "#0077B5",
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    cursor: "pointer",
+                                    transition: "transform 0.2s"
+                                }}>
+                                    <FaLinkedinIn style={{color: "white", fontSize: "14px"}}/>
+                                </div>
+
+                                {/* WhatsApp Logo */}
+                                <div style={{
+                                    width: "28px",
+                                    height: "28px",
+                                    borderRadius: "50%",
+                                    backgroundColor: "#25D366",
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    cursor: "pointer",
+                                    transition: "transform 0.2s"
+                                }}>
+                                    <FaWhatsapp style={{color: "white", fontSize: "14px"}}/>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-        
-        {/* 登录模态框 */}
-        <SignModal />
-        
-        {/* 积分确认模态框 */}
-        <CreditConfirmModal
-            open={showCreditConfirmModal}
-            onOpenChange={setShowCreditConfirmModal}
-            onConfirm={handleConfirmGenerate}
-            credits={2}
-            leftCredits={userCredits}
-        />
+            </div>)}
+
+            {/* 登录模态框 */}
+            <SignModal/>
+
+            {/* 积分确认模态框 */}
+            <CreditConfirmModal
+                open={showCreditConfirmModal}
+                onOpenChange={setShowCreditConfirmModal}
+                onConfirm={handleConfirmGenerate}
+                credits={2}
+                leftCredits={userCredits}
+            />
         </>
     );
 };
