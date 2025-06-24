@@ -9,7 +9,7 @@ import HeaderSignButton from "@/components/sign/header-sign-button";
 
 export default function Header({ locale }: { locale: string }) {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const [isMobile, setIsMobile] = useState(window.innerWidth < 1100); // 初始检测
+    const [isMobile, setIsMobile] = useState(false); // 初始设为false，避免SSR错误
 
     // 监听窗口大小变化，更新移动状态
     useEffect(() => {
@@ -21,12 +21,15 @@ export default function Header({ locale }: { locale: string }) {
             }
         };
 
+        // 初始化设置
+        setIsMobile(window.innerWidth < 1100);
+        
         window.addEventListener('resize', handleResize);
         handleResize(); // 初始化调用
         return () => {
             window.removeEventListener('resize', handleResize);
         };
-    }, []);
+    }, [mobileMenuOpen]);
 
     const closeMobileMenu = () => setMobileMenuOpen(false);
 
