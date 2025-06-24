@@ -10,11 +10,10 @@ import { NextIntlClientProvider } from "next-intl";
 import { ThemeProvider } from "@/providers/theme";
 import { cn } from "@/lib/utils";
 import SubscriptionModal from "@/components/subscription/modal";
-// @ts-ignore
-import { CustomFont } from 'next/font/local'
+import localFont from 'next/font/local'
 
 // 加载本地字体（文件放 public/fonts 目录）
-const dkCoolCrayon = CustomFont({
+const dkCoolCrayon = localFont({
   src: '../../public/fonts/dk_cool_crayon-webfont.woff2', // 路径根据实际调整
   display: 'block', // 控制加载策略，block 会等待字体加载再渲染文字
   weight: '400',

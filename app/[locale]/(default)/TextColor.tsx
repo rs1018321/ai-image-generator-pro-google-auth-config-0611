@@ -408,6 +408,7 @@ const TextColor: React.FC = () => {
                         '--border-radius': '15px',
                         // padding: "20px",
                         backgroundColor: "#f4f9c7", // 添加填充颜色
+                        borderRadius: "15px", // 添加圆角以匹配边框
                     }}
                     className={clsx(styles.flexGroup, styles.group1, styles.borderHandDrown)}>
                     <h3 style={{
@@ -942,6 +943,7 @@ const TextColor: React.FC = () => {
                         '--border-radius': '15px',
                         padding: "20px",
                         backgroundColor: "#fbfbca", // 添加填充颜色
+                        borderRadius: "15px", // 添加圆角以匹配边框
                     }}
                     className={clsx(styles.flexGroup, styles.group2, styles.borderHandDrown)}>
 
@@ -993,8 +995,6 @@ const TextColor: React.FC = () => {
                                         alt="Generated Coloring Book"
                                         style={{
                                             width: "80%",
-                                            padding: "10px",
-                                            // height: "100%",
                                             padding: "5px",
                                             objectFit: "contain",
                                         }}
