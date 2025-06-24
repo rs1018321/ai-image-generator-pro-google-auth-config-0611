@@ -703,7 +703,7 @@ export default function LandingPage({page, locale}: LandingPageProps) {
                             }}
                             className={clsx(`
     
-      text-sm md:text-xs lg:text-xl photo-button flex-1 
+      text-sm md:text-xs lg:text-base photo-button flex-1 
       py-6 px-4 font-medium transition-colors duration-200 rounded-t-lg ${
                                 activeComponent === "photo" ? "hover:opacity-80" : "hover:opacity-80"
                             }`, styles.buttonBorder, styles.buttonGroup)}
@@ -728,7 +728,7 @@ export default function LandingPage({page, locale}: LandingPageProps) {
                             className={clsx(`
     
 
-      text-sm md:text-xs lg:text-xl
+      text-sm md:text-xs lg:text-base
       text-button flex-1 py-6 px-4 font-medium transition-colors duration-200 rounded-t-lg ${
                                 activeComponent === "text" ? "hover:opacity-80" : "hover:opacity-80"
                             }`, styles.buttonBorder, styles.buttonGroup)}
