@@ -30,6 +30,7 @@ const TextColor: React.FC = () => {
     const [selectedSize, setSelectedSize] = useState<string>("Auto");
     const [selectedStyle, setSelectedStyle] = useState<string>("medium"); // 默认选择Medium detailed
     const [isCleared, setIsCleared] = useState<boolean>(false); // 跟踪是否已被清除
+    const [isManuallyCleared, setIsManuallyCleared] = useState<boolean>(false); // 跟踪是否被手动清空
     const [generatedImage, setGeneratedImage] = useState<string | null>(null); // 添加生成图片状态
     const [isGenerating, setIsGenerating] = useState<boolean>(false); // 添加生成中状态
     const [promptValue, setPromptValue] = useState<string>(""); // 新增：跟踪文本框内容
@@ -47,20 +48,70 @@ const TextColor: React.FC = () => {
     const defaultImage = "https://picsum.photos/id/1015/300/200";
     const clearImage = "/imgs/custom/photo.png";
 
-    // 默认结果图片 - 在 result 虚线框中显示
-    const defaultResultImage = "/imgs/custom/textcolor-default-result.png"; // 您需要准备这张图片
+    // 默认描述文本
+    const defaultPrompt = "A little boy flying with balloons over a peaceful village, with a few birds in the sky and soft clouds around. Whimsical and lighthearted, in a crayon-style illustration.";
 
-    // 初始化时设置默认结果图片
+    // 三个Style模式对应的默认结果图片
+    const defaultResultImages = {
+        simplified: "/imgs/custom/textcolor-default-result-simplified.png",   // 需要创建
+        medium: "/imgs/custom/textcolor-default-result-medium.png",           // 需要创建  
+        detailed: "/imgs/custom/textcolor-default-result-detailed.png"        // 需要创建
+    };
+
+    // 预设描述对应的线稿图映射 - 每个描述对应三个Style的线稿图
+    const promptResultImages = {
+        "A cheerful animal parade with elephants, bunnies, and bears holding balloons and playing instruments. Colorful and playful, in storybook style.": {
+            simplified: "/imgs/custom/animal-parade-simplified.png",
+            medium: "/imgs/custom/animal-parade-medium.png",
+            detailed: "/imgs/custom/animal-parade-detailed.png"
+        },
+        "Sunny city park scene with kids flying kites, parents on picnic blanket, ice-cream cart, fountain, pigeons, distant skyline, leafy trees, balloons drifting, friendly dog nearby.": {
+            simplified: "/imgs/custom/city-park-simplified.png",
+            medium: "/imgs/custom/city-park-medium.png",
+            detailed: "/imgs/custom/city-park-detailed.png"
+        },
+        "Kids in bright raincoats jumping in puddles, with smiling frogs, paper boats, and a rainbow in the sky. Crayon-style, full of joy.": {
+            simplified: "/imgs/custom/rainy-day-simplified.png",
+            medium: "/imgs/custom/rainy-day-medium.png",
+            detailed: "/imgs/custom/rainy-day-detailed.png"
+        },
+        [defaultPrompt]: {
+            simplified: "/imgs/custom/textcolor-default-result-simplified.png",
+            medium: "/imgs/custom/textcolor-default-result-medium.png",
+            detailed: "/imgs/custom/textcolor-default-result-detailed.png"
+        }
+    };
+
+    // 初始化时设置默认描述和结果图片
     React.useEffect(() => {
-        setGeneratedImage(defaultResultImage);
+        setPromptValue(defaultPrompt);
+        setGeneratedImage(defaultResultImages.medium); // 默认显示medium模式的线稿图
     }, []);
+
+    // 新增：当Style变化时更新默认结果图片
+    React.useEffect(() => {
+        if (!isGenerating && !generatedImage?.includes('data:image') && !isManuallyCleared) {
+            // 检查当前是否有选中的描述
+            const currentPrompt = promptValue || defaultPrompt;
+            if (promptResultImages[currentPrompt as keyof typeof promptResultImages]) {
+                // 如果当前描述有对应的线稿图，显示对应的线稿图
+                const promptResults = promptResultImages[currentPrompt as keyof typeof promptResultImages];
+                const newResultImage = promptResults[selectedStyle as keyof typeof promptResults];
+                setGeneratedImage(newResultImage);
+                console.log(`🎨 切换Style到${selectedStyle}，描述"${currentPrompt.substring(0, 30)}..."对应的线稿图: ${newResultImage}`);
+            } else {
+                // 如果没有对应的线稿图，显示默认线稿图
+                setGeneratedImage(defaultResultImages[selectedStyle as keyof typeof defaultResultImages] || defaultResultImages.medium);
+            }
+        }
+    }, [selectedStyle, promptValue, isGenerating, isManuallyCleared]);
 
     // 设置表单默认值
     const defaultFormValues = {
         size: "Auto",
         age: [],
         pages: [],
-        prompt: "A little boy flying with balloons over a peaceful village, with a few birds in the sky and soft clouds around. Whimsical and lighthearted, in a crayon-style illustration." // 更新文本框默认值
+        prompt: defaultPrompt // 使用默认描述
     };
 
     const {
@@ -84,7 +135,7 @@ const TextColor: React.FC = () => {
     // 选项与图片的映射关系
     const promptImageMap = {
         "A cheerful animal parade with elephants, bunnies, and bears holding balloons and playing instruments. Colorful and playful, in storybook style.": "https://picsum.photos/id/1005/300/200",
-        "A dreamy treehouse floating in the clouds, with glowing stars, candy ladders, and friendly animals reading books. Soft pastel colors, magical feel.": "https://picsum.photos/id/1015/300/200",
+        "Sunny city park scene with kids flying kites, parents on picnic blanket, ice-cream cart, fountain, pigeons, distant skyline, leafy trees, balloons drifting, friendly dog nearby.": "https://picsum.photos/id/1015/300/200",
         "Kids in bright raincoats jumping in puddles, with smiling frogs, paper boats, and a rainbow in the sky. Crayon-style, full of joy.": "https://picsum.photos/id/1062/300/200"
     };
 
@@ -204,7 +255,7 @@ const TextColor: React.FC = () => {
         },
         {
             id: 2,
-            title: "A dreamy treehouse floating in the clouds, with glowing stars, candy ladders, and friendly animals reading books. Soft pastel colors, magical feel.",
+            title: "Sunny city park scene with kids flying kites, parents on picnic blanket, ice-cream cart, fountain, pigeons, distant skyline, leafy trees, balloons drifting, friendly dog nearby.",
             image: "https://picsum.photos/id/1015/300/200"
         },
         {
@@ -219,17 +270,32 @@ const TextColor: React.FC = () => {
         setSelectedImage(option.image);
         setValue("prompt", option.title); // 使用setValue更新表单值
         setPromptValue(option.title); // 同步更新promptValue状态
+        setIsManuallyCleared(false); // 重置手动清空状态
+        setIsCleared(false); // 重置清空状态
+        
+        // 根据选中的预设描述和当前Style显示对应的线稿图
+        if (promptResultImages[option.title as keyof typeof promptResultImages]) {
+            const promptResults = promptResultImages[option.title as keyof typeof promptResultImages];
+            const resultImage = promptResults[selectedStyle as keyof typeof promptResults];
+            setGeneratedImage(resultImage);
+            console.log(`🎨 选择预设描述"${option.title.substring(0, 30)}..."，当前Style: ${selectedStyle}，显示线稿图: ${resultImage}`);
+        } else {
+            // 如果不是预设描述，显示默认线稿图
+            setGeneratedImage(defaultResultImages[selectedStyle as keyof typeof defaultResultImages] || defaultResultImages.medium);
+        }
     };
 
     const handleClear = () => {
         setSelectedPrompt("");
         setSelectedImage(clearImage);
-        setSelectedStyle("simplified"); // 重置为 simplified
+        setSelectedStyle("medium"); // 重置为 medium
         setSelectedSize("Auto"); // 重置尺寸为 Auto
-        setValue("prompt", ""); // 清空文本框
-        setPromptValue(""); // 同步更新promptValue状态
-        setGeneratedImage(null); // 清除所有图片（包括默认图片和生成的图片）
-        setIsCleared(true); // 设置清除状态为true
+        setValue("prompt", defaultPrompt); // 重置为默认描述
+        setPromptValue(defaultPrompt); // 同步更新promptValue状态
+        setGeneratedImage(defaultResultImages.medium); // 重置为medium对应的默认结果图片
+        setIsCleared(false); // 设置清除状态为false，因为我们设置了默认图片
+        
+        console.log("🧹 清空所有选择，重置为默认状态");
     };
 
     const handleSizeSelect = (size: string) => {
@@ -238,14 +304,36 @@ const TextColor: React.FC = () => {
 
     const handleStyleSelect = (style: string) => {
         setSelectedStyle(style);
+        
+        // 如果当前显示的是默认示例图片或预设描述的线稿图（不是真实生成的图片），并且没有被手动清空，则切换到对应Style的图片
+        if (generatedImage && !generatedImage.includes('data:image') && !generatedImage.includes('blob:') && !isManuallyCleared) {
+            const currentPrompt = promptValue || defaultPrompt;
+            if (promptResultImages[currentPrompt as keyof typeof promptResultImages]) {
+                // 如果当前描述有对应的线稿图，显示对应的线稿图
+                const promptResults = promptResultImages[currentPrompt as keyof typeof promptResultImages];
+                const newResultImage = promptResults[style as keyof typeof promptResults];
+                setGeneratedImage(newResultImage);
+                console.log(`🎨 切换Style到${style}，描述"${currentPrompt.substring(0, 30)}..."对应的线稿图: ${newResultImage}`);
+            } else {
+                // 如果没有对应的线稿图，显示默认线稿图
+                const newResultImage = defaultResultImages[style as keyof typeof defaultResultImages] || defaultResultImages.medium;
+                setGeneratedImage(newResultImage);
+                console.log(`🎨 切换Style到${style}，更新默认结果图片为: ${newResultImage}`);
+            }
+        }
     };
 
     // 新增：清空描述文本框的函数
     const handleClearDescribe = (e: React.MouseEvent) => {
         e.stopPropagation(); // 阻止事件冒泡
-        setValue("prompt", ""); // 清空文本框
+        setValue("prompt", ""); // 完全清空文本框
         setSelectedPrompt(""); // 清空选中的prompt状态
         setPromptValue(""); // 同步更新promptValue状态
+        setGeneratedImage(null); // 完全清空Result框
+        setIsCleared(true); // 设置清除状态为true
+        setIsManuallyCleared(true); // 设置手动清空状态为true
+        
+        console.log("🧹 清空描述和结果图片");
     };
 
     // 新增：处理图片下载

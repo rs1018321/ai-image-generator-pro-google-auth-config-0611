@@ -42,6 +42,7 @@ const PhotoColor: React.FC = () => {
     const [subLoading, setSubLoading] = useState(false);
     const [showTooltip, setShowTooltip] = useState(false);
     const [tooltipMessage, setTooltipMessage] = useState("");
+    const [isManuallyCleared, setIsManuallyCleared] = useState(false);
 
     // 新增：积分相关状态
     const [showCreditConfirmModal, setShowCreditConfirmModal] = useState(false);
@@ -53,14 +54,69 @@ const PhotoColor: React.FC = () => {
     // 默认示例图片 - 在upload虚线框中显示
     const defaultUploadImage = "/imgs/custom/default-upload-example.png"; // 您需要准备这张图片
     
-    // 默认结果图片 - 在result虚线框中显示
-    const defaultResultImage = "/imgs/custom/default-result-example.png"; // 您需要准备这张图片
+    // 三个Style模式对应的默认结果图片
+    const defaultResultImages = {
+        simplified: "/imgs/custom/default-result-simplified.png",   // 需要创建
+        medium: "/imgs/custom/default-result-medium.png",           // 需要创建  
+        detailed: "/imgs/custom/default-result-detailed.png"        // 需要创建
+    };
+    
+    // 预设图片对应的线稿图映射 - 每张预设图对应三个Style的线稿图
+    const presetImageResults = {
+        "/imgs/custom/photo-cartoon.png": {
+            simplified: "/imgs/custom/cartoon-simplified.png",
+            medium: "/imgs/custom/cartoon-medium.png",
+            detailed: "/imgs/custom/cartoon-detailed.png"
+        },
+        "/imgs/custom/photo-portrait.png": {
+            simplified: "/imgs/custom/portrait-simplified.png",
+            medium: "/imgs/custom/portrait-medium.png",
+            detailed: "/imgs/custom/portrait-detailed.png"
+        },
+        "/imgs/custom/photo-landscape.png": {
+            simplified: "/imgs/custom/landscape-simplified.png",
+            medium: "/imgs/custom/landscape-medium.png",
+            detailed: "/imgs/custom/landscape-detailed.png"
+        },
+        "/imgs/custom/photo-animal.png": {
+            simplified: "/imgs/custom/animal-simplified.png",
+            medium: "/imgs/custom/animal-medium.png",
+            detailed: "/imgs/custom/animal-detailed.png"
+        },
+        "/imgs/custom/photo-still-life.png": {
+            simplified: "/imgs/custom/still-life-simplified.png",
+            medium: "/imgs/custom/still-life-medium.png",
+            detailed: "/imgs/custom/still-life-detailed.png"
+        },
+        "/imgs/custom/photo-artistic.png": {
+            simplified: "/imgs/custom/artistic-simplified.png",
+            medium: "/imgs/custom/artistic-medium.png",
+            detailed: "/imgs/custom/artistic-detailed.png"
+        }
+    };
     
     // 初始化时设置默认图片
     React.useEffect(() => {
         setUploadedImage(defaultUploadImage);
-        setGeneratedImage(defaultResultImage);
+        setGeneratedImage(defaultResultImages.medium); // 默认显示medium模式的线稿图
     }, []);
+
+    // 新增：当Style变化时更新默认结果图片
+    React.useEffect(() => {
+        if (!isGenerating && !generatedImage?.includes('data:image')) {
+            // 检查当前是否选中了预设图片
+            if (selectedImage && presetImageResults[selectedImage as keyof typeof presetImageResults]) {
+                // 如果选中了预设图片，显示对应的线稿图
+                const presetResults = presetImageResults[selectedImage as keyof typeof presetImageResults];
+                const newResultImage = presetResults[selectedStyle as keyof typeof presetResults];
+                setGeneratedImage(newResultImage);
+                console.log(`🎨 切换Style到${selectedStyle}，预设图片${selectedImage}对应的线稿图: ${newResultImage}`);
+            } else if (!selectedImage && !uploadedImage && !isManuallyCleared) {
+                // 如果没有选中预设图片，并且不是手动清空的，显示默认线稿图
+                setGeneratedImage(defaultResultImages[selectedStyle as keyof typeof defaultResultImages] || defaultResultImages.medium);
+            }
+        }
+    }, [selectedStyle, selectedImage, isGenerating, uploadedImage, isManuallyCleared]);
 
     // 组件挂载后加载订阅信息（仅一次）
     useEffect(() => {
@@ -251,7 +307,18 @@ const PhotoColor: React.FC = () => {
         console.log("🖼️ 图片被点击了！", imageUrl);
         setSelectedImage(imageUrl);
         setUploadedImage(null);
-        setGeneratedImage(null); // 清除之前生成的结果图片
+        setIsManuallyCleared(false); // 重置手动清空状态
+        
+        // 根据选中的预设图片和当前Style显示对应的线稿图
+        if (presetImageResults[imageUrl as keyof typeof presetImageResults]) {
+            const presetResults = presetImageResults[imageUrl as keyof typeof presetImageResults];
+            const resultImage = presetResults[selectedStyle as keyof typeof presetResults];
+            setGeneratedImage(resultImage);
+            console.log(`🎨 选择预设图片${imageUrl}，当前Style: ${selectedStyle}，显示线稿图: ${resultImage}`);
+        } else {
+            // 如果不是预设图片，清除生成结果
+            setGeneratedImage(null);
+        }
 
         // 计算预设图片尺寸
         const img = new Image();
@@ -299,6 +366,7 @@ const PhotoColor: React.FC = () => {
                 setUploadedImage(result);
                 setSelectedImage(null);
                 setGeneratedImage(null); // 清除之前生成的结果图片
+                setIsManuallyCleared(false); // 重置手动清空状态
 
                 // 计算图片尺寸
                 const img = new Image();
@@ -348,25 +416,28 @@ const PhotoColor: React.FC = () => {
     // 新增：删除上传的图片
     const handleDeleteImage = (e: React.MouseEvent) => {
         e.stopPropagation(); // 阻止事件冒泡，避免触发相机点击事件
-        setUploadedImage(null);
-        setSelectedImage(null);
+        setUploadedImage(null); // 清空上传的图片
+        setSelectedImage(null); // 清空选中的预设图片
         setImageDimensions(null); // 重置图片尺寸
-        setGeneratedImage(null); // 清除生成的结果图片
+        setGeneratedImage(null); // 清空Result框的图片
+        setIsManuallyCleared(true); // 标记为手动清空
 
         // 重置文件输入框的值
         const fileInput = document.getElementById('photo-upload') as HTMLInputElement;
         if (fileInput) {
             fileInput.value = '';
         }
+        
+        console.log("🗑️ 清空上传框和Result框的图片");
     };
 
     // 清除选中的图片
     const handleClear = () => {
-        setSelectedImage(null);
-        setUploadedImage(null); // 完全清空上传图片，不显示默认图片
+        setUploadedImage(defaultUploadImage); // 重置为默认上传图片
+        setSelectedImage(null); // 清空选中的图片
         setSelectedSize("Auto"); // 重置尺寸选择为 Auto
-        setSelectedStyle("simplified"); // 重置样式选择为 simplified
-        setGeneratedImage(null); // 完全清空生成的结果图片
+        setSelectedStyle("medium"); // 重置样式选择为 medium
+        setGeneratedImage(defaultResultImages.medium); // 重置为medium对应的默认结果图片
         setImageDimensions(null); // 重置图片尺寸
         
         // 重置文件输入框的值，解决重复上传同一张图片不显示的问题
@@ -374,6 +445,8 @@ const PhotoColor: React.FC = () => {
         if (fileInput) {
             fileInput.value = '';
         }
+        
+        console.log("🧹 清空所有选择，重置为默认状态");
     };
 
     // 处理尺寸选择
@@ -384,6 +457,22 @@ const PhotoColor: React.FC = () => {
     // 处理Style选择
     const handleStyleSelect = (style: string) => {
         setSelectedStyle(style);
+        
+        // 如果当前显示的是默认示例图片或预设图片的线稿图（不是真实生成的图片），则切换到对应Style的图片
+        if (generatedImage && !generatedImage.includes('data:image') && !generatedImage.includes('blob:')) {
+            if (selectedImage && presetImageResults[selectedImage as keyof typeof presetImageResults]) {
+                // 如果选中了预设图片，显示对应的线稿图
+                const presetResults = presetImageResults[selectedImage as keyof typeof presetImageResults];
+                const newResultImage = presetResults[style as keyof typeof presetResults];
+                setGeneratedImage(newResultImage);
+                console.log(`🎨 切换Style到${style}，预设图片${selectedImage}对应的线稿图: ${newResultImage}`);
+            } else {
+                // 如果没有选中预设图片，显示默认线稿图
+                const newResultImage = defaultResultImages[style as keyof typeof defaultResultImages] || defaultResultImages.medium;
+                setGeneratedImage(newResultImage);
+                console.log(`🎨 切换Style到${style}，更新默认结果图片为: ${newResultImage}`);
+            }
+        }
     };
 
     // 新增：处理图片下载
@@ -1943,7 +2032,7 @@ const PhotoColor: React.FC = () => {
                             fontFamily: "'Comic Sans MS', 'Marker Felt', cursive"
                         }}>
                                 Generating...
-                            </div>
+                        </div>
                         ) : generatedImage && (uploadedImage || selectedImage) ? (
                             // 使用ImageCompare组件显示原图和生成图的对比
                             <ImageCompare
@@ -1952,27 +2041,27 @@ const PhotoColor: React.FC = () => {
                                 leftLabel="Original"
                                 rightLabel="Coloring Page"
                             />
-                        ) : generatedImage ? (
-                            <img
+                    ) : generatedImage ? (
+                        <img
                                     // @ts-ignore
-                                src={generatedImage}
-                                alt="Generated Coloring Book"
-                                style={{
-                                    width: "100%",
-                                    height: "100%",
-                                    objectFit: "contain",
-                                }}
-                            />
-                        ) : (
-                            <div style={{ 
-                                color: "#666", 
-                                fontSize: "14px",
-                                fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
-                                textAlign: "center"
-                            }}>
+                            src={generatedImage}
+                            alt="Generated Coloring Book"
+                            style={{
+                                width: "100%",
+                                height: "100%",
+                                objectFit: "contain",
+                            }}
+                        />
+                    ) : (
+                        <div style={{ 
+                            color: "#666", 
+                            fontSize: "14px",
+                            fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                            textAlign: "center"
+                        }}>
                                     Click Generate to show the result
-                            </div>
-                        )}
+                        </div>
+                    )}
                 </div>
                     <div style={{
                         display: "flex",

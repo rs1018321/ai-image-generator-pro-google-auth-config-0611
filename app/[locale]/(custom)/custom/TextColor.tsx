@@ -43,7 +43,7 @@ const TextColor: React.FC = () => {
     // 选项与图片的映射关系
     const promptImageMap = {
         "A cheerful animal parade with elephants, bunnies, and bears holding balloons and playing instruments. Colorful and playful, in storybook style.": "https://picsum.photos/id/1005/300/200",
-        "A dreamy treehouse floating in the clouds, with glowing stars, candy ladders, and friendly animals reading books. Soft pastel colors, magical feel.": "https://picsum.photos/id/1015/300/200",
+        "Sunny city park scene with kids flying kites, parents on picnic blanket, ice-cream cart, fountain, pigeons, distant skyline, leafy trees, balloons drifting, friendly dog nearby.": "https://picsum.photos/id/1015/300/200",
         "Kids in bright raincoats jumping in puddles, with smiling frogs, paper boats, and a rainbow in the sky. Crayon-style, full of joy.": "https://picsum.photos/id/1062/300/200"
     };
 
@@ -93,7 +93,7 @@ const TextColor: React.FC = () => {
         },
         {
             id: 2,
-            title: "A dreamy treehouse floating in the clouds, with glowing stars, candy ladders, and friendly animals reading books. Soft pastel colors, magical feel.",
+            title: "Sunny city park scene with kids flying kites, parents on picnic blanket, ice-cream cart, fountain, pigeons, distant skyline, leafy trees, balloons drifting, friendly dog nearby.",
             image: "https://picsum.photos/id/1015/300/200"
         },
         {
