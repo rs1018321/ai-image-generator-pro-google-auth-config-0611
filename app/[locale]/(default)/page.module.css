@@ -771,7 +771,7 @@
 .flexButtonContainer {
     display: flex;
     flex-wrap: wrap;
-    max-width:50vw;
+    max-width:60vw;
     margin:0 auto;
     /*background-color: red;*/
 }
