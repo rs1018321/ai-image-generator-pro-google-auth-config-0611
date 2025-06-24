@@ -4,6 +4,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 全局字体设置 - 确保所有元素都使用Comic Sans MS */
+* {
+  font-family: "Comic Sans MS", "Marker Felt", cursive !important;
+}
+
 html {
   scroll-behavior: smooth;
   background-color: #f5f3e8;
@@ -16,6 +21,8 @@ html {
   height: 100%;
   /* 防止水平过度滚动 */
   overflow-x: hidden;
+  /* 确保字体设置 */
+  font-family: "Comic Sans MS", "Marker Felt", cursive !important;
 }
 
 body {
@@ -33,6 +40,8 @@ body {
   overflow-x: hidden;
   /* 防止水平滚动时的过度滚动 */
   overscroll-behavior-x: none;
+  /* 确保字体设置 */
+  font-family: "Comic Sans MS", "Marker Felt", cursive !important;
 }
 
 /* 针对移动端的额外防护 */
@@ -48,6 +57,11 @@ body {
     -webkit-overflow-scrolling: touch;
     position: relative;
   }
+}
+
+/* 确保所有文本元素都使用Comic Sans MS */
+h1, h2, h3, h4, h5, h6, p, span, div, button, input, textarea, label, a {
+  font-family: "Comic Sans MS", "Marker Felt", cursive !important;
 }
 
 @layer base {

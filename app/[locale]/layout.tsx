@@ -54,15 +54,14 @@ export default async function RootLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale} className={dkCoolCrayon.className} suppressHydrationWarning style={{
+    <html lang={locale} suppressHydrationWarning className="font-comic" style={{
       backgroundColor: "#f5f3e8",
       overscrollBehavior: "none",
       height: "100%"
     }}>
       <body
         className={cn(
-          "min-h-screen font-sans antialiased overflow-x-hidden",
-            dkCoolCrayon.className
+          "min-h-screen font-comic antialiased overflow-x-hidden"
         )}
         style={{
           overscrollBehavior: "none",
