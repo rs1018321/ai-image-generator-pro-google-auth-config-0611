@@ -14,9 +14,9 @@ export default function Header({ locale }: { locale: string }) {
     // 监听窗口大小变化，更新移动状态
     useEffect(() => {
         const handleResize = () => {
-            setIsMobile(window.innerWidth < 1200);
+            setIsMobile(window.innerWidth < 1300);
             // 窗口变小时自动关闭菜单
-            if (window.innerWidth < 1200 && mobileMenuOpen) {
+            if (window.innerWidth < 1300 && mobileMenuOpen) {
                 setMobileMenuOpen(false);
             }
         };
