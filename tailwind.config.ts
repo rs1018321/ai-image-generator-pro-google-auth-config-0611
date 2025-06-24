@@ -23,7 +23,9 @@ const config = {
   			sans: [
   				'var(--font-sans)',
                     ...fontFamily.sans
-                ]
+                ],
+			comic: ['"Comic Sans MS"', '"Marker Felt"', 'cursive'],
+			crayon: ['dk_cool_crayonregular', 'system-ui'],
   		},
   		colors: {
   			border: 'hsl(var(--border))',

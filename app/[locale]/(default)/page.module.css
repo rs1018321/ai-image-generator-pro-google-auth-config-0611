@@ -1,6 +1,4 @@
-html, body {
-    background-color: #ECF4D0 !important;
-}
+
 
 @font-face {
     font-family: 'dk_crayonistaregular';
@@ -8,6 +6,7 @@ html, body {
     url('/fonts/dk_crayonista-webfont.woff') format('woff');
     font-weight: normal;
     font-style: normal;
+    font-display: block
 }
 
 @font-face {
@@ -16,6 +15,7 @@ html, body {
     url('/fonts/dk_cool_crayon-webfont.woff') format('woff');
     font-weight: normal;
     font-style: normal;
+    font-display: block
 }
 
 /*实现鼠标移动上去，有放大效果*/
@@ -735,6 +735,7 @@ html, body {
     /*background: #71bc93;*/
 }
 .groupTitle{
+
     text-align: center;
 }
 

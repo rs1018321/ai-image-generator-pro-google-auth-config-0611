@@ -518,7 +518,9 @@ const PhotoColor: React.FC = () => {
                         margin: "30px 0 10px 0",
                         fontFamily: "dk_cool_crayonregular",
                         color: "#786312",
-                        textAlign: "center"
+                        textAlign: "center",
+                        // @ts-ignore
+                        fontDisplay:"block",
                     }} className={clsx("lg:text-5xl md:text-3xl text-xl", styles.groupTitle)}>Upload</h3>
                     <form onSubmit={handleSubmit(onSubmit)} className={clsx(styles.groupContent)}>
                         <div style={{padding: "20px"  }} className={clsx(styles.contentItem1)}>
@@ -1275,7 +1277,9 @@ const PhotoColor: React.FC = () => {
                 {/* Select Photo 区域 占比 2 - 暂时隐藏但保留代码 */}
                     <div
                         style={{
+
                             // @ts-ignore
+                            fontDisplay:"block",
                             '--border-width': '7px',
                             '--border-style': 'solid',
                             '--border-color': '#fae0b3',

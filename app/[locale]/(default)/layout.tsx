@@ -1,14 +1,8 @@
 import React, { ReactNode } from 'react';
-import clsx from 'clsx';
-import { Globe, Moon, Sun } from 'lucide-react'; // 假设使用 lucide-react 图标
 import Footer from "@/components/blocks/footer";
 import Header from "./header";
 import { getLandingPage } from "@/services/page";
-import Feedback from "@/components/feedback";
-import HeaderSignButton from "@/components/sign/header-sign-button";
-import Link from "next/link";
-import styles from './page.module.css';
-import DashboardButton from "@/components/navigation/dashboard-button";
+
 
 // 定义背景样式
 const backgroundStyle = {
