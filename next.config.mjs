@@ -53,9 +53,14 @@ const nextConfig = {
 const configWithMDX = {
   ...nextConfig,
   experimental: {
+    ...nextConfig.experimental, // 继承nextConfig中已有的experimental配置
     mdxRs: true,
-    // 直接硬编码 allowedDevOrigins 确保它不会被覆盖
-    allowedDevOrigins: ["https://85d2-38-98-191-20.ngrok-free.app"],
+    // 动态读取，而不是硬编码
+    allowedDevOrigins: [
+      ...nextConfig.experimental.allowedDevOrigins,
+      "https://*.ngrok-free.app", // 允许所有ngrok子域名
+      "http://*.ngrok-free.app"
+    ].filter(Boolean),
   },
 };
 

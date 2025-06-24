@@ -142,14 +142,14 @@ export default function CreditConfirmModal({
               color: '#679fb5',
               fontSize: '24px'
             }}>
-              确认生成图片
+              Confirm Image Generation
             </DialogTitle>
             <DialogDescription style={{ 
               fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
               fontSize: '16px',
               color: '#666'
             }}>
-              生成图片将消耗 {credits} 个积分
+              Generating image will consume {credits} credits
             </DialogDescription>
           </DialogHeader>
           
@@ -157,35 +157,35 @@ export default function CreditConfirmModal({
             fontFamily: "'Comic Sans MS', 'Marker Felt', cursive"
           }}>
             <div className="flex justify-between items-center mb-4">
-              <span style={{ fontSize: '16px', color: '#333' }}>当前积分余额：</span>
+              <span style={{ fontSize: '16px', color: '#333' }}>Current credit balance:</span>
               <span style={{ 
                 fontSize: '18px', 
                 fontWeight: 'bold', 
                 color: leftCredits >= credits ? '#4CAF50' : '#f44336' 
               }}>
-                {leftCredits} 积分
+                {leftCredits} credits
               </span>
             </div>
             
             <div className="flex justify-between items-center mb-4">
-              <span style={{ fontSize: '16px', color: '#333' }}>本次消耗：</span>
+              <span style={{ fontSize: '16px', color: '#333' }}>This generation:</span>
               <span style={{ 
                 fontSize: '18px', 
                 fontWeight: 'bold', 
                 color: '#ff9800' 
               }}>
-                -{credits} 积分
+                -{credits} credits
               </span>
             </div>
             
             <div className="flex justify-between items-center border-t pt-2">
-              <span style={{ fontSize: '16px', color: '#333' }}>生成后余额：</span>
+              <span style={{ fontSize: '16px', color: '#333' }}>Balance after generation:</span>
               <span style={{ 
                 fontSize: '18px', 
                 fontWeight: 'bold', 
                 color: leftCredits >= credits ? '#4CAF50' : '#f44336' 
               }}>
-                {Math.max(0, leftCredits - credits)} 积分
+                {Math.max(0, leftCredits - credits)} credits
               </span>
             </div>
           </div>
@@ -200,12 +200,12 @@ export default function CreditConfirmModal({
                 fontSize: '16px'
               }}
             >
-              取消
+              Cancel
             </Button>
             <Button 
               onClick={handleConfirm}
-              disabled={leftCredits < credits}
               className="flex-1"
+              disabled={leftCredits < credits}
               style={{
                 fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
                 fontSize: '16px',
@@ -213,7 +213,7 @@ export default function CreditConfirmModal({
                 borderColor: leftCredits >= credits ? '#679fb5' : '#ccc'
               }}
             >
-              {leftCredits >= credits ? '确认生成' : '积分不足'}
+              {leftCredits >= credits ? 'Confirm Generation' : 'Insufficient Credits'}
             </Button>
           </div>
         </GlassDialogContent>
@@ -230,14 +230,14 @@ export default function CreditConfirmModal({
             color: '#679fb5',
             fontSize: '24px'
           }}>
-            确认生成图片
+            Confirm Image Generation
           </DrawerTitle>
           <DrawerDescription style={{ 
             fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
             fontSize: '16px',
             color: '#666'
           }}>
-            生成图片将消耗 {credits} 个积分
+            Generating image will consume {credits} credits
           </DrawerDescription>
         </DrawerHeader>
         
@@ -245,35 +245,35 @@ export default function CreditConfirmModal({
           fontFamily: "'Comic Sans MS', 'Marker Felt', cursive"
         }}>
           <div className="flex justify-between items-center mb-4">
-            <span style={{ fontSize: '16px', color: '#333' }}>当前积分余额：</span>
+            <span style={{ fontSize: '16px', color: '#333' }}>Current credit balance:</span>
             <span style={{ 
               fontSize: '18px', 
               fontWeight: 'bold', 
               color: leftCredits >= credits ? '#4CAF50' : '#f44336' 
             }}>
-              {leftCredits} 积分
+              {leftCredits} credits
             </span>
           </div>
           
           <div className="flex justify-between items-center mb-4">
-            <span style={{ fontSize: '16px', color: '#333' }}>本次消耗：</span>
+            <span style={{ fontSize: '16px', color: '#333' }}>This generation:</span>
             <span style={{ 
               fontSize: '18px', 
               fontWeight: 'bold', 
               color: '#ff9800' 
             }}>
-              -{credits} 积分
+              -{credits} credits
             </span>
           </div>
           
           <div className="flex justify-between items-center border-t pt-2">
-            <span style={{ fontSize: '16px', color: '#333' }}>生成后余额：</span>
+            <span style={{ fontSize: '16px', color: '#333' }}>Balance after generation:</span>
             <span style={{ 
               fontSize: '18px', 
               fontWeight: 'bold', 
               color: leftCredits >= credits ? '#4CAF50' : '#f44336' 
             }}>
-              {Math.max(0, leftCredits - credits)} 积分
+              {Math.max(0, leftCredits - credits)} credits
             </span>
           </div>
         </div>
@@ -289,7 +289,7 @@ export default function CreditConfirmModal({
               borderColor: leftCredits >= credits ? '#679fb5' : '#ccc'
             }}
           >
-            {leftCredits >= credits ? '确认生成' : '积分不足'}
+            {leftCredits >= credits ? 'Confirm Generation' : 'Insufficient Credits'}
           </Button>
           <DrawerClose asChild>
             <Button 
@@ -299,7 +299,7 @@ export default function CreditConfirmModal({
                 fontSize: '16px'
               }}
             >
-              取消
+              Cancel
             </Button>
           </DrawerClose>
         </DrawerFooter>

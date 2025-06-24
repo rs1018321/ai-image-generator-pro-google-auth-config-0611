@@ -44,16 +44,16 @@ export default function CancelSubscriptionButton({
       const data = await response.json();
 
       if (response.ok) {
-        toast.success("订阅已设置为在当前周期结束时取消");
+        toast.success("Subscription has been set to cancel at the end of the current period");
         setOpen(false);
         // 刷新页面以更新状态
         window.location.reload();
       } else {
-        toast.error(data.error || "取消订阅失败");
+        toast.error(data.error || "Failed to cancel subscription");
       }
     } catch (error) {
       console.error("Cancel subscription error:", error);
-      toast.error("取消订阅失败，请稍后重试");
+      toast.error("Failed to cancel subscription, please try again later");
     } finally {
       setIsLoading(false);
     }
@@ -64,14 +64,14 @@ export default function CancelSubscriptionButton({
       <DialogTrigger asChild>
         <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
           <X className="h-4 w-4 mr-1" />
-          取消订阅
+          Cancel Subscription
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>确认取消订阅</DialogTitle>
+          <DialogTitle>Confirm Subscription Cancellation</DialogTitle>
           <DialogDescription>
-            您确定要取消订阅吗？订阅将在当前计费周期结束时取消，您仍可以使用服务直到周期结束。
+            Are you sure you want to cancel your subscription? Your subscription will be cancelled at the end of the current billing period, and you can still use the service until the period ends.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="gap-2">
@@ -80,7 +80,7 @@ export default function CancelSubscriptionButton({
             onClick={() => setOpen(false)}
             disabled={isLoading}
           >
-            取消
+            Cancel
           </Button>
           <Button
             onClick={handleCancelSubscription}
@@ -90,10 +90,10 @@ export default function CancelSubscriptionButton({
             {isLoading ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                处理中...
+                Processing...
               </>
             ) : (
-              "确认取消"
+              "Confirm Cancellation"
             )}
           </Button>
         </DialogFooter>

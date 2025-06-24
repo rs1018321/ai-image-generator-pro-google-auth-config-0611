@@ -117,17 +117,17 @@ export default function Pricing({ pricing, variant = "full" }: { pricing: Pricin
     
     // 当前套餐且已设置取消
     if (isSubscribed && userSubscription?.cancel_at_period_end) {
-      return { text: "重新订阅", disabled: false };
+      return { text: "Resubscribe", disabled: false };
     }
     
-    // 当前套餐且未设置取消
-    if (isSubscribed) {
-      return { text: "您已是该等级会员", disabled: true };
+    // 如果已经是该等级会员（未取消）
+    if (isSubscribed && !userSubscription?.cancel_at_period_end) {
+      return { text: "Current Member", disabled: true };
     }
     
     // 低于当前等级的套餐
     if (!isAvailable) {
-      return { text: "等级过低", disabled: true };
+      return { text: "Not Available", disabled: true };
     }
     
     return { text: item.button?.text || "选择套餐", disabled: false };
@@ -393,17 +393,17 @@ export default function Pricing({ pricing, variant = "full" }: { pricing: Pricin
                         )}
                         {isSubscribed && !isCanceled && (
                           <Badge variant="default" className="bg-green-600">
-                            当前套餐
+                            Current Plan
                           </Badge>
                         )}
                         {isCanceled && (
                           <Badge variant="outline" className="border-orange-500 text-orange-600">
-                            已设置取消
+                            Canceling
                           </Badge>
                         )}
                         {!isAvailable && !isSubscribed && (
                           <Badge variant="outline" className="border-gray-400 text-gray-500">
-                            等级过低
+                            Not Available
                           </Badge>
                         )}
                       </div>
@@ -450,30 +450,6 @@ export default function Pricing({ pricing, variant = "full" }: { pricing: Pricin
                     )}
                   </div>
                   <div className="flex flex-col gap-3 mt-auto pt-4">
-                    {item.cn_amount && item.cn_amount > 0 && !isSubscribed ? (
-                      <div className="flex items-center gap-x-2">
-                        <span className="text-sm">人民币支付 👉</span>
-                        <div
-                          className={`inline-block p-2 rounded-md ${
-                            buttonState.disabled 
-                              ? "opacity-50 cursor-not-allowed" 
-                              : "hover:cursor-pointer hover:bg-base-200"
-                          }`}
-                          onClick={() => {
-                            if (isLoading || buttonState.disabled) {
-                              return;
-                            }
-                            handleCreemCheckout(item, true);
-                          }}
-                        >
-                          <img
-                            src="/imgs/cnpay.png"
-                            alt="cnpay"
-                            className="w-20 h-10 rounded-lg"
-                          />
-                        </div>
-                      </div>
-                    ) : null}
                     {item.button && (
                       <Button
                         className="w-full flex items-center justify-center gap-2 font-semibold py-3"

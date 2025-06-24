@@ -49,13 +49,13 @@ const PhotoColor: React.FC = () => {
 
     const defaultImage = "https://picsum.photos/id/237/100/100";
     const clearImage = "/imgs/custom/photo.png"; // 新的默认图片URL
-
+    
     // 默认示例图片 - 在upload虚线框中显示
     const defaultUploadImage = "/imgs/custom/default-upload-example.png"; // 您需要准备这张图片
-
+    
     // 默认结果图片 - 在result虚线框中显示
     const defaultResultImage = "/imgs/custom/default-result-example.png"; // 您需要准备这张图片
-
+    
     // 初始化时设置默认图片
     React.useEffect(() => {
         setUploadedImage(defaultUploadImage);
@@ -122,14 +122,14 @@ const PhotoColor: React.FC = () => {
 
         const data = pendingFormData;
         const imageToUse = uploadedImage || selectedImage || defaultImage;
-
+        
         setIsGenerating(true);
         setGeneratedImage(null);
 
         try {
             // 创建 FormData 对象
             const formData = new FormData();
-
+            
             // 将 Size 选择映射为对应的 API 尺寸参数
             const sizeMapping: { [key: string]: string } = {
                 "Auto": "1024x1024",      // 默认正方形
@@ -139,11 +139,11 @@ const PhotoColor: React.FC = () => {
                 "16:9": "1248x832",       // 横版 3:2 (接近16:9)
                 "9:16": "832x1248",       // 竖版 2:3 (接近9:16)
             };
-
+            
             const apiSize = sizeMapping[selectedSize] || "1024x1024";
-
+            
             formData.append('size', apiSize);
-
+            
             // 处理图片数据
             if (uploadedImage) {
                 // 如果是上传的图片（base64格式），需要转换为 File 对象
@@ -164,11 +164,11 @@ const PhotoColor: React.FC = () => {
                 const file = new File([blob], 'default-image.jpg', {type: 'image/jpeg'});
                 formData.append('image', file);
             }
-
+            
             // 添加style参数（后端会进行映射）
             formData.append('style', selectedStyle);
             formData.append('watermark', hasWatermark.toString()); // 新增：水印参数
-
+            
             console.log(`🎯 发送请求到 generate-coloring-book API:`);
             console.log(`📐 Size: ${selectedSize} -> ${apiSize}`);
             console.log(`🎨 Style: ${selectedStyle}`);
@@ -179,9 +179,9 @@ const PhotoColor: React.FC = () => {
                     'Content-Type': 'multipart/form-data',
                 },
             });
-
+            
             console.log("✅ API 请求成功，后端返回：", response.data);
-
+            
             // 处理返回的结果，显示生成的图片
             if (response.data.success && response.data.image) {
                 console.log("🖼️ 生成的涂色书图片已准备就绪");
@@ -193,7 +193,7 @@ const PhotoColor: React.FC = () => {
             } else {
                 alert("生成失败：未收到有效的图片数据");
             }
-
+            
         } catch (error: any) {
             console.error("❌ API 请求失败：", error);
             alert(`生成失败: ${error.response?.data?.error || error.message}`);
@@ -251,6 +251,7 @@ const PhotoColor: React.FC = () => {
         console.log("🖼️ 图片被点击了！", imageUrl);
         setSelectedImage(imageUrl);
         setUploadedImage(null);
+        setGeneratedImage(null); // 清除之前生成的结果图片
 
         // 计算预设图片尺寸
         const img = new Image();
@@ -297,6 +298,7 @@ const PhotoColor: React.FC = () => {
                 const result = e.target?.result as string;
                 setUploadedImage(result);
                 setSelectedImage(null);
+                setGeneratedImage(null); // 清除之前生成的结果图片
 
                 // 计算图片尺寸
                 const img = new Image();
@@ -349,6 +351,7 @@ const PhotoColor: React.FC = () => {
         setUploadedImage(null);
         setSelectedImage(null);
         setImageDimensions(null); // 重置图片尺寸
+        setGeneratedImage(null); // 清除生成的结果图片
 
         // 重置文件输入框的值
         const fileInput = document.getElementById('photo-upload') as HTMLInputElement;
@@ -365,7 +368,7 @@ const PhotoColor: React.FC = () => {
         setSelectedStyle("simplified"); // 重置样式选择为 simplified
         setGeneratedImage(null); // 完全清空生成的结果图片
         setImageDimensions(null); // 重置图片尺寸
-
+        
         // 重置文件输入框的值，解决重复上传同一张图片不显示的问题
         const fileInput = document.getElementById('photo-upload') as HTMLInputElement;
         if (fileInput) {
@@ -746,11 +749,7 @@ const PhotoColor: React.FC = () => {
                                             onClick={(e) => {
                                                 e.preventDefault();
                                                 e.stopPropagation();
-                                                console.log("🎯 点击了图片：", photo.title);
-                                                console.log("🖼️ 图片URL：", photo.imageUrl);
-                                                setSelectedImage(photo.imageUrl);
-                                                setUploadedImage(null);
-                                                console.log("✅ 状态已更新");
+                                                handleImageClick(photo.imageUrl);
                                             }}
                                         >
                                             <img
@@ -1102,42 +1101,44 @@ const PhotoColor: React.FC = () => {
                                     '--border-color': '#000',
                                     '--border-radius': '15px',
                                     width: "100%",
-                                    padding:"10px",
-                                    // height: "650px",
+                                    height: "400px", // 固定高度
                                     margin: "10px auto",
                                     display: "flex",
                                     justifyContent: "center",
                                     alignItems: "center",
+                                    position: "relative",
+                                    overflow: "hidden",
+                                    padding: "1rem", // 增加内边距
+                                    boxSizing: "border-box" // 确保内边距包含在宽度和高度内
                                 }}
                             >
                                 {isGenerating ? (
-                                    <div className={clsx("text-xs lg:text-sm md:text-sm")} style={{
+                                    <div style={{
                                         color: "#666",
-                                        // fontSize: "14px",
+                                        fontSize: "18px",
                                         fontFamily: "'Comic Sans MS', 'Marker Felt', cursive"
                                     }}>
-                                        生成中...
+                                        Generating...
                                     </div>
+                                ) : generatedImage && (uploadedImage || selectedImage) ? (
+                                    // 移除多余的wrapper div，让ImageCompare直接成为flex子元素
+                                    <ImageCompare
+                                        leftImage={uploadedImage || selectedImage || ""}
+                                        rightImage={generatedImage || ""}
+                                        leftLabel="Original"
+                                        rightLabel="Coloring Page"
+                                    />
                                 ) : generatedImage ? (
-                                        <ImageCompare
-                                            // @ts-ignore
-                                            leftImage={selectedImage? selectedImage:uploadedImage}
-                                            rightImage={generatedImage}
-                                            leftLabel="Original cityscape"
-                                            rightLabel="Ghibli-style transformation"
-                                        />
-
-
-                                    // <img
-                                    //     src={generatedImage}
-                                    //     alt="Generated Coloring Book"
-                                    //     style={{
-                                    //         width: "100%",
-                                    //         height: "100%",
-                                    //         padding: "10px",
-                                    //         objectFit: "contain",
-                                    //     }}
-                                    // />
+                                    // 只有生成图片时显示生成的图片
+                                    <img
+                                        src={generatedImage}
+                                        alt="Generated Coloring Book"
+                                        style={{
+                                            width: "100%",
+                                            height: "100%",
+                                            objectFit: "contain",
+                                        }}
+                                    />
                                 ) : (
                                     <div style={{
                                         color: "#666",
@@ -1152,11 +1153,10 @@ const PhotoColor: React.FC = () => {
                             <div style={{
                                 display: "flex",
                                 gap: "5px",
-                                marginBottom: "10px",
-                                marginTop: "1px",
                                 justifyContent: "space-between",
-                                // width: "80%",
-                                margin: "15px auto 10px auto"
+                                width: "100%",
+                                marginTop: "40px", // 增加与上方虚线框的距离
+                                marginBottom: "10px"
                             }}>
                                 <button
                                     className={clsx("text-xs lg:text-sm md:text-xs",styles.borderHandDrown) }
@@ -1266,136 +1266,140 @@ const PhotoColor: React.FC = () => {
                 </div>
             </div>
             {false && ( <div
-                style={{
-                    display: "flex",
-                    width: "78vw",
-                    margin: "0 auto",
+            style={{
+                display: "flex",
+                width: "78vw",
+                margin: "0 auto",
                     gap: "0px",
                     flexWrap: "wrap",
-                }}
-            >
+            }}
+        >
                 {/* Select Photo 区域 占比 2 - 暂时隐藏但保留代码 */}
-                    <div
-                        style={{
+            <div
+                style={{
 
-                            // @ts-ignore
+                    // @ts-ignore
                             fontDisplay:"block",
-                            '--border-width': '7px',
-                            '--border-style': 'solid',
-                            '--border-color': '#fae0b3',
-                            '--border-radius': '15px',
-                            padding: "10px",
+                    '--border-width': '7px',
+                    '--border-style': 'solid',
+                    '--border-color': '#fae0b3',
+                    '--border-radius': '15px',
+                    padding: "10px",
                             // margin: "-10px 5px 5px -55px", // 调整左边距使左边框与"Coloring Page"的"C"对齐
-                            flex: "2",
-                            display: "flex",
-                            flexDirection: "column",
-                            backgroundColor: "#fcf6ca", // 添加填充颜色
-                            borderRadius: "15px", // 添加圆角使背景色与边框一致
-                            height: "565px", // 设置固定高度，与TextColor的Select Prompt区域一致
-                            overflow: "hidden", // 隐藏超出部分
-                        }}
-                        className={styles.borderHandDrown}
-                    >
-                        <h3 style={{
-                            textAlign: "center",
-                            margin: "10px auto",
-                            fontSize: "40px",
+                    flex: "2",
+                    display: "flex",
+                    flexDirection: "column",
+                    backgroundColor: "#fcf6ca", // 添加填充颜色
+                    borderRadius: "15px", // 添加圆角使背景色与边框一致
+                    height: "565px", // 设置固定高度，与TextColor的Select Prompt区域一致
+                    overflow: "hidden", // 隐藏超出部分
+                }}
+                className={styles.borderHandDrown}
+            >
+                <h3 style={{ 
+                    textAlign: "center", 
+                    margin: "10px auto", 
+                    fontSize: "40px",
                             fontFamily: "dk_cool_crayonregular",
-                            color: "#f0c46b",
-                            lineHeight: "1.1"
-                        }}>
+                    color: "#f0c46b",
+                    lineHeight: "1.1"
+                }}>
                             Select Photo
-                        </h3>
-                        <div
-                            style={{
-                                display: "grid",
-                                gridTemplateColumns: "repeat(2, 1fr)",
+                </h3>
+                <div
+                    style={{
+                        display: "grid",
+                        gridTemplateColumns: "repeat(2, 1fr)",
                                 gap: "35px 5px", /* 第一个值是行间距，第二个值是列间距 */
                                 marginTop: "25px" /* 调整Photo选择区域与Upload区域之间的间距 */
-                            }}
-                        >
-                            {photoOptions.map((photo, index) => (
-                                <div
-                                    className={styles.borderHandDrown}
-                                    key={index}
-                                    style={{
-                                        display: "flex",
-                                        flexDirection: "column",
-                                        alignItems: "center",
-                                        textAlign: "center",
-                                        cursor: "pointer",
-                                        transition: "transform 0.2s",
-                                        // @ts-ignore
-                                        '--border-width': '2px',
-                                        '--border-style': 'solid',
-                                        '--border-color': selectedImage === photo.imageUrl ? 'blue' : 'transparent',
-                                        '--border-radius': '15px',
-                                        padding: "3px",
-                                    }}
-                                    onClick={() => handleImageClick(photo.imageUrl)}
-                                >
-                                    <div
-                                        style={{
-                                            width: "95px",
-                                            height: "95px",
-                                            marginBottom: "5px",
-                                            overflow: "hidden",
-                                            borderRadius: "8px",
-                                        }}
-                                    >
-                                        <img
-                                            src={photo.imageUrl}
-                                            alt={photo.title}
-                                            style={{
-                                                width: "100%",
-                                                height: "100%",
-                                                objectFit: "cover",
-                                            }}
-                                        />
-                                    </div>
-                                    <p style={{
-                                        margin: "0",
-                                        fontSize: "16px",
-                                        color: "#000",
-                                        fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
-                                        textAlign: "center"
-                                    }}>
-                                        {photo.title}
-                                    </p>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                {/* Upload 区域 - 调整为占据相当于TextColor中Select Prompt + Describe两个区域的空间 */}
-                <div
-                    className={styles.borderHandDrown}
-                    style={{
-                        // @ts-ignore
-                        '--border-width': '7px',
-                        '--border-style': 'solid',
-                        '--border-color': '#c8f1c5',
-                        '--border-radius': '15px',
-                        padding: "20px",
-                        // margin: "0px 15px 5px -55px", // 增加右边距从5px到15px
-                        flex: "5", // flex: "2" + flex: "3" = flex: "5"，占据两个区域的空间
-                        display: "flex",
-                        flexDirection: "column",
-                        backgroundColor: "#f4f9c7", // 添加填充颜色
-                        borderRadius: "15px", // 添加圆角使背景色与边框一致
-                        // height: "565px", // 设置固定高度，与Select Photo区域一致
-                        // overflow: "hidden", // 隐藏超出部分
                     }}
                 >
-                    <h3 style={{
+                    {photoOptions.map((photo, index) => (
+                        <div
+                            className={styles.borderHandDrown}
+                            key={index}
+                            style={{
+                                display: "flex",
+                                flexDirection: "column",
+                                alignItems: "center",
+                                textAlign: "center",
+                                cursor: "pointer",
+                                transition: "transform 0.2s",
+                                // @ts-ignore
+                                '--border-width': '2px',
+                                '--border-style': 'solid',
+                                        '--border-color': selectedImage === photo.imageUrl ? 'blue' : 'transparent',
+                                '--border-radius': '15px',
+                                padding: "3px",
+                            }}
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        handleImageClick(photo.imageUrl);
+                                    }}
+                        >
+                            <div
+                                style={{
+                                    width: "95px",
+                                    height: "95px",
+                                    marginBottom: "5px",
+                                    overflow: "hidden",
+                                    borderRadius: "8px",
+                                }}
+                            >
+                                <img
+                                    src={photo.imageUrl}
+                                    alt={photo.title}
+                                    style={{
+                                        width: "100%",
+                                        height: "100%",
+                                        objectFit: "cover",
+                                    }}
+                                />
+                            </div>
+                            <p style={{ 
+                                margin: "0", 
+                                fontSize: "16px", 
+                                color: "#000",
+                                fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                                textAlign: "center"
+                            }}>
+                                {photo.title}
+                            </p>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+                {/* Upload 区域 - 调整为占据相当于TextColor中Select Prompt + Describe两个区域的空间 */}
+            <div
+                className={styles.borderHandDrown}
+                style={{
+                    // @ts-ignore
+                    '--border-width': '7px',
+                    '--border-style': 'solid',
+                    '--border-color': '#c8f1c5',
+                    '--border-radius': '15px',
+                    padding: "20px",
+                        // margin: "0px 15px 5px -55px", // 增加右边距从5px到15px
+                        flex: "5", // flex: "2" + flex: "3" = flex: "5"，占据两个区域的空间
+                    display: "flex",
+                    flexDirection: "column",
+                    backgroundColor: "#f4f9c7", // 添加填充颜色
+                    borderRadius: "15px", // 添加圆角使背景色与边框一致
+                        // height: "565px", // 设置固定高度，与Select Photo区域一致
+                        // overflow: "hidden", // 隐藏超出部分
+                }}
+            >
+                <h3 style={{ 
                         margin: "30px 0 10px 0",
-                        fontSize: "40px",
+                    fontSize: "40px",
                         fontFamily: "dk_cool_crayonregular",
-                        color: "#786312",
-                        textAlign: "center"
-                    }}>Upload</h3>
-                    <form
-                        onSubmit={handleSubmit(onSubmit)}
+                    color: "#786312",
+                    textAlign: "center"
+                }}>Upload</h3>
+                <form
+                    onSubmit={handleSubmit(onSubmit)}
                         style={{
                             flex: "1",
                             display: "flex",
@@ -1408,46 +1412,46 @@ const PhotoColor: React.FC = () => {
                         <div style={{display: "flex", gap: "20px", marginBottom: "20px", height: "200px"}}>
                             {/* 左侧：图片上传框 */}
                             <div style={{flex: "0.8", position: "relative", zIndex: 1}}>
-                                <div
-                                    className={styles.borderHandDrown}
-                                    style={{
-                                        // @ts-ignore
-                                        '--border-width': '2px',
-                                        '--border-style': 'dashed',
-                                        '--border-color': '#000',
-                                        '--border-radius': '8px',
+                        <div
+                            className={styles.borderHandDrown}
+                            style={{
+                                // @ts-ignore
+                                '--border-width': '2px',
+                                '--border-style': 'dashed',
+                                '--border-color': '#000',
+                                '--border-radius': '8px',
                                         width: "340px",
                                         height: "340px",/* 调整upload虚线框的大小*/
-                                        display: "flex",
-                                        justifyContent: "center",
-                                        alignItems: "center",
-                                        cursor: "pointer",
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                cursor: "pointer",
                                         position: "relative",
                                         margin: "0 auto",
-                                    }}
-                                    onClick={handleCameraClick}
-                                >
-                                    <input
-                                        id="photo-upload"
-                                        type="file"
-                                        accept="image/*"
-                                        onChange={handleFileUpload}
+                            }}
+                            onClick={handleCameraClick}
+                        >
+                            <input
+                                id="photo-upload"
+                                type="file"
+                                accept="image/*"
+                                onChange={handleFileUpload}
                                         style={{display: "none"}}
-                                    />
-
-                                    {uploadedImage ? (
+                            />
+                            
+                            {uploadedImage ? (
                                         <>
-                                            <img
+                                <img
                                                 // @ts-ignore
-                                                src={uploadedImage}
-                                                alt="uploaded"
-                                                style={{
+                                    src={uploadedImage}
+                                    alt="uploaded"
+                                    style={{
                                                     maxWidth: "300px",
                                                     maxHeight: "300px",
                                                     objectFit: "contain",
-                                                    borderRadius: "4px",
-                                                }}
-                                            />
+                                        borderRadius: "4px",
+                                    }}
+                                />
                                             <button
                                                 onClick={handleDeleteImage}
                                                 style={{
@@ -1474,19 +1478,19 @@ const PhotoColor: React.FC = () => {
                                                 ×
                                             </button>
                                         </>
-                                    ) : selectedImage ? (
+                            ) : selectedImage ? (
                                         <>
-                                            <img
+                                <img
                                                 // @ts-ignore
-                                                src={selectedImage}
-                                                alt="selected"
-                                                style={{
+                                    src={selectedImage}
+                                    alt="selected"
+                                    style={{
                                                     maxWidth: "300px",
                                                     maxHeight: "300px",
                                                     objectFit: "contain",
-                                                    borderRadius: "4px",
-                                                }}
-                                            />
+                                        borderRadius: "4px",
+                                    }}
+                                />
                                             <button
                                                 onClick={handleDeleteImage}
                                                 style={{
@@ -1513,18 +1517,18 @@ const PhotoColor: React.FC = () => {
                                                 ×
                                             </button>
                                         </>
-                                    ) : (
-                                        <img
-                                            src={clearImage}
-                                            alt="camera"
-                                            style={{
+                            ) : (
+                                <img
+                                    src={clearImage}
+                                    alt="camera"
+                                    style={{
                                                 width: "150px",
                                                 height: "150px",
-                                                objectFit: "contain",
-                                            }}
-                                        />
-                                    )}
-                                </div>
+                                        objectFit: "contain",
+                                    }}
+                                />
+                            )}
+                        </div>
 
                                 {/* 在虚线框下方添加提示文字 */}
                                 <div style={{
@@ -1568,11 +1572,7 @@ const PhotoColor: React.FC = () => {
                                             onClick={(e) => {
                                                 e.preventDefault();
                                                 e.stopPropagation();
-                                                console.log("🎯 点击了图片：", photo.title);
-                                                console.log("🖼️ 图片URL：", photo.imageUrl);
-                                                setSelectedImage(photo.imageUrl);
-                                                setUploadedImage(null);
-                                                console.log("✅ 状态已更新");
+                                                handleImageClick(photo.imageUrl);
                                             }}
                                         >
                                             <img
@@ -1594,8 +1594,8 @@ const PhotoColor: React.FC = () => {
 
                             {/* 右侧：Size选项 */}
                             <div style={{flex: "1", display: "flex", flexDirection: "column"}}>
-                                <label style={{
-                                    fontSize: "18px",
+                                <label style={{ 
+                                    fontSize: "18px", 
                                     fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
                                     backgroundColor: '#f7c863',
                                     borderRadius: '25px',
@@ -1613,23 +1613,23 @@ const PhotoColor: React.FC = () => {
                                     gap: "5px",
                                     marginBottom: "20px"
                                 }}>
-                                    {sizeOptions.map((option) => (
-                                        <div key={option.value} style={{
-                                            display: "flex",
-                                            flexDirection: "column",
-                                            alignItems: "center",
+                                {sizeOptions.map((option) => (
+                                    <div key={option.value} style={{ 
+                                        display: "flex", 
+                                        flexDirection: "column", 
+                                        alignItems: "center",
                                             cursor: "pointer",
                                             flex: "1"
-                                        }}>
-                                            <div
-                                                className={styles.borderHandDrown}
-                                                onClick={() => handleSizeSelect(option.value)}
-                                                style={{
-                                                    // @ts-ignore
-                                                    '--border-width': '2px',
-                                                    '--border-style': 'dashed',
-                                                    '--border-color': '#000',
-                                                    '--border-radius': '8px',
+                                    }}>
+                                        <div
+                                            className={styles.borderHandDrown}
+                                            onClick={() => handleSizeSelect(option.value)}
+                                            style={{
+                                                // @ts-ignore
+                                                '--border-width': '2px',
+                                                '--border-style': 'dashed',
+                                                '--border-color': '#000',
+                                                '--border-radius': '8px',
                                                     width: option.value === "Auto" ? "42px" :
                                                         option.value === "1:1" ? "42px" :
                                                             option.value === "4:3" ? "56px" :
@@ -1642,164 +1642,164 @@ const PhotoColor: React.FC = () => {
                                                                 option.value === "3:4" ? "56px" :
                                                                     option.value === "16:9" ? "39px" :
                                                                         option.value === "9:16" ? "65px" : "42px",
-                                                    display: "flex",
-                                                    flexDirection: "column",
-                                                    justifyContent: "center",
-                                                    alignItems: "center",
-                                                    borderRadius: "4px",
-                                                    cursor: "pointer",
-                                                    backgroundColor: selectedSize === option.value ? "#e6f7ff" : "transparent",
-                                                    transition: "all 0.2s",
-                                                    flexShrink: 0,
-                                                    minWidth: "unset",
-                                                    minHeight: "unset",
-                                                    padding: "0",
+                                                display: "flex",
+                                                flexDirection: "column",
+                                                justifyContent: "center",
+                                                alignItems: "center",
+                                                borderRadius: "4px",
+                                                cursor: "pointer",
+                                                backgroundColor: selectedSize === option.value ? "#e6f7ff" : "transparent",
+                                                transition: "all 0.2s",
+                                                flexShrink: 0,
+                                                minWidth: "unset",
+                                                minHeight: "unset",
+                                                padding: "0",
                                                     boxSizing: "border-box",
                                                     marginBottom: "5px"
-                                                }}
-                                            >
-                                            </div>
-                                            <div style={{
-                                                fontSize: "12px",
-                                                marginTop: "3px",
-                                                textAlign: "center",
-                                                fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
-                                                whiteSpace: "nowrap"
-                                            }}>
-                                                {option.label}
-                                            </div>
+                                            }}
+                                        >
                                         </div>
-                                    ))}
-                                </div>
+                                        <div style={{ 
+                                            fontSize: "12px", 
+                                            marginTop: "3px", 
+                                            textAlign: "center",
+                                            fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                                            whiteSpace: "nowrap"
+                                        }}>
+                                            {option.label}
+                                        </div>
+                                    </div>
+                                ))}
+                        </div>
 
                                 {/* Style区域移到Size区域内部 */}
                                 <div style={{display: "flex", flexDirection: "column"}}>
-                                    <label style={{
-                                        fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
-                                        fontSize: "18px",
-                                        backgroundColor: '#f7c863',
-                                        borderRadius: '25px',
-                                        color: 'white',
-                                        padding: '8px 16px',
-                                        display: 'inline-block',
+                            <label style={{
+                                fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                                fontSize: "18px",
+                                backgroundColor: '#f7c863',
+                                borderRadius: '25px',
+                                color: 'white',
+                                padding: '8px 16px',
+                                display: 'inline-block',
                                         alignSelf: 'flex-start',
                                         marginBottom: '15px'
-                                    }}>Style</label>
+                            }}>Style</label>
 
                                     {/* Style选项区域 - 三个龙猫图片水平排列 */}
-                                    <div style={{
-                                        display: "flex",
-                                        justifyContent: "space-between",
+                        <div style={{ 
+                            display: "flex", 
+                            justifyContent: "space-between", 
                                         gap: "10px"
-                                    }}>
-                                        {/* Simplified (for kids) */}
-                                        <div
-                                            style={{
-                                                display: "flex",
-                                                flexDirection: "column",
-                                                alignItems: "center",
-                                                flex: "1",
-                                                cursor: "pointer",
-                                                padding: "8px",
-                                                borderRadius: "8px",
-                                                backgroundColor: selectedStyle === "simplified" ? "#e6f7ff" : "transparent",
-                                                transition: "all 0.2s",
-                                                border: selectedStyle === "simplified" ? "2px solid #1890ff" : "2px solid transparent"
-                                            }}
-                                            onClick={() => handleStyleSelect("simplified")}
-                                        >
-                                            <img
-                                                src="/imgs/custom/totoro-simple.png"
-                                                alt="Simplified style"
-                                                style={{
+                        }}>
+                            {/* Simplified (for kids) */}
+                            <div 
+                                style={{ 
+                                    display: "flex", 
+                                    flexDirection: "column", 
+                                    alignItems: "center",
+                                    flex: "1",
+                                    cursor: "pointer",
+                                    padding: "8px",
+                                    borderRadius: "8px",
+                                    backgroundColor: selectedStyle === "simplified" ? "#e6f7ff" : "transparent",
+                                    transition: "all 0.2s",
+                                    border: selectedStyle === "simplified" ? "2px solid #1890ff" : "2px solid transparent"
+                                }}
+                                onClick={() => handleStyleSelect("simplified")}
+                            >
+                                <img
+                                    src="/imgs/custom/totoro-simple.png"
+                                    alt="Simplified style"
+                                    style={{
                                                     width: "150px",
                                                     height: "150px",
-                                                    objectFit: "contain",
-                                                    marginBottom: "8px"
-                                                }}
-                                            />
-                                            <div style={{
+                                        objectFit: "contain",
+                                        marginBottom: "8px"
+                                    }}
+                                />
+                                <div style={{
                                                 fontSize: "10px",
-                                                fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
-                                                textAlign: "center",
-                                                lineHeight: "1.2",
-                                                color: "#000"
-                                            }}>
-                                                Simplified (for kids)
-                                            </div>
-                                        </div>
+                                    fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                                    textAlign: "center",
+                                    lineHeight: "1.2",
+                                    color: "#000"
+                                }}>
+                                    Simplified (for kids)
+                                </div>
+                            </div>
 
-                                        {/* Medium detailed (for kids) */}
-                                        <div
-                                            style={{
-                                                display: "flex",
-                                                flexDirection: "column",
-                                                alignItems: "center",
-                                                flex: "1",
-                                                cursor: "pointer",
-                                                padding: "8px",
-                                                borderRadius: "8px",
-                                                backgroundColor: selectedStyle === "medium" ? "#e6f7ff" : "transparent",
-                                                transition: "all 0.2s",
-                                                border: selectedStyle === "medium" ? "2px solid #1890ff" : "2px solid transparent"
-                                            }}
-                                            onClick={() => handleStyleSelect("medium")}
-                                        >
-                                            <img
-                                                src="/imgs/custom/totoro-medium.png"
-                                                alt="Medium detailed style"
-                                                style={{
+                            {/* Medium detailed (for kids) */}
+                            <div 
+                                style={{ 
+                                    display: "flex", 
+                                    flexDirection: "column", 
+                                    alignItems: "center",
+                                    flex: "1",
+                                    cursor: "pointer",
+                                    padding: "8px",
+                                    borderRadius: "8px",
+                                    backgroundColor: selectedStyle === "medium" ? "#e6f7ff" : "transparent",
+                                    transition: "all 0.2s",
+                                    border: selectedStyle === "medium" ? "2px solid #1890ff" : "2px solid transparent"
+                                }}
+                                onClick={() => handleStyleSelect("medium")}
+                            >
+                                <img
+                                    src="/imgs/custom/totoro-medium.png"
+                                    alt="Medium detailed style"
+                                    style={{
                                                     width: "150px",
                                                     height: "150px",
-                                                    objectFit: "contain",
-                                                    marginBottom: "8px"
-                                                }}
-                                            />
-                                            <div style={{
+                                        objectFit: "contain",
+                                        marginBottom: "8px"
+                                    }}
+                                />
+                                <div style={{
                                                 fontSize: "10px",
-                                                fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
-                                                textAlign: "center",
-                                                lineHeight: "1.2",
-                                                color: "#000"
-                                            }}>
-                                                Medium detailed (for kids)
-                                            </div>
-                                        </div>
+                                    fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                                    textAlign: "center",
+                                    lineHeight: "1.2",
+                                    color: "#000"
+                                }}>
+                                    Medium detailed (for kids)
+                                </div>
+                            </div>
 
-                                        {/* Detailed (for adults) */}
-                                        <div
-                                            style={{
-                                                display: "flex",
-                                                flexDirection: "column",
-                                                alignItems: "center",
-                                                flex: "1",
-                                                cursor: "pointer",
-                                                padding: "8px",
-                                                borderRadius: "8px",
-                                                backgroundColor: selectedStyle === "detailed" ? "#e6f7ff" : "transparent",
-                                                transition: "all 0.2s",
-                                                border: selectedStyle === "detailed" ? "2px solid #1890ff" : "2px solid transparent"
-                                            }}
-                                            onClick={() => handleStyleSelect("detailed")}
-                                        >
-                                            <img
-                                                src="/imgs/custom/totoro-detailed.png"
-                                                alt="Detailed style"
-                                                style={{
+                            {/* Detailed (for adults) */}
+                            <div 
+                                style={{ 
+                                    display: "flex", 
+                                    flexDirection: "column", 
+                                    alignItems: "center",
+                                    flex: "1",
+                                    cursor: "pointer",
+                                    padding: "8px",
+                                    borderRadius: "8px",
+                                    backgroundColor: selectedStyle === "detailed" ? "#e6f7ff" : "transparent",
+                                    transition: "all 0.2s",
+                                    border: selectedStyle === "detailed" ? "2px solid #1890ff" : "2px solid transparent"
+                                }}
+                                onClick={() => handleStyleSelect("detailed")}
+                            >
+                                <img
+                                    src="/imgs/custom/totoro-detailed.png"
+                                    alt="Detailed style"
+                                    style={{
                                                     width: "150px",
                                                     height: "150px",
-                                                    objectFit: "contain",
-                                                    marginBottom: "8px"
-                                                }}
-                                            />
-                                            <div style={{
+                                        objectFit: "contain",
+                                        marginBottom: "8px"
+                                    }}
+                                />
+                                <div style={{
                                                 fontSize: "10px",
-                                                fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
-                                                textAlign: "center",
-                                                lineHeight: "1.2",
-                                                color: "#000"
-                                            }}>
-                                                Detailed (for adults)
+                                    fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                                    textAlign: "center",
+                                    lineHeight: "1.2",
+                                    color: "#000"
+                                }}>
+                                    Detailed (for adults)
                                             </div>
                                         </div>
                                     </div>
@@ -1839,14 +1839,14 @@ const PhotoColor: React.FC = () => {
                                         alignItems: "flex-start",
                                         gap: "8px"
                                     }}>
-                                    <span style={{
+                            <span style={{ 
                                         fontSize: "18px",
                                         fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
                                         color: "#679fb5",
                                         fontWeight: "bold"
                                     }}>
                                         Remove watermark
-                                    </span>
+                            </span>
                                         <div style={{
                                             fontSize: "12px",
                                             fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
@@ -1860,91 +1860,101 @@ const PhotoColor: React.FC = () => {
                                             Members only feature
                                         </div>
                                     </div>
-                                </div>
+                    </div>
 
                                 {/* Generate按钮 - 与第三张style图片右边框对齐 */}
                                 <div style={{flex: "1", display: "flex", justifyContent: "flex-end"}}>
-                                    <button
-                                        type="submit"
+                        <button
+                            type="submit"
                                         className={styles.borderHandDrown}
-                                        style={{
+                            style={{
                                             // @ts-ignore
                                             '--border-width': '3px',
                                             '--border-style': 'solid',
                                             '--border-color': '#679fb5',
                                             '--border-radius': '25px',
                                             fontSize: "26px",
-                                            backgroundColor: "#679fb5",
-                                            color: "#FFF",
+                                backgroundColor: "#679fb5",
+                                color: "#FFF",
                                             padding: "12px 20px",
-                                            fontWeight: "bold",
-                                            fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
-                                            borderRadius: "25px",
-                                            border: "none"
-                                        }}
-                                    >
+                                fontWeight: "bold",
+                                fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                                borderRadius: "25px",
+                                border: "none"
+                            }}
+                        >
                                         Generate
-                                    </button>
+                        </button>
                                 </div>
                             </div>
-                        </div>
-                    </form>
-                </div>
+                    </div>
+                </form>
+            </div>
 
-                {/* Result 区域 占比 3 */}
-               <div
+            {/* Result 区域 占比 3 */}
+            <div
+                className={styles.borderHandDrown}
+                style={{
+                    // @ts-ignore
+                    '--border-width': '7px',
+                    '--border-style': 'solid',
+                    '--border-color': '#f9ef94',
+                    '--border-radius': '15px',
+                    padding: "20px",
+                        margin: "-10px -55px 5px 15px", // 增加左边距从5px到15px
+                    flex: "3",
+                    display: "flex",
+                    flexDirection: "column",
+                    backgroundColor: "#fbfbca", // 添加填充颜色
+                    borderRadius: "15px", // 添加圆角使背景色与边框一致
+                    height: "565px", // 设置固定高度，与Select Photo区域一致
+                    overflow: "hidden", // 隐藏超出部分
+                }}
+            >
+                <h3 style={{ 
+                    margin: "0 0 10px 0", 
+                    fontSize: "40px",
+                        fontFamily: "dk_cool_crayonregular",
+                    color: "#786312",
+                    textAlign: "center"
+                }}>Result</h3>
+                <div
                     className={styles.borderHandDrown}
                     style={{
                         // @ts-ignore
-                        '--border-width': '7px',
-                        '--border-style': 'solid',
-                        '--border-color': '#f9ef94',
+                        '--border-width': '2px',
+                        '--border-style': 'dashed',
+                        '--border-color': '#000',
                         '--border-radius': '15px',
-                        padding: "20px",
-                        margin: "-10px -55px 5px 15px", // 增加左边距从5px到15px
-                        flex: "3",
+                        width: "80%",
+                            height: "400px", // 固定高度，不再因为生成状态而变化
+                        margin: "10px auto",
                         display: "flex",
-                        flexDirection: "column",
-                        backgroundColor: "#fbfbca", // 添加填充颜色
-                        borderRadius: "15px", // 添加圆角使背景色与边框一致
-                        height: "565px", // 设置固定高度，与Select Photo区域一致
-                        overflow: "hidden", // 隐藏超出部分
+                        justifyContent: "center",
+                        alignItems: "center",
+                            padding: "1rem", // 增加内边距
+                            boxSizing: "border-box" // 确保内边距包含在宽度和高度内
                     }}
                 >
-                    <h3 style={{
-                        margin: "0 0 10px 0",
-                        fontSize: "40px",
-                        fontFamily: "dk_cool_crayonregular",
-                        color: "#786312",
-                        textAlign: "center"
-                    }}>Result</h3>
-                    <div
-                        className={styles.borderHandDrown}
-                        style={{
-                            // @ts-ignore
-                            '--border-width': '2px',
-                            '--border-style': 'dashed',
-                            '--border-color': '#000',
-                            '--border-radius': '15px',
-                            width: "80%",
-                            height: "650px",
-                            margin: "10px auto",
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
-                        }}
-                    >
-                        {isGenerating ? (
-                            <div style={{
-                                color: "#666",
-                                fontSize: "14px",
-                                fontFamily: "'Comic Sans MS', 'Marker Felt', cursive"
-                            }}>
-                                生成中...
+                    {isGenerating ? (
+                        <div style={{ 
+                            color: "#666", 
+                                fontSize: "18px",
+                            fontFamily: "'Comic Sans MS', 'Marker Felt', cursive"
+                        }}>
+                                Generating...
                             </div>
+                        ) : generatedImage && (uploadedImage || selectedImage) ? (
+                            // 使用ImageCompare组件显示原图和生成图的对比
+                            <ImageCompare
+                                leftImage={uploadedImage || selectedImage || ""}
+                                rightImage={generatedImage || ""}
+                                leftLabel="Original"
+                                rightLabel="Coloring Page"
+                            />
                         ) : generatedImage ? (
                             <img
-                                // @ts-ignore
+                                    // @ts-ignore
                                 src={generatedImage}
                                 alt="Generated Coloring Book"
                                 style={{
@@ -1954,48 +1964,47 @@ const PhotoColor: React.FC = () => {
                                 }}
                             />
                         ) : (
-                            <div style={{
-                                color: "#666",
+                            <div style={{ 
+                                color: "#666", 
                                 fontSize: "14px",
                                 fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
                                 textAlign: "center"
                             }}>
-                                Click Generate to show the result
+                                    Click Generate to show the result
                             </div>
                         )}
-                    </div>
+                </div>
                     <div style={{
                         display: "flex",
                         gap: "5px",
-                        marginBottom: "10px",
-                        marginTop: "1px",
                         justifyContent: "space-between",
                         width: "80%",
-                        margin: "1px auto 10px auto"
+                        marginTop: "20px", // 增加与上方虚线框的距离
+                        marginBottom: "10px"
                     }}>
-                        <button
-                            className={styles.borderHandDrown}
-                            onClick={handleDownload}
-                            style={{
-                                // @ts-ignore
-                                '--border-width': '3px',
-                                '--border-style': 'solid',
-                                '--border-color': '#70c09d',
-                                '--border-radius': '20px',
+                    <button  
+                        className={styles.borderHandDrown}
+                        onClick={handleDownload}
+                        style={{
+                            // @ts-ignore
+                            '--border-width': '3px',
+                            '--border-style': 'solid',
+                            '--border-color': '#70c09d',
+                            '--border-radius': '20px',
                                 fontSize: "14px",
-                                backgroundColor: "#70c09d",
-                                color: "#fff",
+                            backgroundColor: "#70c09d", 
+                            color: "#fff", 
                                 padding: "8px 12px",
-                                fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
-                                borderRadius: "20px",
-                                border: "none",
-                                cursor: generatedImage ? "pointer" : "not-allowed",
-                                opacity: generatedImage ? 1 : 0.5
-                            }}>
-                            Download Image
-                        </button>
+                            fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                            borderRadius: "20px",
+                            border: "none",
+                            cursor: generatedImage ? "pointer" : "not-allowed",
+                            opacity: generatedImage ? 1 : 0.5
+                        }}>
+                        Download Image
+                    </button>
 
-                        <div style={{
+                    <div style={{ 
                             display: "flex",
                             flexDirection: "row",
                             justifyContent: "center",
@@ -2004,77 +2013,77 @@ const PhotoColor: React.FC = () => {
                         }}>
                             <div style={{
                                 fontSize: "20px",
-                                fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
-                                color: "#786312",
-                                textAlign: "center",
-                                margin: "0"
-                            }}>
-                                Share To
-                            </div>
+                        fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                        color: "#786312",
+                        textAlign: "center",
+                        margin: "0"
+                    }}>
+                        Share To
+                    </div>
                             <div style={{display: "flex", gap: "10px", justifyContent: "center", alignItems: "center"}}>
-                                {/* Twitter Logo */}
-                                <div style={{
+                        {/* Twitter Logo */}
+                        <div style={{ 
                                     width: "28px",
                                     height: "28px",
-                                    borderRadius: "50%",
-                                    backgroundColor: "#1DA1F2",
-                                    display: "flex",
-                                    justifyContent: "center",
-                                    alignItems: "center",
-                                    cursor: "pointer",
-                                    transition: "transform 0.2s"
-                                }}>
+                            borderRadius: "50%", 
+                            backgroundColor: "#1DA1F2", 
+                            display: "flex", 
+                            justifyContent: "center", 
+                            alignItems: "center",
+                            cursor: "pointer",
+                            transition: "transform 0.2s"
+                        }}>
                                     <TwitterLogoIcon style={{color: "white", fontSize: "14px"}}/>
-                                </div>
-
-                                {/* Facebook Logo */}
-                                <div style={{
+                        </div>
+                        
+                        {/* Facebook Logo */}
+                        <div style={{ 
                                     width: "28px",
                                     height: "28px",
-                                    borderRadius: "50%",
-                                    backgroundColor: "#4267B2",
-                                    display: "flex",
-                                    justifyContent: "center",
-                                    alignItems: "center",
-                                    cursor: "pointer",
-                                    transition: "transform 0.2s"
-                                }}>
+                            borderRadius: "50%", 
+                            backgroundColor: "#4267B2", 
+                            display: "flex", 
+                            justifyContent: "center", 
+                            alignItems: "center",
+                            cursor: "pointer",
+                            transition: "transform 0.2s"
+                        }}>
                                     <FaFacebookF style={{color: "white", fontSize: "14px"}}/>
-                                </div>
-
-                                {/* LinkedIn Logo */}
-                                <div style={{
+                        </div>
+                        
+                        {/* LinkedIn Logo */}
+                        <div style={{ 
                                     width: "28px",
                                     height: "28px",
-                                    borderRadius: "50%",
-                                    backgroundColor: "#0077B5",
-                                    display: "flex",
-                                    justifyContent: "center",
-                                    alignItems: "center",
-                                    cursor: "pointer",
-                                    transition: "transform 0.2s"
-                                }}>
+                            borderRadius: "50%", 
+                            backgroundColor: "#0077B5", 
+                            display: "flex", 
+                            justifyContent: "center", 
+                            alignItems: "center",
+                            cursor: "pointer",
+                            transition: "transform 0.2s"
+                        }}>
                                     <FaLinkedinIn style={{color: "white", fontSize: "14px"}}/>
-                                </div>
-
-                                {/* WhatsApp Logo */}
-                                <div style={{
+                        </div>
+                        
+                        {/* WhatsApp Logo */}
+                        <div style={{ 
                                     width: "28px",
                                     height: "28px",
-                                    borderRadius: "50%",
-                                    backgroundColor: "#25D366",
-                                    display: "flex",
-                                    justifyContent: "center",
-                                    alignItems: "center",
-                                    cursor: "pointer",
-                                    transition: "transform 0.2s"
-                                }}>
+                            borderRadius: "50%", 
+                            backgroundColor: "#25D366", 
+                            display: "flex", 
+                            justifyContent: "center", 
+                            alignItems: "center",
+                            cursor: "pointer",
+                            transition: "transform 0.2s"
+                        }}>
                                     <FaWhatsapp style={{color: "white", fontSize: "14px"}}/>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
             </div> )}
 
             {/* 登录模态框 */}
@@ -2092,4 +2101,4 @@ const PhotoColor: React.FC = () => {
     );
 };
 
-export default PhotoColor;
+export default PhotoColor; 

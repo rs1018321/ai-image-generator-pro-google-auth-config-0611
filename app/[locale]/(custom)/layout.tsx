@@ -78,7 +78,7 @@ export default function CustomLayout({
                     {/* 导航菜单项（桌面端显示） */}
                     <nav className="hidden md:flex space-x-7 text-gray-800 items-center">
 
-                        <a href="#features"  style={{
+                        <a href="/#features"  style={{
                             // @ts-ignore
                             '--border-width': '6px',
                             '--border-style': 'solid',
@@ -96,7 +96,7 @@ export default function CustomLayout({
                             textAlign: 'center'
 
                         }} className={clsx("hover:text-purple-600", styles.headerCircle)} >Features</a>
-                        <a href="#faq"
+                        <a href="/#faq"
                            style={{
                                // @ts-ignore
                                '--border-width': '6px',

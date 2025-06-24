@@ -545,68 +545,7 @@
     },
     "copyright": "© 2025 • Coloring Page All rights reserved.",
     "nav": {
-      "items": [
-        {
-          "title": "About",
-          "children": [
-            {
-              "title": "Features",
-              "url": "/#feature",
-              "target": "_self"
-            },
-            {
-              "title": "Showcases",
-              "url": "/#showcase",
-              "target": "_self"
-            },
-            {
-              "title": "Pricing",
-              "url": "/#pricing",
-              "target": "_self"
-            }
-          ]
-        },
-        {
-          "title": "Resources",
-          "children": [
-            {
-              "title": "Documents",
-              "url": "https://docs.coloringpage.ai",
-              "target": "_blank"
-            },
-            {
-              "title": "Components",
-              "url": "https://coloringpage.ai/components",
-              "target": "_blank"
-            },
-            {
-              "title": "Templates",
-              "url": "https://coloringpage.ai/templates",
-              "target": "_blank"
-            }
-          ]
-        },
-        {
-          "title": "Friends",
-          "children": [
-            {
-              "title": "ThinkAny",
-              "url": "https://thinkany.ai",
-              "target": "_blank"
-            },
-            {
-              "title": "HeyBeauty",
-              "url": "https://heybeauty.ai",
-              "target": "_blank"
-            },
-            {
-              "title": "Pagen",
-              "url": "https://pagen.so",
-              "target": "_blank"
-            }
-          ]
-        }
-      ]
+      "items": []
     },
     "social": {
       "items": [

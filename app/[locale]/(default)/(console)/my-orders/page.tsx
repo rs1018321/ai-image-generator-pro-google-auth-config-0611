@@ -40,51 +40,6 @@ export default async function MyOrdersPage({ searchParams }: PageProps) {
     orders = await getOrdersByPaidEmail(user_email);
   }
 
-  const columns: TableColumn[] = [
-    { name: "order_no", title: t("my_orders.table.order_no") },
-    { name: "paid_email", title: t("my_orders.table.email") },
-    { name: "product_name", title: t("my_orders.table.product_name") },
-    {
-      name: "amount",
-      title: t("my_orders.table.amount"),
-      callback: (item: any) =>
-        `${item.currency.toUpperCase() === "CNY" ? "¥" : "$"} ${
-          item.amount / 100
-        }`,
-    },
-    {
-      name: "paid_at",
-      title: t("my_orders.table.paid_at"),
-      callback: (item: any) =>
-        moment(item.paid_at).format("YYYY-MM-DD HH:mm:ss"),
-    },
-  ];
-
-  const table: TableSlotType = {
-    title: t("my_orders.orders_title"),
-    description: t("my_orders.orders_description"),
-    toolbar: {
-      items: [
-        {
-          title: t("my_orders.read_docs"),
-          icon: "RiBookLine",
-          url: "https://docs.coloringpage.ai",
-          target: "_blank",
-          variant: "outline",
-        },
-        {
-          title: t("my_orders.join_discord"),
-          icon: "RiDiscordFill",
-          url: "https://discord.gg/HQNnrzjZQS",
-          target: "_blank",
-        },
-      ],
-    },
-    columns: columns,
-    data: orders,
-    empty_message: t("my_orders.no_orders"),
-  };
-
   // 获取会员等级图标和颜色
   const getMembershipIcon = (level: string) => {
     switch (level) {
@@ -154,9 +109,13 @@ export default async function MyOrdersPage({ searchParams }: PageProps) {
             <div className="space-y-3">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <CalendarDays className="h-4 w-4" />
-                {t("my_orders.membership.expires_at", {
-                  date: moment(subscription.current_period_end).format("YYYY-MM-DD HH:mm:ss")
-                })}
+                {subscription.cancel_at_period_end ? (
+                  t("my_orders.membership.expires_at", {
+                    date: moment(subscription.current_period_end).format("YYYY-MM-DD HH:mm:ss")
+                  })
+                ) : (
+                  `Renews on ${moment(subscription.current_period_end).format("YYYY-MM-DD HH:mm:ss")}`
+                )}
               </div>
               
               <div className="text-sm">
@@ -199,9 +158,6 @@ export default async function MyOrdersPage({ searchParams }: PageProps) {
           )}
         </CardContent>
       </Card>
-
-      {/* 订单表格 */}
-      <TableSlot {...table} />
     </div>
   );
 }

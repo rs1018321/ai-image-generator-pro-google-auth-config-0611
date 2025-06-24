@@ -8,9 +8,10 @@ import styles from '../../app/[locale]/(default)/page.module.css';
 
 interface DashboardButtonProps {
   locale: string;
+  variant?: "desktop" | "mobile";
 }
 
-export default function DashboardButton({ locale }: DashboardButtonProps) {
+export default function DashboardButton({ locale, variant = "desktop" }: DashboardButtonProps) {
   const { user, setShowSignModal, setPendingRedirect } = useAppContext();
   const router = useRouter();
   const t = useTranslations();
@@ -28,6 +29,18 @@ export default function DashboardButton({ locale }: DashboardButtonProps) {
     }
   };
 
+  if (variant === "mobile") {
+    return (
+      <button
+        onClick={handleClick}
+        className="text-gray-800 hover:bg-[#d8e4a1] p-2 rounded text-left"
+      >
+        Dashboard
+      </button>
+    );
+  }
+
+  // desktop default
   return (
     <button
       onClick={handleClick}

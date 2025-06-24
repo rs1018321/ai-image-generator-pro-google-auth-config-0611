@@ -63,7 +63,7 @@ export default async function DefaultLayout({
         }}>
           {/* 导航菜单项（桌面端显示） */}
           <nav className="hidden md:flex space-x-7 text-gray-800 items-center">
-            <a href="#features" style={{
+            <a href="/#features" style={{
               // @ts-ignore
               '--border-width': '6px',
               '--border-style': 'solid',
@@ -83,7 +83,7 @@ export default async function DefaultLayout({
               textDecoration: 'none'
             }} className={clsx("hover:bg-[#64bd9b] hover:text-white hover:scale-105 transition-all", styles.headerCircle)}>Features</a>
 
-            <a href="#faq" style={{
+            <a href="/#faq" style={{
               // @ts-ignore
               '--border-width': '6px',
               '--border-style': 'solid',

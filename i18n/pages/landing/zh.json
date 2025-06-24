@@ -503,68 +503,7 @@
     },
     "copyright": "© 2025 • Coloring Page 保留所有权利。",
     "nav": {
-      "items": [
-        {
-          "title": "关于",
-          "children": [
-            {
-              "title": "功能特点",
-              "url": "/#feature",
-              "target": "_self"
-            },
-            {
-              "title": "案例展示",
-              "url": "/#showcase",
-              "target": "_self"
-            },
-            {
-              "title": "定价",
-              "url": "/#pricing",
-              "target": "_self"
-            }
-          ]
-        },
-        {
-          "title": "资源",
-          "children": [
-            {
-              "title": "文档",
-              "url": "https://docs.coloringpage.ai",
-              "target": "_blank"
-            },
-            {
-              "title": "组件",
-              "url": "https://coloringpage.ai/components",
-              "target": "_blank"
-            },
-            {
-              "title": "模板",
-              "url": "https://coloringpage.ai/templates",
-              "target": "_blank"
-            }
-          ]
-        },
-        {
-          "title": "友情链接",
-          "children": [
-            {
-              "title": "ThinkAny",
-              "url": "https://thinkany.ai",
-              "target": "_blank"
-            },
-            {
-              "title": "HeyBeauty",
-              "url": "https://heybeauty.ai",
-              "target": "_blank"
-            },
-            {
-              "title": "Pagen",
-              "url": "https://pagen.so",
-              "target": "_blank"
-            }
-          ]
-        }
-      ]
+      "items": []
     },
     "social": {
       "items": [

@@ -31,10 +31,6 @@ export default function HeaderSignButton({ locale }: HeaderSignButtonProps) {
     router.push("/my-orders");
   };
 
-  const handleAdminClick = () => {
-    window.open("/admin/users", "_blank");
-  };
-
   const handleSignOut = async () => {
     await signOut({ 
       callbackUrl: `/${locale || currentLocale}`,
@@ -93,10 +89,6 @@ export default function HeaderSignButton({ locale }: HeaderSignButtonProps) {
           <DropdownMenuItem className="cursor-pointer" onClick={handleUserCenterClick}>
             {t("user.user_center")}
           </DropdownMenuItem>
-          <DropdownMenuItem className="cursor-pointer" onClick={handleAdminClick}>
-            {t("user.admin_system")}
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
           <DropdownMenuItem
             className="cursor-pointer"
             onClick={handleSignOut}
