@@ -2,24 +2,96 @@ import { NextRequest, NextResponse } from 'next/server'
 import Replicate from 'replicate'
 import { auth } from '@/auth'
 import { decreaseCredits, CreditsTransType } from '@/services/credit'
+import sharp from 'sharp'
 
-// ------ 新增：获取最新 version 哈希 ------
-// async function getLatestVersionId() {
-//   const res = await fetch(
-//     "https://api.replicate.com/v1/models/black-forest-labs/flux-kontext-pro/versions",
-//     {
-//       headers: {
-//         Authorization: `Token ${process.env.REPLICATE_API_TOKEN}`,
-//       },
-//     }
-//   );
-//   if (!res.ok)
-//     throw new Error(`Replicate version list HTTP ${res.status}`);
+// ------ 更新：水印处理函数 ------
+async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
+  console.log("🖨️ [addWatermark] 开始添加水印，buffer 大小:", imageBuffer.length);
+  const borderPx = 25;
+  const text = "coloring page";
+  const textColor = "#000000"; // Black text
+  const borderColor = "#000000"; // Black border
+  const cutoutBackgroundColor = "#FFFFFF"; // White background for text cutout
 
-//   const json = await res.json();
-//   return json.results[0].id as string; // 第 0 条就是最新
-// }
-// ----------------------------------------
+  const image = sharp(imageBuffer);
+  const meta = await image.metadata();
+  const imageWidth = meta.width!;
+  const imageHeight = meta.height!;
+
+  console.log("🖨️ [addWatermark] 原图尺寸:", imageWidth, imageHeight);
+
+  const finalWidth = imageWidth + borderPx * 2;
+  const finalHeight = imageHeight + borderPx * 2;
+
+  console.log("🖨️ [addWatermark] 最终图尺寸:", finalWidth, finalHeight);
+
+  const fontSize = Math.round(imageWidth * 0.030); // 调整字体大小
+  const textPaddingHorizontal = Math.round(fontSize * 0.8);
+
+  // 使用 SVG 和 Sharp 动态计算文本宽度
+  const probeSvg = `<svg><text font-size="${fontSize}" font-family="sans-serif" font-weight="bold">${text}</text></svg>`;
+  const textMetadata = await sharp(Buffer.from(probeSvg)).metadata();
+  const textWidth = textMetadata.width!;
+
+  console.log("🖨️ [addWatermark] textWidth:", textWidth);
+
+  const cutoutWidth = textWidth + textPaddingHorizontal * 2;
+  const cutoutHeight = borderPx;
+  const cutoutX = Math.round((finalWidth - cutoutWidth) / 2);
+  const cutoutY = finalHeight - borderPx;
+
+  // 创建文字 SVG
+  const textSvg = `
+    <svg width="${cutoutWidth}" height="${cutoutHeight}">
+      <style>
+        .title { 
+          font-family: sans-serif;
+          font-size: ${fontSize}px; 
+          fill: ${textColor}; 
+          font-weight: bold;
+          text-anchor: middle;
+        }
+      </style>
+      <text x="50%" y="50%" dy="0.35em" class="title">${text}</text>
+    </svg>
+  `;
+
+  // 使用 sharp 的 composite 功能合成图片
+  return sharp({
+      create: {
+        width: finalWidth,
+        height: finalHeight,
+        channels: 4, // 使用4通道以支持透明度
+        background: borderColor
+      }
+    })
+    .composite([
+      // 1. 将原图置于中心
+      { input: imageBuffer, top: borderPx, left: borderPx },
+      // 2. 在底部边框创建白色镂空背景
+      { 
+        input: {
+          create: {
+            width: cutoutWidth,
+            height: cutoutHeight,
+            channels: 3,
+            background: cutoutBackgroundColor
+          }
+        },
+        top: cutoutY,
+        left: cutoutX
+      },
+      // 3. 在白色背景上放置文字
+      {
+        input: Buffer.from(textSvg),
+        top: cutoutY,
+        left: cutoutX
+      }
+    ])
+    .png()
+    .toBuffer();
+}
+// --------------------------------
 
 
 const replicate = new Replicate({
@@ -49,6 +121,9 @@ export async function POST(request: NextRequest) {
     const file = formData.get('image') as File
     const size = formData.get('size') as string || '1024x1024'
     const style = formData.get('style') as string || 'medium'
+    // ⚠️ 前端字段 "watermark" = 'true' 表示需要水印，'false' 表示不要水印
+    const hasWatermark = formData.get('watermark') === 'true'
+    console.log("💧 前端是否需要水印:", hasWatermark)
 
     if (!file) {
       return NextResponse.json({ error: "未提供图片文件" }, { status: 400 })
@@ -176,14 +251,23 @@ export async function POST(request: NextRequest) {
             console.log("📄 获取到图片数据，大小:", fullData.length, "bytes")
             console.log("📄 文件头:", fullData.slice(0, 8))
             
-            // 直接将二进制数据转换为 base64
-            const imageData = Buffer.from(fullData).toString('base64')
-            
+            let bufferData: Buffer = Buffer.from(fullData);
+            // 如果需要，添加水印
+            if (hasWatermark) {
+              console.log("💧 添加水印 (ReadableStream)...")
+              bufferData = await addWatermark(bufferData);
+              console.log("✅ 水印添加成功 (ReadableStream)")
+            } else {
+              console.log("✅ 无需水印，直接返回原图 (ReadableStream)");
+            }
+
+            const imageData = bufferData.toString('base64');
+
             console.log("✅ 图片数据转换为 base64 成功，长度:", imageData.length)
 
             // 直接返回结果，不需要下载步骤
             const processingTime = Date.now() - startTime
-            
+
             return NextResponse.json({
               success: true,
               image: `data:image/png;base64,${imageData}`,
@@ -213,14 +297,25 @@ export async function POST(request: NextRequest) {
           throw new Error(`无效的图片 URL: ${imageUrl}`)
         }
 
-        // 下载图片并转换为 base64
+        // 下载图片并转换为 buffer
         const imageResponse = await fetch(imageUrl)
         if (!imageResponse.ok) {
           throw new Error(`下载生成的图片失败: ${imageResponse.status} ${imageResponse.statusText}`)
         }
         
         const imageBuffer = await imageResponse.arrayBuffer()
-        const imageData = Buffer.from(imageBuffer).toString('base64')
+        let imageData: string;
+
+        // 如果需要，添加水印
+        if (hasWatermark) {
+          console.log("💧 添加水印...")
+          const watermarkedBuffer = await addWatermark(Buffer.from(imageBuffer));
+          imageData = watermarkedBuffer.toString('base64');
+          console.log("✅ 水印添加成功")
+        } else {
+          imageData = Buffer.from(imageBuffer).toString('base64')
+          console.log("✅ 无需水印，直接返回原图")
+        }
 
         console.log("✅ 图片转换为 base64 成功，长度:", imageData.length)
 
