@@ -3,6 +3,21 @@ import Replicate from 'replicate'
 import { auth } from '@/auth'
 import { decreaseCredits, CreditsTransType } from '@/services/credit'
 import sharp from 'sharp'
+import fs from 'fs'
+import path from 'path'
+
+// -- 字体加载 --
+// 在模块加载时只执行一次，避免重复读取文件
+const fontPath = path.join(process.cwd(), 'public', 'fonts', 'DejaVuSans.ttf');
+let fontBase64 = '';
+try {
+  const fontBuffer = fs.readFileSync(fontPath);
+  fontBase64 = fontBuffer.toString('base64');
+  console.log("✅ [Watermark] 字体文件加载成功。");
+} catch (error) {
+  console.error("❌ [Watermark] 无法加载字体文件，文字水印将不可用:", error);
+}
+// --
 
 // ------ 更新：水印处理函数 ------
 async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
@@ -41,22 +56,33 @@ async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
 
     console.log("🖨️ [addWatermark] cutoutWidth:", cutoutWidth, "cutoutHeight:", cutoutHeight);
 
-    // 1. 创建仅包含文字的SVG
-    const textSvg = `
-      <svg width="${cutoutWidth}" height="${cutoutHeight}" xmlns="http://www.w3.org/2000/svg">
-        <text x="50%" y="50%"
-              font-family="sans-serif"
-              font-size="${fontSize}"
-              fill="${textColor}"
-              text-anchor="middle"
-              dominant-baseline="central">
-            ${text}
-        </text>
-      </svg>
-    `;
-    // 2. 将文字SVG转换为PNG Buffer
-    const textBuffer = await sharp(Buffer.from(textSvg)).png().toBuffer();
-    console.log("🖨️ [addWatermark] 文字水印 Buffer 创建成功");
+    // 1. 创建仅包含文字的SVG, 并嵌入字体
+    let textBuffer: Buffer | null = null;
+    if (fontBase64) {
+      const textSvg = `
+        <svg width="${cutoutWidth}" height="${cutoutHeight}" xmlns="http://www.w3.org/2000/svg">
+          <style>
+            @font-face {
+              font-family: 'DejaVu Sans';
+              src: url('data:font/ttf;base64,${fontBase64}');
+            }
+          </style>
+          <text x="50%" y="50%"
+                font-family="DejaVu Sans, sans-serif"
+                font-size="${fontSize}"
+                fill="${textColor}"
+                text-anchor="middle"
+                dominant-baseline="central">
+              ${text}
+          </text>
+        </svg>
+      `;
+      // 2. 将文字SVG转换为PNG Buffer
+      textBuffer = await sharp(Buffer.from(textSvg)).png().toBuffer();
+      console.log("🖨️ [addWatermark] 文字水印 Buffer 创建成功");
+    } else {
+      console.log("⚠️ [addWatermark] 字体未加载，跳过文字水印。");
+    }
 
     // 3. 创建白色背景的 Buffer
     const whiteBackground = await sharp({
@@ -69,8 +95,29 @@ async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
     }).png().toBuffer();
 
     console.log("🖨️ [addWatermark] 白色背景创建成功");
+    
+    // 4. 合成图层
+    const compositeLayers = [
+      // 图层1: 将原图置于中心
+      { input: imageBuffer, top: borderPx, left: borderPx },
+      // 图层2: 在底部边框创建白色镂空背景
+      { 
+        input: whiteBackground,
+        top: cutoutY,
+        left: cutoutX
+      },
+    ];
 
-    // 4. 使用 sharp 的 composite 功能合成最终图片
+    // 图层3: 如果文字buffer成功创建，则添加文字
+    if (textBuffer) {
+      compositeLayers.push({
+        input: textBuffer,
+        top: cutoutY,
+        left: cutoutX
+      });
+    }
+
+    // 5. 使用 sharp 的 composite 功能合成最终图片
     return await sharp({
         create: {
           width: finalWidth,
@@ -79,22 +126,7 @@ async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
           background: { r: 0, g: 0, b: 0, alpha: 1 } // 黑色边框
         }
       })
-      .composite([
-        // 图层1: 将原图置于中心
-        { input: imageBuffer, top: borderPx, left: borderPx },
-        // 图层2: 在底部边框创建白色镂空背景
-        { 
-          input: whiteBackground,
-          top: cutoutY,
-          left: cutoutX
-        },
-        // 图层3: 在白色背景上放置文字
-        {
-          input: textBuffer,
-          top: cutoutY,
-          left: cutoutX
-        }
-      ])
+      .composite(compositeLayers)
       .png({
         compressionLevel: 6,
         adaptiveFiltering: false
