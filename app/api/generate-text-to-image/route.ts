@@ -3,25 +3,10 @@ import Replicate from 'replicate'
 import { auth } from '@/auth'
 import { decreaseCredits, CreditsTransType } from '@/services/credit'
 import sharp from 'sharp'
-import fs from 'fs'
-import path from 'path'
 
 const replicate = new Replicate({
   auth: process.env.REPLICATE_TEXT_API_TOKEN!,  // 使用文生图专用的 API Token
 })
-
-// -- 字体加载 --
-// 在模块加载时只执行一次，避免重复读取文件
-const fontPath = path.join(process.cwd(), 'public', 'fonts', 'DejaVuSans.ttf');
-let fontBase64 = '';
-try {
-  const fontBuffer = fs.readFileSync(fontPath);
-  fontBase64 = fontBuffer.toString('base64');
-  console.log("✅ [Watermark] 字体文件加载成功。");
-} catch (error) {
-  console.error("❌ [Watermark] 无法加载字体文件，文字水印将不可用:", error);
-}
-// --
 
 // 添加水印函数 - 优化 Vercel 环境兼容性
 async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
@@ -36,7 +21,7 @@ async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
     
     console.log(`📐 图片尺寸: ${width}x${height}`);
     
-    // 水印设置
+    // 水印设置 - 简化版本，避免字体问题
     const borderPx = 15; // 边框厚度 15px
     const fontSize = Math.max(20, Math.min(width * 0.03, 36)); // 减小字体大小
     const text = "coloring page";
@@ -54,51 +39,31 @@ async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
     
     console.log(`🖨️ 水印参数: cutoutWidth=${cutoutWidth}, cutoutHeight=${cutoutHeight}`);
     
-    // 4. 创建仅包含边框和白色背景的SVG
-    const baseSvg = `
-    <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
-      <!-- 黑色边框 -->
-      <rect x="0" y="0" width="${width}" height="${borderPx}" fill="black"/>
-      <rect x="0" y="${height - borderPx}" width="${width}" height="${borderPx}" fill="black"/>
-      <rect x="0" y="0" width="${borderPx}" height="${height}" fill="black"/>
-      <rect x="${width - borderPx}" y="0" width="${borderPx}" height="${height}" fill="black"/>
-      
-      <!-- 底部白色区域 -->
-      <rect x="${cutoutX}" y="${cutoutY}" width="${cutoutWidth}" height="${cutoutHeight}" fill="white" stroke="black" stroke-width="1"/>
-    </svg>
-    `;
-    
-    // 直接使用 SVG 生成文字水印
-    const textSvg = `
-      <svg width="${cutoutWidth}" height="${cutoutHeight}" xmlns="http://www.w3.org/2000/svg">
-        <text x="50%" y="50%" 
-              dominant-baseline="middle" 
-              text-anchor="middle"
-              font-family="Arial, sans-serif" 
-              font-size="${fontSize}px" 
-              fill="#000000">${text}</text>
+    // 创建简化的 SVG 水印 - 仅边框与白底，无文字，避免 Fontconfig 错误
+    const svgWatermark = `
+      <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+        <!-- 黑色边框 -->
+        <rect x="0" y="0" width="${width}" height="${borderPx}" fill="black"/>
+        <rect x="0" y="${height - borderPx}" width="${width}" height="${borderPx}" fill="black"/>
+        <rect x="0" y="0" width="${borderPx}" height="${height}" fill="black"/>
+        <rect x="${width - borderPx}" y="0" width="${borderPx}" height="${height}" fill="black"/>
+        
+        <!-- 底部白色区域 -->
+        <rect x="${cutoutX}" y="${cutoutY}" width="${cutoutWidth}" height="${cutoutHeight}" fill="white" stroke="black" stroke-width="1"/>
       </svg>
     `;
     
-    let textBuffer: Buffer | null = null;
-    try {
-      textBuffer = await sharp(Buffer.from(textSvg))
-        .png()
-        .toBuffer();
-      console.log("🖨️ SVG 文字水印生成成功");
-    } catch (svgErr) {
-      console.warn("⚠️ SVG 文字生成异常，跳过文字水印:", svgErr);
-    }
-
-    // 6. 合成最终图片
-    // 首先，将背景和文字（如果存在）合成一个水印图层
-    const watermarkLayer = await sharp(Buffer.from(baseSvg))
-      .composite(textBuffer ? [{ input: textBuffer, top: cutoutY, left: cutoutX }] : [])
-      .toBuffer();
-
-    // 然后，将这个完整的水印图层叠加到原始图片上
+    console.log("🖼️ SVG水印创建完成");
+    
+    // 使用更安全的 Sharp 配置
     const watermarkedImage = await sharp(imageBuffer)
-      .composite([{ input: watermarkLayer, top: 0, left: 0 }])
+      .composite([
+        {
+          input: Buffer.from(svgWatermark),
+          top: 0,
+          left: 0,
+        }
+      ])
       .png({
         // 优化 PNG 输出
         compressionLevel: 6,
