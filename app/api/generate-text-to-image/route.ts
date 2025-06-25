@@ -90,8 +90,8 @@ export async function POST(request: NextRequest) {
   const baseDelay = 5000
 
   // 检查 API token
-  if (!process.env.REPLICATE_API_TOKEN) {
-    console.error("❌ REPLICATE_API_TOKEN 环境变量未进行设置")
+  if (!process.env.REPLICATE_TEXT_API_TOKEN) {
+    console.error("❌ REPLICATE_TEXT_API_TOKEN 环境变量未进行设置")
     return NextResponse.json({ error: "API 配置错误，请联系管理员" }, { status: 500 })
   }
 
@@ -134,11 +134,9 @@ export async function POST(request: NextRequest) {
     
     const fullPrompt = `${prompt}. ${basePrompt} ${stylePrompt}`;
 
-    // 准备 Replicate API 参数
+    // 准备 MiniMax API 参数 - 与 generate-text-sketch 保持一致
     const input = {
       prompt: fullPrompt,
-      guidance_scale: 2.5,
-      num_inference_steps: 28,
       aspect_ratio: size === "1024x1024" ? "1:1" :     // 1:1 正方形
                    size === "832x1248" ? "2:3" :      // 2:3 竖版
                    size === "1248x832" ? "3:2" :      // 3:2 横版
@@ -151,31 +149,30 @@ export async function POST(request: NextRequest) {
     // 重试循环（只重试 API 调用部分）
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        console.log(`第 ${attempt} 次尝试调用 Replicate API`)
-        console.log("准备调用 Replicate API: black-forest-labs/flux-schnell")
-        console.log("API Token 已设置:", process.env.REPLICATE_API_TOKEN ? '是' : '否')
+        console.log(`第 ${attempt} 次尝试调用 MiniMax API`)
+        console.log("准备调用 Replicate API: minimax/image-01")
+        console.log("API Token 已设置:", process.env.REPLICATE_TEXT_API_TOKEN ? '是' : '否')
 
         const startTime = Date.now()
 
-        // 调用 Replicate API
-        const output = await replicate.run("black-forest-labs/flux-schnell", { input }) as any;
+        // 调用 MiniMax API
+        const output = await replicate.run("minimax/image-01", { input }) as any;
 
-        console.log(`Replicate API 调用成功`)
+        console.log(`MiniMax API 调用成功`)
         console.log("输出类型:", typeof output)
         console.log("输出构造函数:", output?.constructor?.name)
 
-        // 处理不同类型的 Replicate 输出
+        // 处理 MiniMax 模型的输出 - 通常返回 URL 数组
         let imageUrl: string
 
-        if (typeof output === 'string') {
+        if (Array.isArray(output) && output.length > 0) {
+          // MiniMax 通常返回 URL 数组
+          imageUrl = output[0]
+          console.log("输出格式: MiniMax URL 数组")
+        } else if (typeof output === 'string') {
           // 直接返回 URL 字符串
           imageUrl = output
           console.log("输出格式: 直接 URL 字符串")
-        } else if (Array.isArray(output) && output.length > 0) {
-          // 如果返回数组，取第一个元素
-          imageUrl = output[0]
-          console.log("输出格式: URL 数组")
-          
         } else if (output && typeof output.getReader === 'function') {
           // 如果是 ReadableStream，直接读取为二进制图片数据
           console.log("输出格式: ReadableStream (二进制图片数据)")
@@ -233,7 +230,7 @@ export async function POST(request: NextRequest) {
               success: true,
               image: `data:image/png;base64,${imageData}`,
               processingTime: `${processingTime}ms`,
-              model: "flux-schnell",
+              model: "minimax/image-01",
               attempt: attempt,
               format: "ReadableStream"
             })
@@ -299,7 +296,7 @@ export async function POST(request: NextRequest) {
           success: true,
           image: `data:image/png;base64,${imageData}`,
           processingTime: `${processingTime}ms`,
-          model: "flux-schnell",
+          model: "minimax/image-01",
           attempt: attempt
         })
 
@@ -311,7 +308,7 @@ export async function POST(request: NextRequest) {
           console.log("❌ 图片生成失败，不扣除积分")
           return NextResponse.json({ 
             error: error.message || "图片生成失败",
-            model: "flux-schnell",
+            model: "minimax/image-01",
             attempts: maxRetries,
             suggestion: error.message.includes('rate limit') ? '请稍后再试，API 调用频率限制' :
                        error.message.includes('timeout') ? '请尝试使用更简单的描述' :
