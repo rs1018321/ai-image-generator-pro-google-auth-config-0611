@@ -163,12 +163,89 @@ export async function POST(request: NextRequest) {
         console.log("输出构造函数:", output?.constructor?.name)
 
         // 处理 MiniMax 模型的输出 - 通常返回 URL 数组
-        let imageUrl: string
+        let imageUrl: string | null = null
+        let isReadableStream = false
 
         if (Array.isArray(output) && output.length > 0) {
-          // MiniMax 通常返回 URL 数组
-          imageUrl = output[0]
-          console.log("输出格式: MiniMax URL 数组")
+          // 检查数组第一个元素的类型
+          const firstElement = output[0]
+          
+          if (typeof firstElement === 'string' && firstElement.startsWith('http')) {
+            // MiniMax 返回 URL 数组
+            imageUrl = firstElement
+            console.log("输出格式: MiniMax URL 数组")
+          } else if (firstElement && typeof firstElement.getReader === 'function') {
+            // MiniMax 返回 ReadableStream 数组
+            console.log("输出格式: MiniMax ReadableStream 数组")
+            isReadableStream = true
+            
+            // 处理 ReadableStream
+            const reader = firstElement.getReader()
+            const chunks = []
+            
+            try {
+              while (true) {
+                const { done, value } = await reader.read()
+                if (done) break
+                chunks.push(value)
+              }
+              
+              // 将 chunks 合并为完整的图片数据
+              const fullData = new Uint8Array(chunks.reduce((acc, chunk) => acc + chunk.length, 0))
+              let offset = 0
+              for (const chunk of chunks) {
+                fullData.set(chunk, offset)
+                offset += chunk.length
+              }
+              
+              console.log("获取到图片数据，大小:", fullData.length, "bytes")
+              
+              // 创建 Buffer 并检查是否需要添加水印
+              let bufferData: Buffer = Buffer.from(fullData);
+              if (hasWatermark) {
+                console.log("添加水印中...")
+                bufferData = await addWatermark(bufferData);
+                console.log("水印添加完成")
+              } else {
+                console.log("跳过水印添加")
+              }
+
+              const imageData = bufferData.toString('base64');
+
+              console.log("图片数据转换为 base64 成功，长度:", imageData.length)
+
+              // 🎯 图片生成成功后扣除积分
+              try {
+                await decreaseCredits({
+                  user_uuid: session.user.uuid,
+                  trans_type: CreditsTransType.GenerateImage,
+                  credits: 1
+                })
+                console.log("✅ 图片生成成功，积分扣除完成")
+              } catch (error: any) {
+                console.error("⚠️ 积分扣除失败，但图片已生成:", error)
+                // 积分扣除失败不影响图片返回，只记录日志
+              }
+
+              // 直接返回结果，不需要下载步骤
+              const processingTime = Date.now() - startTime
+
+              return NextResponse.json({
+                success: true,
+                image: `data:image/png;base64,${imageData}`,
+                processingTime: `${processingTime}ms`,
+                model: "minimax/image-01",
+                attempt: attempt,
+                format: "ReadableStream Array"
+              })
+              
+            } finally {
+              reader.releaseLock()
+            }
+          } else {
+            console.error("数组第一个元素类型未知:", typeof firstElement, firstElement)
+            throw new Error(`数组第一个元素类型不支持: ${typeof firstElement}`)
+          }
         } else if (typeof output === 'string') {
           // 直接返回 URL 字符串
           imageUrl = output
@@ -176,6 +253,8 @@ export async function POST(request: NextRequest) {
         } else if (output && typeof output.getReader === 'function') {
           // 如果是 ReadableStream，直接读取为二进制图片数据
           console.log("输出格式: ReadableStream (二进制图片数据)")
+          isReadableStream = true
+          
           const reader = output.getReader()
           const chunks = []
           
@@ -248,57 +327,65 @@ export async function POST(request: NextRequest) {
           throw new Error(`不支持的输出格式: ${typeof output}, constructor: ${output?.constructor?.name}`)
         }
 
-        console.log("解析得到的图片 URL:", imageUrl)
+        // 如果已经通过 ReadableStream 处理完成，上面的代码已经返回了
+        // 下面的代码只处理 URL 的情况
+        if (!isReadableStream && imageUrl) {
+          console.log("解析得到的图片 URL:", imageUrl)
 
-        // 验证 URL 格式
-        if (!imageUrl || !imageUrl.startsWith('http')) {
-          throw new Error(`无效的图片 URL: ${imageUrl}`)
-        }
+          // 验证 URL 格式
+          if (!imageUrl || !imageUrl.startsWith('http')) {
+            throw new Error(`无效的图片 URL: ${imageUrl}`)
+          }
 
-        // 下载图片并转换为 base64
-        const imageResponse = await fetch(imageUrl)
-        if (!imageResponse.ok) {
-          throw new Error(`下载生成的图片失败: ${imageResponse.status} ${imageResponse.statusText}`)
-        }
-        
-        let imageBuffer: Buffer = Buffer.from(await imageResponse.arrayBuffer())
-        
-        // 如果需要，添加水印
-        if (hasWatermark) {
-          console.log("添加水印中...")
-          imageBuffer = await addWatermark(imageBuffer);
-          console.log("水印添加完成")
-        } else {
-          console.log("跳过水印添加")
-        }
+          // 下载图片并转换为 base64
+          const imageResponse = await fetch(imageUrl)
+          if (!imageResponse.ok) {
+            throw new Error(`下载生成的图片失败: ${imageResponse.status} ${imageResponse.statusText}`)
+          }
+          
+          let imageBuffer: Buffer = Buffer.from(await imageResponse.arrayBuffer())
+          
+          // 如果需要，添加水印
+          if (hasWatermark) {
+            console.log("添加水印中...")
+            imageBuffer = await addWatermark(imageBuffer);
+            console.log("水印添加完成")
+          } else {
+            console.log("跳过水印添加")
+          }
 
-        const imageData = imageBuffer.toString('base64')
+          const imageData = imageBuffer.toString('base64')
 
-        console.log("图片转换为 base64 成功，长度:", imageData.length)
+          console.log("图片转换为 base64 成功，长度:", imageData.length)
 
-        // 🎯 图片生成成功后扣除积分
-        try {
-          await decreaseCredits({
-            user_uuid: session.user.uuid,
-            trans_type: CreditsTransType.GenerateImage,
-            credits: 1
+          // 🎯 图片生成成功后扣除积分
+          try {
+            await decreaseCredits({
+              user_uuid: session.user.uuid,
+              trans_type: CreditsTransType.GenerateImage,
+              credits: 1
+            })
+            console.log("✅ 图片生成成功，积分扣除完成")
+          } catch (error: any) {
+            console.error("⚠️ 积分扣除失败，但图片已生成:", error)
+            // 积分扣除失败不影响图片返回，只记录日志
+          }
+
+          // 如果成功，返回结果
+          const processingTime = Date.now() - startTime
+          
+          return NextResponse.json({
+            success: true,
+            image: `data:image/png;base64,${imageData}`,
+            processingTime: `${processingTime}ms`,
+            model: "minimax/image-01",
+            attempt: attempt,
+            format: "URL"
           })
-          console.log("✅ 图片生成成功，积分扣除完成")
-        } catch (error: any) {
-          console.error("⚠️ 积分扣除失败，但图片已生成:", error)
-          // 积分扣除失败不影响图片返回，只记录日志
         }
 
-        // 如果成功，返回结果
-        const processingTime = Date.now() - startTime
-        
-        return NextResponse.json({
-          success: true,
-          image: `data:image/png;base64,${imageData}`,
-          processingTime: `${processingTime}ms`,
-          model: "minimax/image-01",
-          attempt: attempt
-        })
+        // 如果既不是 ReadableStream 也没有有效的 URL，抛出错误
+        throw new Error("无法处理 MiniMax 模型的输出格式")
 
       } catch (error: any) {
         console.error(`第 ${attempt} 次尝试失败:`, error)
