@@ -55,15 +55,38 @@ async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
     
     console.log("🖼️ SVG水印创建完成");
     
+    // 远程生成文字 PNG（透明背景）
+    const quickChartTextUrl = `https://quickchart.io/text?text=${encodeURIComponent(text)}&fontSize=${fontSize}&fontFamily=Arial&format=png&color=000000&backgroundColor=ffffff00`;
+
+    let textOverlay: Buffer | null = null;
+    try {
+      const textResp = await fetch(quickChartTextUrl);
+      if (textResp.ok) {
+        const arrBuf = await textResp.arrayBuffer();
+        textOverlay = Buffer.from(arrBuf);
+        // 根据 cutoutWidth 调整大小
+        textOverlay = await sharp(textOverlay)
+          .resize({ width: cutoutWidth, height: cutoutHeight, fit: 'contain' })
+          .png()
+          .toBuffer();
+        console.log("🖨️ [addWatermark] 文字水印获取并缩放成功 (文本)");
+      } else {
+        console.warn("⚠️ 无法获取文字水印: ", textResp.status, textResp.statusText);
+      }
+    } catch (err) {
+      console.warn("⚠️ 获取文字水印失败:", err);
+    }
+
+    const composites: import('sharp').OverlayOptions[] = [
+      { input: Buffer.from(svgWatermark), top: 0, left: 0 }
+    ];
+    if (textOverlay) {
+      composites.push({ input: textOverlay, top: cutoutY, left: cutoutX });
+    }
+
     // 使用更安全的 Sharp 配置
     const watermarkedImage = await sharp(imageBuffer)
-      .composite([
-        {
-          input: Buffer.from(svgWatermark),
-          top: 0,
-          left: 0,
-        }
-      ])
+      .composite(composites)
       .png({
         // 优化 PNG 输出
         compressionLevel: 6,

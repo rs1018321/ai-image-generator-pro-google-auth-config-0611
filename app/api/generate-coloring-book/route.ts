@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import Replicate from 'replicate'
 import { auth } from '@/auth'
 import { decreaseCredits, CreditsTransType } from '@/services/credit'
-import sharp from 'sharp'
+import sharp, { OverlayOptions } from 'sharp'
 
 // ------ 更新：水印处理函数 ------
 async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
@@ -53,26 +53,50 @@ async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
 
     console.log("🖨️ [addWatermark] 白色背景创建成功");
 
-    // 使用 sharp 的 composite 功能合成图片（仅边框与白底，无文字，避免 Fontconfig 错误）
+    // 远程生成文字 PNG（透明背景）
+    const quickChartTextUrl = `https://quickchart.io/text?text=${encodeURIComponent(text)}&fontSize=${fontSize}&fontFamily=Arial&format=png&color=000000&backgroundColor=ffffff00`;
+
+    let textOverlay: Buffer | null = null;
+    try {
+      const textResp = await fetch(quickChartTextUrl);
+      if (textResp.ok) {
+        const arrBuf = await textResp.arrayBuffer();
+        textOverlay = Buffer.from(arrBuf);
+        // 根据 cutoutWidth 调整大小
+        textOverlay = await sharp(textOverlay)
+          .resize({ width: cutoutWidth, height: cutoutHeight, fit: 'contain' })
+          .png()
+          .toBuffer();
+        console.log("🖨️ [addWatermark] 文字水印获取并缩放成功");
+      } else {
+        console.warn("⚠️ 无法获取文字水印: ", textResp.status, textResp.statusText);
+      }
+    } catch (err) {
+      console.warn("⚠️ 获取文字水印失败:", err);
+    }
+
+    // 使用 sharp 的 composite 功能合成图片（边框+白底+文字水印）
+    const composites: OverlayOptions[] = [
+      // 1. 将原图置于中心
+      { input: imageBuffer, top: borderPx, left: borderPx },
+      // 2. 在底部边框创建白色镂空背景
+      { input: whiteBackground, top: cutoutY, left: cutoutX }
+    ];
+
+    // 3. 文字水印，如果成功获取
+    if (textOverlay) {
+      composites.push({ input: textOverlay, top: cutoutY, left: cutoutX });
+    }
+
     return await sharp({
-        create: {
-          width: finalWidth,
-          height: finalHeight,
-          channels: 4, // 使用4通道以支持透明度
-          background: { r: 0, g: 0, b: 0, alpha: 1 } // 黑色边框
-        }
-      })
-      .composite([
-        // 1. 将原图置于中心
-        { input: imageBuffer, top: borderPx, left: borderPx },
-        // 2. 在底部边框创建白色镂空背景
-        { 
-          input: whiteBackground,
-          top: cutoutY,
-          left: cutoutX
-        }
-        // ⚠️ 暂时移除文字叠加，避免 Fontconfig 错误
-      ])
+      create: {
+        width: finalWidth,
+        height: finalHeight,
+        channels: 4, // 使用4通道以支持透明度
+        background: { r: 0, g: 0, b: 0, alpha: 1 } // 黑色边框
+      }
+    })
+      .composite(composites)
       .png({
         compressionLevel: 6,
         adaptiveFiltering: false
