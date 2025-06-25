@@ -132,21 +132,19 @@ export async function POST(request: NextRequest) {
     console.log(`收到图片文件: ${file.name}, 大小: ${file.size} bytes, 输出尺寸: ${size}`)
     console.log(`Style: ${style}`)
 
-    // Style prompt 映射（与文生图API保持一致）
+    // Style prompt 映射 - 使用新的完整prompt
     const stylePromptMapping: { [key: string]: string } = {
-      "simplified": "Few, thick outlines with very simple shapes. Large open areas for easy coloring. No textures or shading lines.",
-      "medium": "A moderate number of lines with more varied shapes. Adds light hatching and simple textures for depth. Still leaves plenty of open space to avoid clutter.",
-      "detailed": "Dense, fine linework with abundant realistic textures and details. Highly realistic style with rich shading and tonal variation. Minimal blank areas, offering a challenging coloring experience"
+      "simplified": "Convert this illustration into an ultra-simple black-and-white coloring-book line drawing. Retain only the outer silhouette of each primary foreground subject. Remove interior markings, textures, small accessories, and all secondary or background elements such as signage, text, floor patterns, or distant scenery. Use clean medium-weight strokes, leave large blank areas, and add no shading, hatching, or textures.",
+      "medium": "Convert this illustration into a medium-detailed black-and-white coloring-book line drawing for children. Preserve the outline of every object already present in the original scene and keep simple interior details inside the primary subjects. Do not invent or add any new objects that are not present in the source image. Maintain moderate line density so blank areas remain for coloring, and avoid heavy shading or intricate textures",
+      "detailed": "Convert this illustration into an intricate black-and-white coloring-book line drawing for advanced colorists. Translate every colour area into visible line work: apply tightly spaced cross-hatching, parallel strokes or stippling in dark or saturated zones; use medium spacing in mid-tones; even the lightest regions should receive subtle texture with fine strokes—no large blank spaces should remain. Draw contour lines to express form and volume, and preserve all existing surface patterns such as fabric folds, foliage, wood grain or bricks. Represent every tonal difference solely through variations in line weight, spacing and orientation, avoiding solid fills. The final page should feel richly textured across its entire surface while staying clean and printable"
     };
 
     const stylePrompt = stylePromptMapping[style] || stylePromptMapping["medium"];
 
     console.log(`Style Prompt: ${stylePrompt}`)
 
-    // 构建完整的提示词：基础要求 + style prompt
-    const basePrompt = "Convert this colored illustration into clean black-and-white coloring-book line art. CRITICAL REQUIREMENT: The ENTIRE original image must be preserved completely - DO NOT crop, cut, trim, or remove ANY portion of the original image. ALL elements from edge to edge of the original image must remain visible and intact. Create a larger canvas with the target aspect ratio and place the complete, unmodified original image in the center. Fill the extra space around the original image with pure white background. Think of this as putting a complete postcard into a larger picture frame - the postcard (original image) stays exactly the same size and shape, you just add a white border around it. Draw bold, continuous pure-black strokes for outlines only. Remove all color, shading, gradients and fills, leaving crisp, simple contours. Output as a high-resolution PNG."
-    
-    const fullPrompt = `${basePrompt} ${stylePrompt}`;
+    // 直接使用style prompt，移除原有的共通prompt
+    const fullPrompt = stylePrompt;
 
     // 准备 Replicate API 参数
     const input = {

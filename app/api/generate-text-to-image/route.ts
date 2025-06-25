@@ -3,9 +3,15 @@ import Replicate from 'replicate'
 import { auth } from '@/auth'
 import { decreaseCredits, CreditsTransType } from '@/services/credit'
 import sharp from 'sharp'
+import { getRecommendedModel } from '@/lib/language-detector'
 
 const replicate = new Replicate({
   auth: process.env.REPLICATE_TEXT_API_TOKEN!,  // 使用文生图专用的 API Token
+})
+
+// Flux 模型需要的 Replicate 实例（使用不同的 token）
+const fluxReplicate = new Replicate({
+  auth: process.env.REPLICATE_API_TOKEN!,  // 使用图生图的 API Token
 })
 
 // 添加水印函数 - 优化 Vercel 环境兼容性
@@ -86,12 +92,6 @@ export async function POST(request: NextRequest) {
   const maxRetries = 3
   const baseDelay = 5000
 
-  // 检查 API token
-  if (!process.env.REPLICATE_TEXT_API_TOKEN) {
-    console.error("❌ REPLICATE_TEXT_API_TOKEN 环境变量未进行设置")
-    return NextResponse.json({ error: "API 配置错误，请联系管理员" }, { status: 500 })
-  }
-
   // 检查用户认证
   const session = await auth()
   if (!session?.user?.uuid) {
@@ -99,81 +99,117 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    console.log("开始处理文生图请求")
+    console.log("🚀 开始处理智能文生图请求")
 
     const formData = await request.formData()
     const prompt = formData.get('prompt') as string
     const size = formData.get('size') as string || '1024x1024'
     const style = formData.get('style') as string || 'medium'
     const hasWatermark = formData.get('watermark') === 'true'
-    console.log(`💧 水印设置: ${hasWatermark ? '需要水印' : '无需水印'}`)
 
     if (!prompt || prompt.trim() === '') {
       return NextResponse.json({ error: "请提供描述内容" }, { status: 400 })
     }
 
-    console.log(`收到文字描述: ${prompt}, 输出尺寸: ${size}`)
-    console.log(`Style: ${style}`)
+    console.log(`📝 收到文字描述: ${prompt}`)
+    console.log(`📐 输出尺寸: ${size}`)
+    console.log(`🎨 Style: ${style}`)
+    console.log(`💧 水印设置: ${hasWatermark ? '需要水印' : '无需水印'}`)
 
-    // Style prompt 映射
+    // 🎯 核心功能：根据语言自动选择模型
+    const recommendedModel = getRecommendedModel(prompt);
+    const useFlux = recommendedModel === 'flux';
+    
+    console.log(`🤖 根据语言检测选择模型: ${useFlux ? 'Flux (英语)' : 'MiniMax (非英语)'}`);
+
+    // 检查对应的 API token
+    if (useFlux && !process.env.REPLICATE_API_TOKEN) {
+      console.error("❌ REPLICATE_API_TOKEN 环境变量未设置 (Flux模型需要)")
+      return NextResponse.json({ error: "Flux API 配置错误，请联系管理员" }, { status: 500 })
+    }
+    
+    if (!useFlux && !process.env.REPLICATE_TEXT_API_TOKEN) {
+      console.error("❌ REPLICATE_TEXT_API_TOKEN 环境变量未设置 (MiniMax模型需要)")
+      return NextResponse.json({ error: "MiniMax API 配置错误，请联系管理员" }, { status: 500 })
+    }
+
+    // Style prompt 映射 - 使用新的完整prompt
     const stylePromptMapping: { [key: string]: string } = {
-      "simplified": "Few, thick outlines with very simple shapes. Large open areas for easy coloring. No textures or shading lines.",
-      "medium": "A moderate number of lines with more varied shapes. Adds light hatching and simple textures for depth. Still leaves plenty of open space to avoid clutter.",
-      "detailed": "Dense, fine linework with abundant realistic textures and details. Highly realistic style with rich shading and tonal variation. Minimal blank areas, offering a challenging coloring experience"
+      "simplified": "create an ultra-simple black-and-white coloring-book line drawing. Use only pure black lines on a pure white background—no gray, no colour. Draw two to four large, easily recognisable shapes (characters, objects, or icons) evenly distributed across the page so the composition feels balanced. Outline each shape with widely spaced, clean medium-weight strokes and leave its interior mostly empty. Outside the shapes, keep some white space but avoid huge uninterrupted blanks. Add no interior details, textures, accessories, text, background scenery, shading, hatching, stippling or solid fills. The overall theme and imagery must follow a familiar Western style. no any colors!",
+      "medium": "Create a medium-detailed black-and-white coloring-book line drawing for children. Only black lines on white—no colour. Draw every described object plus essential background shapes in a clear Western aesthetic. Add simple interior lines (faces, folds, basic textures). Keep roughly one-third to one-half of the page blank. Use moderately dense line work with light, widely spaced hatching or stippling for gentle shading. Do not invent objects that are not requested.. The overall theme and imagery must follow a familiar Western style. no any colors!",
+      "detailed": "Create an intricate black-and-white coloring-book line drawing for advanced hobbyists. Strictly monochrome—no colour. Cover at least 90 % of the canvas with line art in a realistic Western-style scene. Convert every tonal difference into line work: dense cross-hatching, parallel strokes or stippling in dark areas; medium spacing in mid-tones; subtle texture even in highlights—no large blank regions. Outline all forms and include rich surface details such as fabric folds, foliage, wood grain and bricks. Use variations in line weight, spacing and orientation only; avoid solid fills. The overall theme and imagery must follow a familiar Western style. no any colors!"
     };
 
     const stylePrompt = stylePromptMapping[style] || stylePromptMapping["medium"];
+    console.log(`🎨 Style Prompt: ${stylePrompt}`);
 
-    console.log(`Style Prompt: ${stylePrompt}`)
+    let fullPrompt: string;
+    let modelName: string;
+    let input: any;
 
-    // 构建完整的提示词：用户描述 + 转换要求 + style prompt
-    const basePrompt = "Convert this description into clean black-and-white coloring-book line art. Draw bold, continuous pure-black strokes for outlines only. Remove all color, shading, gradients and fills, leaving crisp, simple contours. Output as a high-resolution PNG."
-    
-    const fullPrompt = `${prompt}. ${basePrompt} ${stylePrompt}`;
-
-    // 准备 MiniMax API 参数 - 与 generate-text-sketch 保持一致
-    const input = {
-      prompt: fullPrompt,
-      aspect_ratio: size === "1024x1024" ? "1:1" :     // 1:1 正方形
-                   size === "832x1248" ? "2:3" :      // 2:3 竖版
-                   size === "1248x832" ? "3:2" :      // 3:2 横版
-                   "1:1",                              // 默认 1:1
-      seed: Math.floor(Math.random() * 1000000)
+    if (useFlux) {
+      // 🔥 Flux 模型（英语输入）
+      modelName = "black-forest-labs/flux-kontext-pro";
+      // 直接使用用户描述 + style prompt，移除原有的共通prompt
+      fullPrompt = `${prompt}. ${stylePrompt}`;
+      
+      input = {
+        prompt: fullPrompt,
+        guidance_scale: 2.5,
+        num_inference_steps: 28,
+        aspect_ratio: size === "1024x1024" ? "1:1" :
+                     size === "832x1248" ? "2:3" :
+                     size === "1248x832" ? "3:2" :
+                     "1:1",
+        seed: Math.floor(Math.random() * 1000000)
+      };
+    } else {
+      // 🔥 MiniMax 模型（非英语输入）
+      modelName = "minimax/image-01";
+      // 直接使用用户描述 + style prompt，移除原有的共通prompt
+      fullPrompt = `${prompt}. ${stylePrompt}`;
+      
+      input = {
+        prompt: fullPrompt,
+        aspect_ratio: size === "1024x1024" ? "1:1" :
+                     size === "832x1248" ? "2:3" :
+                     size === "1248x832" ? "3:2" :
+                     "1:1",
+        seed: Math.floor(Math.random() * 1000000)
+      };
     }
 
-    console.log(`完整提示词: ${fullPrompt}`)
+    console.log(`🎯 完整提示词: ${fullPrompt}`);
+    console.log(`🚀 使用模型: ${modelName}`);
 
     // 重试循环（只重试 API 调用部分）
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        console.log(`第 ${attempt} 次尝试调用 MiniMax API`)
-        console.log("准备调用 Replicate API: minimax/image-01")
-        console.log("API Token 已设置:", process.env.REPLICATE_TEXT_API_TOKEN ? '是' : '否')
+        console.log(`📡 第 ${attempt} 次尝试调用 ${useFlux ? 'Flux' : 'MiniMax'} API`);
+        console.log(`🔑 API Token 已设置: ${useFlux ? (process.env.REPLICATE_API_TOKEN ? '是' : '否') : (process.env.REPLICATE_TEXT_API_TOKEN ? '是' : '否')}`);
 
         const startTime = Date.now()
 
-        // 调用 MiniMax API
-        const output = await replicate.run("minimax/image-01", { input }) as any;
+        // 根据模型选择对应的 Replicate 实例
+        const replicateInstance = useFlux ? fluxReplicate : replicate;
+        const output = await replicateInstance.run(modelName as any, { input }) as any;
 
-        console.log(`MiniMax API 调用成功`)
-        console.log("输出类型:", typeof output)
-        console.log("输出构造函数:", output?.constructor?.name)
+        console.log(`✅ ${useFlux ? 'Flux' : 'MiniMax'} API 调用成功`);
+        console.log("📋 输出类型:", typeof output);
+        console.log("📋 输出构造函数:", output?.constructor?.name);
 
-        // 处理 MiniMax 模型的输出 - 通常返回 URL 数组
+        // 处理不同模型的输出格式
         let imageUrl: string | null = null
         let isReadableStream = false
 
         if (Array.isArray(output) && output.length > 0) {
-          // 检查数组第一个元素的类型
           const firstElement = output[0]
           
           if (typeof firstElement === 'string' && firstElement.startsWith('http')) {
-            // MiniMax 返回 URL 数组
             imageUrl = firstElement
-            console.log("输出格式: MiniMax URL 数组")
+            console.log(`📎 ${useFlux ? 'Flux' : 'MiniMax'} 输出格式: URL 数组`);
           } else if (firstElement && typeof firstElement.getReader === 'function') {
-            // MiniMax 返回 ReadableStream 数组
-            console.log("输出格式: MiniMax ReadableStream 数组")
+            console.log(`📎 ${useFlux ? 'Flux' : 'MiniMax'} 输出格式: ReadableStream 数组`);
             isReadableStream = true
             
             // 处理 ReadableStream
@@ -187,7 +223,6 @@ export async function POST(request: NextRequest) {
                 chunks.push(value)
               }
               
-              // 将 chunks 合并为完整的图片数据
               const fullData = new Uint8Array(chunks.reduce((acc, chunk) => acc + chunk.length, 0))
               let offset = 0
               for (const chunk of chunks) {
@@ -195,43 +230,40 @@ export async function POST(request: NextRequest) {
                 offset += chunk.length
               }
               
-              console.log("获取到图片数据，大小:", fullData.length, "bytes")
+              console.log("📄 获取到图片数据，大小:", fullData.length, "bytes")
               
-              // 创建 Buffer 并检查是否需要添加水印
               let bufferData: Buffer = Buffer.from(fullData);
               if (hasWatermark) {
-                console.log("添加水印中...")
+                console.log("🎨 添加水印中...")
                 bufferData = await addWatermark(bufferData);
-                console.log("水印添加完成")
+                console.log("✅ 水印添加完成")
               } else {
-                console.log("跳过水印添加")
+                console.log("⏭️ 跳过水印添加")
               }
 
               const imageData = bufferData.toString('base64');
+              console.log("✅ 图片数据转换为 base64 成功，长度:", imageData.length)
 
-              console.log("图片数据转换为 base64 成功，长度:", imageData.length)
-
-              // 🎯 图片生成成功后扣除积分
+              // 扣除积分
               try {
                 await decreaseCredits({
                   user_uuid: session.user.uuid,
                   trans_type: CreditsTransType.GenerateImage,
                   credits: 1
                 })
-                console.log("✅ 图片生成成功，积分扣除完成")
+                console.log("💰 图片生成成功，积分扣除完成")
               } catch (error: any) {
                 console.error("⚠️ 积分扣除失败，但图片已生成:", error)
-                // 积分扣除失败不影响图片返回，只记录日志
               }
 
-              // 直接返回结果，不需要下载步骤
               const processingTime = Date.now() - startTime
-
               return NextResponse.json({
                 success: true,
                 image: `data:image/png;base64,${imageData}`,
                 processingTime: `${processingTime}ms`,
-                model: "minimax/image-01",
+                model: modelName,
+                modelType: useFlux ? 'flux' : 'minimax',
+                language: useFlux ? 'english' : 'non-english',
                 attempt: attempt,
                 format: "ReadableStream Array"
               })
@@ -240,16 +272,14 @@ export async function POST(request: NextRequest) {
               reader.releaseLock()
             }
           } else {
-            console.error("数组第一个元素类型未知:", typeof firstElement, firstElement)
+            console.error("❌ 数组第一个元素类型未知:", typeof firstElement, firstElement)
             throw new Error(`数组第一个元素类型不支持: ${typeof firstElement}`)
           }
         } else if (typeof output === 'string') {
-          // 直接返回 URL 字符串
           imageUrl = output
-          console.log("输出格式: 直接 URL 字符串")
+          console.log(`📎 ${useFlux ? 'Flux' : 'MiniMax'} 输出格式: 直接 URL 字符串`);
         } else if (output && typeof output.getReader === 'function') {
-          // 如果是 ReadableStream，直接读取为二进制图片数据
-          console.log("输出格式: ReadableStream (二进制图片数据)")
+          console.log(`📎 ${useFlux ? 'Flux' : 'MiniMax'} 输出格式: ReadableStream (二进制图片数据)`);
           isReadableStream = true
           
           const reader = output.getReader()
@@ -262,7 +292,6 @@ export async function POST(request: NextRequest) {
               chunks.push(value)
             }
             
-            // 将 chunks 合并为完整的图片数据
             const fullData = new Uint8Array(chunks.reduce((acc, chunk) => acc + chunk.length, 0))
             let offset = 0
             for (const chunk of chunks) {
@@ -270,43 +299,40 @@ export async function POST(request: NextRequest) {
               offset += chunk.length
             }
             
-            console.log("获取到图片数据，大小:", fullData.length, "bytes")
+            console.log("📄 获取到图片数据，大小:", fullData.length, "bytes")
             
-            // 创建 Buffer 并检查是否需要添加水印
             let bufferData: Buffer = Buffer.from(fullData);
             if (hasWatermark) {
-              console.log("添加水印中...")
+              console.log("🎨 添加水印中...")
               bufferData = await addWatermark(bufferData);
-              console.log("水印添加完成")
+              console.log("✅ 水印添加完成")
             } else {
-              console.log("跳过水印添加")
+              console.log("⏭️ 跳过水印添加")
             }
 
             const imageData = bufferData.toString('base64');
+            console.log("✅ 图片数据转换为 base64 成功，长度:", imageData.length)
 
-            console.log("图片数据转换为 base64 成功，长度:", imageData.length)
-
-            // 🎯 图片生成成功后扣除积分
+            // 扣除积分
             try {
               await decreaseCredits({
                 user_uuid: session.user.uuid,
                 trans_type: CreditsTransType.GenerateImage,
                 credits: 1
               })
-              console.log("✅ 图片生成成功，积分扣除完成")
+              console.log("💰 图片生成成功，积分扣除完成")
             } catch (error: any) {
               console.error("⚠️ 积分扣除失败，但图片已生成:", error)
-              // 积分扣除失败不影响图片返回，只记录日志
             }
 
-            // 直接返回结果，不需要下载步骤
             const processingTime = Date.now() - startTime
-
             return NextResponse.json({
               success: true,
               image: `data:image/png;base64,${imageData}`,
               processingTime: `${processingTime}ms`,
-              model: "minimax/image-01",
+              model: modelName,
+              modelType: useFlux ? 'flux' : 'minimax',
+              language: useFlux ? 'english' : 'non-english',
               attempt: attempt,
               format: "ReadableStream"
             })
@@ -315,19 +341,18 @@ export async function POST(request: NextRequest) {
             reader.releaseLock()
           }
         } else if (output && output.url) {
-          // 如果是包含 url 属性的对象
           imageUrl = typeof output.url === 'function' ? output.url() : output.url
-          console.log("输出格式: URL 对象")
+          console.log(`📎 ${useFlux ? 'Flux' : 'MiniMax'} 输出格式: URL 对象`);
         } else {
-          console.error("未知的输出格式:", output)
-          console.error("输出详细信息:", JSON.stringify(output, null, 2))
+          console.error("❌ 未知的输出格式:", output)
+          console.error("❌ 输出详细信息:", JSON.stringify(output, null, 2))
           throw new Error(`不支持的输出格式: ${typeof output}, constructor: ${output?.constructor?.name}`)
         }
 
         // 如果已经通过 ReadableStream 处理完成，上面的代码已经返回了
         // 下面的代码只处理 URL 的情况
         if (!isReadableStream && imageUrl) {
-          console.log("解析得到的图片 URL:", imageUrl)
+          console.log("🔗 解析得到的图片 URL:", imageUrl)
 
           // 验证 URL 格式
           if (!imageUrl || !imageUrl.startsWith('http')) {
@@ -344,55 +369,55 @@ export async function POST(request: NextRequest) {
           
           // 如果需要，添加水印
           if (hasWatermark) {
-            console.log("添加水印中...")
+            console.log("🎨 添加水印中...")
             imageBuffer = await addWatermark(imageBuffer);
-            console.log("水印添加完成")
+            console.log("✅ 水印添加完成")
           } else {
-            console.log("跳过水印添加")
+            console.log("⏭️ 跳过水印添加")
           }
 
           const imageData = imageBuffer.toString('base64')
+          console.log("✅ 图片转换为 base64 成功，长度:", imageData.length)
 
-          console.log("图片转换为 base64 成功，长度:", imageData.length)
-
-          // 🎯 图片生成成功后扣除积分
+          // 扣除积分
           try {
             await decreaseCredits({
               user_uuid: session.user.uuid,
               trans_type: CreditsTransType.GenerateImage,
               credits: 1
             })
-            console.log("✅ 图片生成成功，积分扣除完成")
+            console.log("💰 图片生成成功，积分扣除完成")
           } catch (error: any) {
             console.error("⚠️ 积分扣除失败，但图片已生成:", error)
-            // 积分扣除失败不影响图片返回，只记录日志
           }
 
-          // 如果成功，返回结果
           const processingTime = Date.now() - startTime
-          
           return NextResponse.json({
             success: true,
             image: `data:image/png;base64,${imageData}`,
             processingTime: `${processingTime}ms`,
-            model: "minimax/image-01",
+            model: modelName,
+            modelType: useFlux ? 'flux' : 'minimax',
+            language: useFlux ? 'english' : 'non-english',
             attempt: attempt,
             format: "URL"
           })
         }
 
         // 如果既不是 ReadableStream 也没有有效的 URL，抛出错误
-        throw new Error("无法处理 MiniMax 模型的输出格式")
+        throw new Error(`无法处理 ${useFlux ? 'Flux' : 'MiniMax'} 模型的输出格式`)
 
       } catch (error: any) {
-        console.error(`第 ${attempt} 次尝试失败:`, error)
+        console.error(`❌ 第 ${attempt} 次尝试失败:`, error)
 
         if (attempt === maxRetries) {
-          console.error("图片生成最终失败:", error.message)
+          console.error("❌ 图片生成最终失败:", error.message)
           console.log("❌ 图片生成失败，不扣除积分")
           return NextResponse.json({ 
             error: error.message || "图片生成失败",
-            model: "minimax/image-01",
+            model: modelName,
+            modelType: useFlux ? 'flux' : 'minimax',
+            language: useFlux ? 'english' : 'non-english',
             attempts: maxRetries,
             suggestion: error.message.includes('rate limit') ? '请稍后再试，API 调用频率限制' :
                        error.message.includes('timeout') ? '请尝试使用更简单的描述' :
@@ -404,13 +429,13 @@ export async function POST(request: NextRequest) {
 
         // 等待后重试
         const delay = baseDelay * attempt
-        console.log(`等待 ${delay}ms 后重试...`)
+        console.log(`⏳ 等待 ${delay}ms 后重试...`)
         await new Promise(resolve => setTimeout(resolve, delay))
       }
     }
 
   } catch (error: any) {
-    console.error("请求处理失败:", error)
+    console.error("❌ 请求处理失败:", error)
     console.log("❌ 请求处理失败，不扣除积分")
     return NextResponse.json({ 
       error: error.message || "请求处理失败",

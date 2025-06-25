@@ -733,7 +733,7 @@ const TextColor: React.FC = () => {
 
                             {errors.prompt && (
                                 <span style={{color: "red", fontSize: "12px", marginLeft: "25px"}}>
-                            描述文字是必填项
+                            Description is required
                         </span>
                             )}
 
