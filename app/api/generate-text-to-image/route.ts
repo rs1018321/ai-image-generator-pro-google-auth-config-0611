@@ -39,7 +39,7 @@ async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
     
     console.log(`🖨️ 水印参数: cutoutWidth=${cutoutWidth}, cutoutHeight=${cutoutHeight}`);
     
-    // 创建简化的 SVG 水印 - 避免字体配置问题
+    // 创建简化的 SVG 水印 - 仅边框与白底，无文字，避免 Fontconfig 错误
     const svgWatermark = `
       <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
         <!-- 黑色边框 -->
@@ -48,19 +48,8 @@ async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
         <rect x="0" y="0" width="${borderPx}" height="${height}" fill="black"/>
         <rect x="${width - borderPx}" y="0" width="${borderPx}" height="${height}" fill="black"/>
         
-        <!-- 底部文字区域的白色背景 -->
+        <!-- 底部白色区域 -->
         <rect x="${cutoutX}" y="${cutoutY}" width="${cutoutWidth}" height="${cutoutHeight}" fill="white" stroke="black" stroke-width="1"/>
-        
-        <!-- 居中文字 - 使用系统默认字体 -->
-        <text x="${width / 2}" y="${height - textPaddingVertical - 2}" 
-              font-family="monospace, sans-serif" 
-              font-size="${fontSize}" 
-              font-weight="normal"
-              fill="black" 
-              text-anchor="middle" 
-              dominant-baseline="text-bottom">
-          ${text}
-        </text>
       </svg>
     `;
     

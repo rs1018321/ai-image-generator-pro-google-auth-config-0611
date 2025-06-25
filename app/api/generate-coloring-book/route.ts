@@ -10,9 +10,7 @@ async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
     console.log("🖨️ [addWatermark] 开始添加水印，buffer 大小:", imageBuffer.length);
     const borderPx = 5;
     const text = "coloring page";
-    const textColor = "#000000"; // Black text
-    const borderColor = "#000000"; // Black border
-    const cutoutBackgroundColor = "#FFFFFF"; // White background for text cutout
+    // ⚠️ 取消文字水印，保留边框，因此无需 textColor/borderColor 变量
 
     const image = sharp(imageBuffer);
     const meta = await image.metadata();
@@ -43,19 +41,6 @@ async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
 
     console.log("🖨️ [addWatermark] cutoutWidth:", cutoutWidth, "cutoutHeight:", cutoutHeight);
 
-    // 创建简化的文字 SVG - 使用系统默认字体
-    const textSvg = `
-      <svg width="${cutoutWidth}" height="${cutoutHeight}">
-        <text x="50%" y="50%" 
-              font-family="monospace, sans-serif"
-              font-size="${fontSize}px" 
-              fill="${textColor}" 
-              font-weight="normal"
-              text-anchor="middle"
-              dominant-baseline="central">${text}</text>
-      </svg>
-    `;
-
     // 创建白色背景的 Buffer
     const whiteBackground = await sharp({
       create: {
@@ -68,7 +53,7 @@ async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
 
     console.log("🖨️ [addWatermark] 白色背景创建成功");
 
-    // 使用 sharp 的 composite 功能合成图片
+    // 使用 sharp 的 composite 功能合成图片（仅边框与白底，无文字，避免 Fontconfig 错误）
     return await sharp({
         create: {
           width: finalWidth,
@@ -85,13 +70,8 @@ async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
           input: whiteBackground,
           top: cutoutY,
           left: cutoutX
-        },
-        // 3. 在白色背景上放置文字
-        {
-          input: Buffer.from(textSvg),
-          top: cutoutY,
-          left: cutoutX
         }
+        // ⚠️ 暂时移除文字叠加，避免 Fontconfig 错误
       ])
       .png({
         compressionLevel: 6,
