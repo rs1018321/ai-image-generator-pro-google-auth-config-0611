@@ -790,6 +790,20 @@ const PhotoColor: React.FC = () => {
                                                     aspectRatio: "1/1",
                                                 }}
                                             />
+                                            {/* 添加安全提示文字 */}
+                                            <div style={{
+                                                marginTop: "8px",
+                                                textAlign: "center",
+                                                fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                                                fontSize: "10px",
+                                                color: "#999",
+                                                lineHeight: "1.2",
+                                                maxWidth: "150px"
+                                            }}>
+                                                <div>
+                                                    (Do not upload illegal, violent, or pornographic images. Generated content is based on user input, for personal use only)
+                                                </div>
+                                            </div>
                                         </div>
 
                                     )}
@@ -1607,15 +1621,35 @@ const PhotoColor: React.FC = () => {
                                             </button>
                                         </>
                             ) : (
-                                <img
-                                    src={clearImage}
-                                    alt="camera"
-                                    style={{
-                                                width: "150px",
-                                                height: "150px",
-                                        objectFit: "contain",
-                                    }}
-                                />
+                                <div style={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    alignItems: "center"
+                                }}>
+                                    <img
+                                        src={clearImage}
+                                        alt="camera"
+                                        style={{
+                                            width: "150px",
+                                            height: "150px",
+                                            objectFit: "contain",
+                                        }}
+                                    />
+                                    {/* 添加安全提示文字 */}
+                                    <div style={{
+                                        marginTop: "8px",
+                                        textAlign: "center",
+                                        fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                                        fontSize: "10px",
+                                        color: "#999",
+                                        lineHeight: "1.2",
+                                        maxWidth: "150px"
+                                    }}>
+                                        <div>
+                                            (Do not upload illegal, violent, or pornographic images. Generated content is based on user input, for personal use only)
+                                        </div>
+                                    </div>
+                                </div>
                             )}
                         </div>
 

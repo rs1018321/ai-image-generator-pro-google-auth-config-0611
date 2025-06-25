@@ -45,7 +45,7 @@ export default function Header({ locale }: { locale: string }) {
                                         color: '#64c19f',
                                         whiteSpace: 'nowrap',
                                     }}
-                                    className="font-bold lg:text-5xl md:text-5xl text-4xl"
+                                    className="font-bold lg:text-4xl md:text-3xl text-2xl"
                                 >
                                     Coloring-Pages.app
                                 </h1>

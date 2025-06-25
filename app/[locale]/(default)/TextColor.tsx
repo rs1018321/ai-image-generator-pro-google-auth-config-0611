@@ -634,6 +634,25 @@ const TextColor: React.FC = () => {
                                     )}
                                 </div>
 
+
+                                {/* 添加安全提示文字 */}
+                                <div style={{
+                                    marginTop: "8px",
+                                    textAlign: "center",
+                                    fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                                    fontSize: "10px",
+                                    color: "#999",
+                                    lineHeight: "1.2",
+                                    margin: "8px auto 0 auto",
+                                    pointerEvents: "none"
+                                }}>
+                                    
+                                    <div style={{ marginTop: "2px", fontSize: "12px" }}>
+                                        (Do not enter illegal, violent, or pornographic content. Generated content is based on user input, for personal use only)
+                                    </div>
+                                </div>
+
+
                                 {/* 在虚线框下方添加提示文字 */}
                                 <div style={{
                                     marginTop: "10px",

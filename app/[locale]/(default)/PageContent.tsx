@@ -803,9 +803,9 @@ export default function LandingPage({page, locale}: LandingPageProps) {
                 </div>
             </div>
 
-            {/* Key Features of Coloring Page 标题部份 */}
+            {/*  标题部份 */}
             <div style={{marginTop: '8rem'}}>
-                <h3 className={styles.accordionTitle}>Key Features of Coloring Page</h3>
+                <h3 className={styles.accordionTitle}>Key Features of Coloring-Pages.app</h3>
                 <p className={styles.accordionTip}>Everything you need to create coloring page artwork for personal or
                     commercial use.</p>
             </div>
@@ -835,7 +835,7 @@ export default function LandingPage({page, locale}: LandingPageProps) {
 
             {/* What Users Say About Coloring Page 标题部份 */}
             <div style={{marginTop: '8rem'}}>
-                <h3 className={styles.accordionTitle}>What Users Say About Coloring Page</h3>
+                <h3 className={styles.accordionTitle}>What Users Say About Coloring-Pages.app</h3>
                 <p className={styles.accordionTip}>Hear from artists, fans, and creators who use our Coloring Page AI
                     generator.</p>
             </div>

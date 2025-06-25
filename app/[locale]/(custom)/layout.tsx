@@ -66,7 +66,7 @@ export default function CustomLayout({
                         <h1 style={{
                             fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
                             color: '#64c19f'
-                        }} className={clsx(" font-bold text-5xl")} >Coloring-Pages.app</h1>
+                        }} className={clsx(" font-bold lg:text-4xl md:text-3xl text-2xl")} >Coloring-Pages.app</h1>
                     </Link>
                 </div>
 

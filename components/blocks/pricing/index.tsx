@@ -109,7 +109,7 @@ export default function Pricing({ pricing, variant = "full" }: { pricing: Pricin
   // 获取按钮状态
   const getButtonState = (item: PricingItem) => {
     if (subscriptionLoading) {
-      return { text: "检查订阅状态...", disabled: true };
+      return { text: "", disabled: true };
     }
     
     const isSubscribed = isUserSubscribed(item.product_id);
