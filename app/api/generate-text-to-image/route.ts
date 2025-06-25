@@ -68,32 +68,26 @@ async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
     </svg>
     `;
     
-    // 5. 创建仅包含文字的SVG, 并嵌入字体
+    // 直接使用 SVG 生成文字水印
+    const textSvg = `
+      <svg width="${cutoutWidth}" height="${cutoutHeight}" xmlns="http://www.w3.org/2000/svg">
+        <text x="50%" y="50%" 
+              dominant-baseline="middle" 
+              text-anchor="middle"
+              font-family="Arial, sans-serif" 
+              font-size="${fontSize}px" 
+              fill="#000000">${text}</text>
+      </svg>
+    `;
+    
     let textBuffer: Buffer | null = null;
-    if (fontBase64) {
-      const textSvg = `
-        <svg width="${cutoutWidth}" height="${cutoutHeight}" xmlns="http://www.w3.org/2000/svg">
-          <style>
-            @font-face {
-              font-family: 'DejaVu Sans';
-              src: url('data:font/ttf;base64,${fontBase64}');
-            }
-          </style>
-          <text x="50%" y="50%"
-                font-family="DejaVu Sans, sans-serif"
-                font-size="${fontSize}"
-                fill="black"
-                text-anchor="middle"
-                dominant-baseline="central">
-            ${text}
-          </text>
-        </svg>
-      `;
-      // 将文字SVG转换为PNG Buffer
-      textBuffer = await sharp(Buffer.from(textSvg)).png().toBuffer();
-      console.log("🖨️ [addWatermark] 文字水印 Buffer 创建成功 (文本)");
-    } else {
-      console.log("⚠️ [addWatermark] 字体未加载，跳过文字水印。");
+    try {
+      textBuffer = await sharp(Buffer.from(textSvg))
+        .png()
+        .toBuffer();
+      console.log("🖨️ SVG 文字水印生成成功");
+    } catch (svgErr) {
+      console.warn("⚠️ SVG 文字生成异常，跳过文字水印:", svgErr);
     }
 
     // 6. 合成最终图片
