@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import Replicate from 'replicate'
 import { auth } from '@/auth'
 import { decreaseCredits, CreditsTransType } from '@/services/credit'
-import sharp, { OverlayOptions } from 'sharp'
+import sharp from 'sharp'
 
 // ------ 更新：水印处理函数 ------
 async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
@@ -10,7 +10,7 @@ async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
     console.log("🖨️ [addWatermark] 开始添加水印，buffer 大小:", imageBuffer.length);
     const borderPx = 5;
     const text = "coloring page";
-    // ⚠️ 取消文字水印，保留边框，因此无需 textColor/borderColor 变量
+    const textColor = "#000000"; // Black text
 
     const image = sharp(imageBuffer);
     const meta = await image.metadata();
@@ -41,7 +41,24 @@ async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
 
     console.log("🖨️ [addWatermark] cutoutWidth:", cutoutWidth, "cutoutHeight:", cutoutHeight);
 
-    // 创建白色背景的 Buffer
+    // 1. 创建仅包含文字的SVG
+    const textSvg = `
+      <svg width="${cutoutWidth}" height="${cutoutHeight}" xmlns="http://www.w3.org/2000/svg">
+        <text x="50%" y="50%"
+              font-family="sans-serif"
+              font-size="${fontSize}"
+              fill="${textColor}"
+              text-anchor="middle"
+              dominant-baseline="central">
+            ${text}
+        </text>
+      </svg>
+    `;
+    // 2. 将文字SVG转换为PNG Buffer
+    const textBuffer = await sharp(Buffer.from(textSvg)).png().toBuffer();
+    console.log("🖨️ [addWatermark] 文字水印 Buffer 创建成功");
+
+    // 3. 创建白色背景的 Buffer
     const whiteBackground = await sharp({
       create: {
         width: cutoutWidth,
@@ -53,50 +70,31 @@ async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
 
     console.log("🖨️ [addWatermark] 白色背景创建成功");
 
-    // 远程生成文字 PNG（透明背景）
-    const quickChartTextUrl = `https://quickchart.io/text?text=${encodeURIComponent(text)}&fontSize=${fontSize}&fontFamily=Arial&format=png&color=000000&backgroundColor=ffffff00`;
-
-    let textOverlay: Buffer | null = null;
-    try {
-      const textResp = await fetch(quickChartTextUrl);
-      if (textResp.ok) {
-        const arrBuf = await textResp.arrayBuffer();
-        textOverlay = Buffer.from(arrBuf);
-        // 根据 cutoutWidth 调整大小
-        textOverlay = await sharp(textOverlay)
-          .resize({ width: cutoutWidth, height: cutoutHeight, fit: 'contain' })
-          .png()
-          .toBuffer();
-        console.log("🖨️ [addWatermark] 文字水印获取并缩放成功");
-      } else {
-        console.warn("⚠️ 无法获取文字水印: ", textResp.status, textResp.statusText);
-      }
-    } catch (err) {
-      console.warn("⚠️ 获取文字水印失败:", err);
-    }
-
-    // 使用 sharp 的 composite 功能合成图片（边框+白底+文字水印）
-    const composites: OverlayOptions[] = [
-      // 1. 将原图置于中心
-      { input: imageBuffer, top: borderPx, left: borderPx },
-      // 2. 在底部边框创建白色镂空背景
-      { input: whiteBackground, top: cutoutY, left: cutoutX }
-    ];
-
-    // 3. 文字水印，如果成功获取
-    if (textOverlay) {
-      composites.push({ input: textOverlay, top: cutoutY, left: cutoutX });
-    }
-
+    // 4. 使用 sharp 的 composite 功能合成最终图片
     return await sharp({
-      create: {
-        width: finalWidth,
-        height: finalHeight,
-        channels: 4, // 使用4通道以支持透明度
-        background: { r: 0, g: 0, b: 0, alpha: 1 } // 黑色边框
-      }
-    })
-      .composite(composites)
+        create: {
+          width: finalWidth,
+          height: finalHeight,
+          channels: 4, // 使用4通道以支持透明度
+          background: { r: 0, g: 0, b: 0, alpha: 1 } // 黑色边框
+        }
+      })
+      .composite([
+        // 图层1: 将原图置于中心
+        { input: imageBuffer, top: borderPx, left: borderPx },
+        // 图层2: 在底部边框创建白色镂空背景
+        { 
+          input: whiteBackground,
+          top: cutoutY,
+          left: cutoutX
+        },
+        // 图层3: 在白色背景上放置文字
+        {
+          input: textBuffer,
+          top: cutoutY,
+          left: cutoutX
+        }
+      ])
       .png({
         compressionLevel: 6,
         adaptiveFiltering: false

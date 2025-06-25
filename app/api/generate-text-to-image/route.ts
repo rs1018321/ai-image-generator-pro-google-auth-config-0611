@@ -39,8 +39,8 @@ async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
     
     console.log(`🖨️ 水印参数: cutoutWidth=${cutoutWidth}, cutoutHeight=${cutoutHeight}`);
     
-    // 创建简化的 SVG 水印 - 仅边框与白底，无文字，避免 Fontconfig 错误
-    const svgWatermark = `
+    // 1. 创建包含边框和白色背景的 SVG
+    const baseSvg = `
       <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
         <!-- 黑色边框 -->
         <rect x="0" y="0" width="${width}" height="${borderPx}" fill="black"/>
@@ -53,40 +53,37 @@ async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
       </svg>
     `;
     
-    console.log("🖼️ SVG水印创建完成");
-    
-    // 远程生成文字 PNG（透明背景）
-    const quickChartTextUrl = `https://quickchart.io/text?text=${encodeURIComponent(text)}&fontSize=${fontSize}&fontFamily=Arial&format=png&color=000000&backgroundColor=ffffff00`;
+    // 2. 创建仅包含文字的SVG
+    const textSvg = `
+      <svg width="${cutoutWidth}" height="${cutoutHeight}" xmlns="http://www.w3.org/2000/svg">
+        <text x="50%" y="50%"
+              font-family="sans-serif"
+              font-size="${fontSize}"
+              fill="black"
+              text-anchor="middle"
+              dominant-baseline="central">
+          ${text}
+        </text>
+      </svg>
+    `;
+    // 3. 将文字SVG转换为PNG Buffer
+    const textBuffer = await sharp(Buffer.from(textSvg)).png().toBuffer();
+    console.log("🖨️ [addWatermark] 文字水印 Buffer 创建成功 (文本)");
 
-    let textOverlay: Buffer | null = null;
-    try {
-      const textResp = await fetch(quickChartTextUrl);
-      if (textResp.ok) {
-        const arrBuf = await textResp.arrayBuffer();
-        textOverlay = Buffer.from(arrBuf);
-        // 根据 cutoutWidth 调整大小
-        textOverlay = await sharp(textOverlay)
-          .resize({ width: cutoutWidth, height: cutoutHeight, fit: 'contain' })
-          .png()
-          .toBuffer();
-        console.log("🖨️ [addWatermark] 文字水印获取并缩放成功 (文本)");
-      } else {
-        console.warn("⚠️ 无法获取文字水印: ", textResp.status, textResp.statusText);
-      }
-    } catch (err) {
-      console.warn("⚠️ 获取文字水印失败:", err);
-    }
-
-    const composites: import('sharp').OverlayOptions[] = [
-      { input: Buffer.from(svgWatermark), top: 0, left: 0 }
-    ];
-    if (textOverlay) {
-      composites.push({ input: textOverlay, top: cutoutY, left: cutoutX });
-    }
-
-    // 使用更安全的 Sharp 配置
+    // 4. 合成最终图片
     const watermarkedImage = await sharp(imageBuffer)
-      .composite(composites)
+      .composite([
+        {
+          input: Buffer.from(baseSvg),
+          top: 0,
+          left: 0,
+        },
+        {
+          input: textBuffer,
+          top: cutoutY,
+          left: cutoutX,
+        }
+      ])
       .png({
         // 优化 PNG 输出
         compressionLevel: 6,
