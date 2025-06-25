@@ -6,92 +6,98 @@ import sharp from 'sharp'
 
 // ------ 更新：水印处理函数 ------
 async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
-  console.log("🖨️ [addWatermark] 开始添加水印，buffer 大小:", imageBuffer.length);
-  const borderPx = 5;
-  const text = "coloring page";
-  const textColor = "#000000"; // Black text
-  const borderColor = "#000000"; // Black border
-  const cutoutBackgroundColor = "#FFFFFF"; // White background for text cutout
+  try {
+    console.log("🖨️ [addWatermark] 开始添加水印，buffer 大小:", imageBuffer.length);
+    const borderPx = 5;
+    const text = "coloring page";
+    const textColor = "#000000"; // Black text
+    const borderColor = "#000000"; // Black border
+    const cutoutBackgroundColor = "#FFFFFF"; // White background for text cutout
 
-  const image = sharp(imageBuffer);
-  const meta = await image.metadata();
-  const imageWidth = meta.width!;
-  const imageHeight = meta.height!;
+    const image = sharp(imageBuffer);
+    const meta = await image.metadata();
+    const imageWidth = meta.width!;
+    const imageHeight = meta.height!;
 
-  console.log("🖨️ [addWatermark] 原图尺寸:", imageWidth, imageHeight);
+    console.log("🖨️ [addWatermark] 原图尺寸:", imageWidth, imageHeight);
 
-  const finalWidth = imageWidth + borderPx * 2;
-  const finalHeight = imageHeight + borderPx * 2;
+    const finalWidth = imageWidth + borderPx * 2;
+    const finalHeight = imageHeight + borderPx * 2;
 
-  console.log("🖨️ [addWatermark] 最终图尺寸:", finalWidth, finalHeight);
+    console.log("🖨️ [addWatermark] 最终图尺寸:", finalWidth, finalHeight);
 
-  const fontSize = Math.round(imageWidth * 0.030); // 调整字体大小
-  const textPaddingHorizontal = Math.round(fontSize * 0.8);
-  const textPaddingVertical = Math.round(fontSize * 0.2); // 垂直内边距
+    const fontSize = Math.round(imageWidth * 0.025); // 减小字体大小避免问题
+    const textPaddingHorizontal = Math.round(fontSize * 0.8);
+    const textPaddingVertical = Math.round(fontSize * 0.2); // 垂直内边距
 
-  // 使用 SVG 和 Sharp 动态计算文本宽度
-  const probeSvg = `<svg><text font-size="${fontSize}" font-family="sans-serif" font-weight="bold">${text}</text></svg>`;
-  const textMetadata = await sharp(Buffer.from(probeSvg)).metadata();
-  const textWidth = textMetadata.width!;
+    // 简化文本宽度计算，避免 SVG 字体问题
+    const textWidth = text.length * fontSize * 0.6; // 保守估算
 
-  console.log("🖨️ [addWatermark] textWidth:", textWidth);
+    console.log("🖨️ [addWatermark] textWidth:", textWidth);
 
-  const cutoutWidth = textWidth + textPaddingHorizontal * 2;
-  const cutoutHeight = Math.max(borderPx, fontSize + textPaddingVertical * 2);
-  const cutoutX = Math.round((finalWidth - cutoutWidth) / 2);
-  // 将镂空矩形顶端放在距底部 cutoutHeight 位置
-  const cutoutY = finalHeight - cutoutHeight;
+    const cutoutWidth = textWidth + textPaddingHorizontal * 2;
+    const cutoutHeight = Math.max(borderPx, fontSize + textPaddingVertical * 2);
+    const cutoutX = Math.round((finalWidth - cutoutWidth) / 2);
+    // 将镂空矩形顶端放在距底部 cutoutHeight 位置
+    const cutoutY = finalHeight - cutoutHeight;
 
-  // 创建文字 SVG
-  const textSvg = `
-    <svg width="${cutoutWidth}" height="${cutoutHeight}">
-      <style>
-        .title { 
-          font-family: sans-serif;
-          font-size: ${fontSize}px; 
-          fill: ${textColor}; 
-          font-weight: bold;
-          text-anchor: middle;
+    // 创建简化的文字 SVG - 使用系统默认字体
+    const textSvg = `
+      <svg width="${cutoutWidth}" height="${cutoutHeight}">
+        <text x="50%" y="50%" 
+              font-family="monospace, sans-serif"
+              font-size="${fontSize}px" 
+              fill="${textColor}" 
+              font-weight="normal"
+              text-anchor="middle"
+              dominant-baseline="central">${text}</text>
+      </svg>
+    `;
+
+    // 使用 sharp 的 composite 功能合成图片
+    return await sharp({
+        create: {
+          width: finalWidth,
+          height: finalHeight,
+          channels: 4, // 使用4通道以支持透明度
+          background: borderColor
         }
-      </style>
-      <text x="50%" y="50%" dy="0" class="title">${text}</text>
-    </svg>
-  `;
-
-  // 使用 sharp 的 composite 功能合成图片
-  return sharp({
-      create: {
-        width: finalWidth,
-        height: finalHeight,
-        channels: 4, // 使用4通道以支持透明度
-        background: borderColor
-      }
-    })
-    .composite([
-      // 1. 将原图置于中心
-      { input: imageBuffer, top: borderPx, left: borderPx },
-      // 2. 在底部边框创建白色镂空背景
-      { 
-        input: {
-          create: {
-            width: cutoutWidth,
-            height: cutoutHeight,
-            channels: 3,
-            background: cutoutBackgroundColor
-          }
+      })
+      .composite([
+        // 1. 将原图置于中心
+        { input: imageBuffer, top: borderPx, left: borderPx },
+        // 2. 在底部边框创建白色镂空背景
+        { 
+          input: {
+            create: {
+              width: cutoutWidth,
+              height: cutoutHeight,
+              channels: 3,
+              background: cutoutBackgroundColor
+            }
+          },
+          top: cutoutY,
+          left: cutoutX
         },
-        top: cutoutY,
-        left: cutoutX
-      },
-      // 3. 在白色背景上放置文字
-      {
-        input: Buffer.from(textSvg),
-        top: cutoutY,
-        left: cutoutX
-      }
-    ])
-    .png()
-    .toBuffer();
+        // 3. 在白色背景上放置文字
+        {
+          input: Buffer.from(textSvg),
+          top: cutoutY,
+          left: cutoutX
+        }
+      ])
+      .png({
+        compressionLevel: 6,
+        adaptiveFiltering: false
+      })
+      .toBuffer();
+      
+  } catch (error) {
+    console.error("❌ [addWatermark] 添加水印失败:", error);
+    // 如果水印添加失败，返回原图而不是抛出错误
+    console.log("⚠️ [addWatermark] 水印添加失败，返回原图");
+    return imageBuffer;
+  }
 }
 // --------------------------------
 

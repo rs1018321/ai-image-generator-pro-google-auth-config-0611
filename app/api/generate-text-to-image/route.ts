@@ -8,7 +8,7 @@ const replicate = new Replicate({
   auth: process.env.REPLICATE_TEXT_API_TOKEN!,  // 使用文生图专用的 API Token
 })
 
-// 添加水印函数 - 与图生图完全相同的实现
+// 添加水印函数 - 优化 Vercel 环境兼容性
 async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
   try {
     console.log("🎨 开始添加水印到生成的图片");
@@ -21,23 +21,23 @@ async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
     
     console.log(`📐 图片尺寸: ${width}x${height}`);
     
-    // 水印设置 - 与图生图完全相同
+    // 水印设置 - 简化版本，避免字体问题
     const borderPx = 15; // 边框厚度 15px
-    const fontSize = Math.max(24, Math.min(width * 0.04, 48)); // 字体大小
+    const fontSize = Math.max(20, Math.min(width * 0.03, 36)); // 减小字体大小
     const text = "coloring page";
-    const textPaddingHorizontal = 20;
-    const textPaddingVertical = 8;
+    const textPaddingHorizontal = 16;
+    const textPaddingVertical = 6;
     
-    // 计算文本宽度（估算）
-    const textWidth = text.length * fontSize * 0.6;
+    // 计算文本宽度（保守估算）
+    const textWidth = text.length * fontSize * 0.5;
     
     // 计算裁剪区域的尺寸和位置
     const cutoutWidth = textWidth + textPaddingHorizontal * 2;
     const cutoutHeight = Math.max(fontSize + textPaddingVertical * 2, borderPx + textPaddingVertical);
-    const cutoutX = (width - cutoutWidth) / 2;
-    const cutoutY = height - cutoutHeight;
+    const cutoutX = Math.max(0, (width - cutoutWidth) / 2);
+    const cutoutY = Math.max(0, height - cutoutHeight);
     
-    // 创建SVG水印
+    // 创建简化的 SVG 水印 - 避免字体配置问题
     const svgWatermark = `
       <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
         <!-- 黑色边框 -->
@@ -47,16 +47,16 @@ async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
         <rect x="${width - borderPx}" y="0" width="${borderPx}" height="${height}" fill="black"/>
         
         <!-- 底部文字区域的白色背景 -->
-        <rect x="${cutoutX}" y="${cutoutY}" width="${cutoutWidth}" height="${cutoutHeight}" fill="white"/>
+        <rect x="${cutoutX}" y="${cutoutY}" width="${cutoutWidth}" height="${cutoutHeight}" fill="white" stroke="black" stroke-width="1"/>
         
-        <!-- 居中文字 -->
-        <text x="${width / 2}" y="${height - textPaddingVertical}" 
-              font-family="Arial, sans-serif" 
+        <!-- 居中文字 - 使用系统默认字体 -->
+        <text x="${width / 2}" y="${height - textPaddingVertical - 2}" 
+              font-family="monospace, sans-serif" 
               font-size="${fontSize}" 
-              font-weight="bold"
+              font-weight="normal"
               fill="black" 
               text-anchor="middle" 
-              dy="0">
+              dominant-baseline="text-bottom">
           ${text}
         </text>
       </svg>
@@ -64,7 +64,7 @@ async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
     
     console.log("🖼️ SVG水印创建完成");
     
-    // 将SVG水印叠加到原图上
+    // 使用更安全的 Sharp 配置
     const watermarkedImage = await sharp(imageBuffer)
       .composite([
         {
@@ -73,7 +73,11 @@ async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
           left: 0,
         }
       ])
-      .png()
+      .png({
+        // 优化 PNG 输出
+        compressionLevel: 6,
+        adaptiveFiltering: false
+      })
       .toBuffer();
     
     console.log("✅ 水印添加成功");
@@ -81,7 +85,9 @@ async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
     
   } catch (error) {
     console.error("❌ 添加水印失败:", error);
-    throw error;
+    // 如果水印添加失败，返回原图而不是抛出错误
+    console.log("⚠️ 水印添加失败，返回原图");
+    return imageBuffer;
   }
 }
 
