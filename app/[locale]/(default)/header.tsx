@@ -139,7 +139,7 @@ export default function Header({ locale }: { locale: string }) {
                                 href={`/${locale}/pricing`}
                                 className={clsx("hover:bg-[#64bd9b] hover:text-white hover:scale-105 transition-all", styles.headerCircle)}
                             >
-                                pricing
+                                Pricing
                             </a>
                         </nav>
                     </div>

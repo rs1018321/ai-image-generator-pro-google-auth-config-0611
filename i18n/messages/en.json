@@ -68,7 +68,8 @@
       "cancel_no": "Keep Subscription",
       "canceling": "Cancelling...",
       "cancel_success": "Subscription cancelled successfully, will expire at the end of current period",
-      "cancel_error": "Failed to cancel subscription, please try again later"
+      "cancel_error": "Failed to cancel subscription, please try again later",
+      "subscription_success": "Subscription successful! Your membership status has been updated."
     }
   },
   "my_credits": {

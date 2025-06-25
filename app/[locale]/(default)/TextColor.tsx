@@ -212,8 +212,8 @@ const TextColor: React.FC = () => {
                 setIsCleared(false); // 重置清除状态，确保显示生成的图片
 
                 // 更新用户积分
-                setUserCredits(prev => Math.max(0, prev - 2));
-                toast.success("图片生成成功！已消耗2个积分");
+                setUserCredits(prev => Math.max(0, prev - 1));
+                toast.success("图片生成成功！已消耗1个积分");
             } else {
                 alert("生成失败：未收到有效的图片数据");
             }
@@ -1215,7 +1215,7 @@ const TextColor: React.FC = () => {
                 open={showCreditConfirmModal}
                 onOpenChange={setShowCreditConfirmModal}
                 onConfirm={handleConfirmGenerate}
-                credits={2}
+                credits={1}
                 leftCredits={userCredits}
             />
         </>

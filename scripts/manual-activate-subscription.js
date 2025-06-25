@@ -19,18 +19,18 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 const SUBSCRIPTION_PLANS = {
   'starter': {
     plan_name: 'Starter',
-    credits_monthly: 50,
-    credits_to_add: 50
+    credits_monthly: 100,
+    credits_to_add: 100
   },
   'standard': {
     plan_name: 'Standard', 
-    credits_monthly: 200,
-    credits_to_add: 200
+    credits_monthly: 500,
+    credits_to_add: 500
   },
   'premium': {
     plan_name: 'Premium',
-    credits_monthly: 500,
-    credits_to_add: 500
+    credits_monthly: 1000,
+    credits_to_add: 1000
   }
 };
 
@@ -132,9 +132,9 @@ if (args.length < 1) {
   console.log('node scripts/manual-activate-subscription.js <用户邮箱> [订阅类型]');
   console.log('');
   console.log('订阅类型选项:');
-  console.log('- starter (默认): 50积分/月');
-  console.log('- standard: 200积分/月');
-  console.log('- premium: 500积分/月');
+  console.log('- starter (默认): 100积分/月');
+  console.log('- standard: 500积分/月');
+  console.log('- premium: 1000积分/月');
   console.log('');
   console.log('示例:');
   console.log('node scripts/manual-activate-subscription.js user@example.com starter');

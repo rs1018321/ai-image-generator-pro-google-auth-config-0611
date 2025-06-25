@@ -84,14 +84,14 @@ export async function POST(request: NextRequest) {
       case "payment_intent.succeeded":
         console.log("Processing payment success event");
         
-        // 处理支付成功事件
+        // 处理支付成功事件 - 只调用handleCreemOrderSession，避免重复添加积分
         if (event.data && event.data.object) {
           await handleCreemOrderSession(event.data.object);
         } else if (event.object) {
           await handleCreemOrderSession(event.object);
         } else {
           console.log("Processing payment success with full event data");
-          await handleCheckoutCompleted(event);
+          await handleCreemOrderSession(event);
         }
         break;
 
@@ -118,11 +118,7 @@ export async function POST(request: NextRequest) {
 
       default:
         console.log("Unhandled webhook event type:", actualEventType);
-        // 尝试作为通用支付完成事件处理
-        if (event.object || event.data) {
-          console.log("Attempting to process as generic payment event");
-          await handleCheckoutCompleted(event);
-        }
+        // 对于未知事件，不进行任何处理，避免意外的重复积分添加
         break;
     }
 
@@ -136,54 +132,90 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// 核心：处理支付成功和订阅创建
+// 核心：处理支付成功和订阅创建 - 同时处理订阅创建和积分添加
 async function handleCheckoutCompleted(event: any) {
   try {
-    console.log("--- Handling Checkout Completed ---");
+    console.log("=== handleCheckoutCompleted DEBUG ===");
+    console.log("Full event object:", JSON.stringify(event, null, 2));
     
-    const checkoutData = event.object || event.data?.object || event;
-    if (!checkoutData) {
-      console.error("No valid checkout data found in event.");
+    // 尝试不同的数据结构访问方式
+    let checkoutData = event.data?.object || event.object || event;
+    
+    // 如果找不到checkout数据，尝试其他可能的结构
+    if (!checkoutData || !checkoutData.id) {
+      console.log("Trying alternative data structures...");
+      checkoutData = event.checkout || event.session || event.payment || event;
+    }
+    
+    console.log("Extracted checkoutData:", JSON.stringify(checkoutData, null, 2));
+    
+    if (!checkoutData || !checkoutData.id) {
+      console.error("No valid checkout data found in event");
       return;
     }
 
-    const metadata = checkoutData.metadata || {};
-    const userEmail = metadata.user_email || checkoutData.customer_details?.email || checkoutData.customer_email;
-    const userUuid = metadata.user_uuid;
+    console.log("Processing checkout completed:", checkoutData.id);
 
-    if (!userEmail || !userUuid) {
-      console.error("Missing required user info (email or uuid) in metadata.");
+    // 尝试不同的用户邮箱访问方式
+    const userEmail = checkoutData.customer?.email || 
+                     checkoutData.customerEmail || 
+                     checkoutData.email ||
+                     checkoutData.customer_details?.email ||
+                     checkoutData.customer_email;
+                     
+    const metadata = checkoutData.metadata || checkoutData.meta || {};
+    
+    console.log("User email:", userEmail);
+    console.log("Metadata:", JSON.stringify(metadata, null, 2));
+
+    if (!userEmail) {
+      console.error("No user email found in checkout data");
       return;
     }
 
+    // 获取用户信息
     const user = await findUserByEmail(userEmail);
     if (!user) {
-      console.error(`User not found for email: ${userEmail}`);
+      console.error("User not found for checkout:", userEmail);
       return;
     }
 
-    const originalProductId = metadata.original_product_id || checkoutData.line_items?.data[0]?.price.product;
-    if (!originalProductId) {
-      console.error("Could not determine product ID.");
-      return;
-    }
-
-    const productInfo = getProductInfoByOriginalId(originalProductId);
+    // 获取产品信息 - 尝试多种方式获取产品ID
+    const originalProductId = metadata.product_id || 
+                             metadata.original_product_id ||
+                             checkoutData.product_id ||
+                             checkoutData.order?.items?.[0]?.product?.id ||
+                             checkoutData.productId;
+                             
+    console.log("Original product ID:", originalProductId);
+    
+    const productInfo = getProductInfo(originalProductId);
     if (!productInfo) {
-      console.error(`Unknown product ID: ${originalProductId}`);
+      console.error("Unknown product for checkout:", originalProductId);
+      console.error("Available product IDs:", Object.keys({
+        'starter': true,
+        'standard': true, 
+        'premium': true
+      }));
       return;
     }
 
-    // --- 订阅处理 ---
-    const existingSubscription = await getUserSubscription(user.uuid!);
+    console.log(`Processing checkout for user ${user.uuid}, product: ${originalProductId}`);
+    console.log("Product info:", JSON.stringify(productInfo, null, 2));
 
+    // --- 订阅处理逻辑 ---
     let shouldCreateNew = false;
+    const existingSubscription = await getUserSubscription(user.uuid!);
 
     if (!existingSubscription) {
       shouldCreateNew = true;
+      console.log("No existing subscription, will create new one");
     } else {
+      console.log("Existing subscription found:", JSON.stringify(existingSubscription, null, 2));
       const isUpgrade = existingSubscription.product_id !== originalProductId;
       const isPendingCancel = existingSubscription.cancel_at_period_end;
+
+      console.log("Upgrade check:", { isUpgrade, isPendingCancel });
 
       if (isUpgrade || isPendingCancel) {
         // 立即取消旧订阅，创建新订阅
@@ -208,7 +240,7 @@ async function handleCheckoutCompleted(event: any) {
         plan_name: productInfo.plan_name,
         status: 'active',
         credits_monthly: productInfo.credits,
-        creem_subscription_id: checkoutData.subscription || `sub_${Date.now()}`,
+        creem_subscription_id: checkoutData.subscription || checkoutData.subscriptionId || `sub_${Date.now()}`,
         current_period_start: new Date().toISOString(),
         current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
       });
@@ -221,22 +253,25 @@ async function handleCheckoutCompleted(event: any) {
       console.log(`User ${user.uuid} already has an active subscription, no new subscription created.`);
     }
 
-    // --- 积分处理 ---
-    console.log(`Increasing ${productInfo.credits} credits for user ${user.uuid}`);
+    // --- 积分处理 - 使用统一 order_no 保证幂等 ---
+    const orderNoForCredit = metadata.order_no || metadata.orderNo || checkoutData.orderNo || checkoutData.id;
+    console.log(`Adding ${productInfo.credits} credits for user ${user.uuid} with order_no ${orderNoForCredit}`);
+    
     await increaseCredits({
       user_uuid: user.uuid!,
       trans_type: CreditsTransType.SubscriptionPayment,
       credits: productInfo.credits,
       expired_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-      order_no: metadata.order_no || checkoutData.id,
+      order_no: orderNoForCredit, // 使用统一 order_no 保证幂等
     });
-    console.log("Successfully increased credits.");
+    console.log("Successfully added credits via webhook");
 
-    console.log("--- Checkout event processed successfully for user ---", userEmail);
+    console.log("--- Checkout event processed successfully (subscription + credits) ---", userEmail);
   } catch (error: any) {
     console.error("!! FATAL ERROR in handleCheckoutCompleted !!");
     console.error("Message:", error.message);
     console.error("Stack:", error.stack);
+    console.error("Event that caused error:", JSON.stringify(event, null, 2));
   }
 }
 
@@ -278,17 +313,9 @@ async function handleSubscriptionCreated(data: any) {
       current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
     });
 
-    // 如果订阅是活跃状态，增加积分
-    if (subscription.status === 'active') {
-      await increaseCredits({
-        user_uuid: user.uuid!,
-        trans_type: CreditsTransType.SubscriptionPayment,
-        credits: productInfo.credits,
-        expired_at: new Date(subscription.current_period_end * 1000).toISOString(),
-      });
-    }
-
-    console.log("Subscription created successfully");
+    // 注意：不在这里添加积分，积分只在checkout.completed事件中添加
+    // 这样可以避免重复添加积分的问题
+    console.log("Subscription created successfully (credits will be added via checkout.completed event)");
   } catch (error) {
     console.error("Error handling subscription created:", error);
   }
@@ -334,9 +361,9 @@ async function handleSubscriptionCancelled(data: any) {
 // 获取产品信息
 function getProductInfo(productId: string) {
   const productMap: Record<string, { product_id: string, plan_name: string, credits: number }> = {
-    'starter': { product_id: 'starter', plan_name: 'AI涂色页生成器 入门版', credits: 50 },
-    'standard': { product_id: 'standard', plan_name: 'AI涂色页生成器 标准版', credits: 200 },
-    'premium': { product_id: 'premium', plan_name: 'AI涂色页生成器 高级版', credits: 500 },
+    'starter': { product_id: 'starter', plan_name: 'AI涂色页生成器 入门版', credits: 100 },
+    'standard': { product_id: 'standard', plan_name: 'AI涂色页生成器 标准版', credits: 500 },
+    'premium': { product_id: 'premium', plan_name: 'AI涂色页生成器 高级版', credits: 1000 },
   };
 
   return productMap[productId] || null;
@@ -345,9 +372,9 @@ function getProductInfo(productId: string) {
 // 获取产品信息
 function getProductInfoByOriginalId(originalProductId: string) {
   const productMap: Record<string, { product_id: string, plan_name: string, credits: number }> = {
-    'starter': { product_id: 'starter', plan_name: 'AI涂色页生成器 入门版', credits: 50 },
-    'standard': { product_id: 'standard', plan_name: 'AI涂色页生成器 标准版', credits: 200 },
-    'premium': { product_id: 'premium', plan_name: 'AI涂色页生成器 高级版', credits: 500 },
+    'starter': { product_id: 'starter', plan_name: 'AI涂色页生成器 入门版', credits: 100 },
+    'standard': { product_id: 'standard', plan_name: 'AI涂色页生成器 标准版', credits: 500 },
+    'premium': { product_id: 'premium', plan_name: 'AI涂色页生成器 高级版', credits: 1000 },
   };
 
   return productMap[originalProductId] || null;

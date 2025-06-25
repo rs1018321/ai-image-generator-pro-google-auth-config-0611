@@ -87,7 +87,7 @@ export default async function MyOrdersPage({ searchParams }: PageProps) {
           <CardContent className="pt-6">
             <div className="flex items-center gap-2 text-green-800">
               <CheckCircle className="h-5 w-5" />
-              <p className="font-medium">订阅成功！您的会员状态已更新。</p>
+              <p className="font-medium">{t("my_orders.membership.subscription_success")}</p>
             </div>
           </CardContent>
         </Card>

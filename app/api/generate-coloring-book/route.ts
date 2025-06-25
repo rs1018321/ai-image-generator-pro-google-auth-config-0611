@@ -7,7 +7,7 @@ import sharp from 'sharp'
 // ------ 更新：水印处理函数 ------
 async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
   console.log("🖨️ [addWatermark] 开始添加水印，buffer 大小:", imageBuffer.length);
-  const borderPx = 25;
+  const borderPx = 5;
   const text = "coloring page";
   const textColor = "#000000"; // Black text
   const borderColor = "#000000"; // Black border
@@ -27,6 +27,7 @@ async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
 
   const fontSize = Math.round(imageWidth * 0.030); // 调整字体大小
   const textPaddingHorizontal = Math.round(fontSize * 0.8);
+  const textPaddingVertical = Math.round(fontSize * 0.2); // 垂直内边距
 
   // 使用 SVG 和 Sharp 动态计算文本宽度
   const probeSvg = `<svg><text font-size="${fontSize}" font-family="sans-serif" font-weight="bold">${text}</text></svg>`;
@@ -36,9 +37,10 @@ async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
   console.log("🖨️ [addWatermark] textWidth:", textWidth);
 
   const cutoutWidth = textWidth + textPaddingHorizontal * 2;
-  const cutoutHeight = borderPx;
+  const cutoutHeight = Math.max(borderPx, fontSize + textPaddingVertical * 2);
   const cutoutX = Math.round((finalWidth - cutoutWidth) / 2);
-  const cutoutY = finalHeight - borderPx;
+  // 将镂空矩形顶端放在距底部 cutoutHeight 位置
+  const cutoutY = finalHeight - cutoutHeight;
 
   // 创建文字 SVG
   const textSvg = `
@@ -52,7 +54,7 @@ async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
           text-anchor: middle;
         }
       </style>
-      <text x="50%" y="50%" dy="0.35em" class="title">${text}</text>
+      <text x="50%" y="50%" dy="0" class="title">${text}</text>
     </svg>
   `;
 
@@ -115,7 +117,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    console.log("🚀 开始处理涂色书生成请求")
+    console.log("开始处理涂色书生成请求")
 
     const formData = await request.formData()
     const file = formData.get('image') as File
@@ -123,25 +125,10 @@ export async function POST(request: NextRequest) {
     const style = formData.get('style') as string || 'medium'
     // ⚠️ 前端字段 "watermark" = 'true' 表示需要水印，'false' 表示不要水印
     const hasWatermark = formData.get('watermark') === 'true'
-    console.log("💧 前端是否需要水印:", hasWatermark)
+    console.log("前端是否需要水印:", hasWatermark)
 
     if (!file) {
       return NextResponse.json({ error: "未提供图片文件" }, { status: 400 })
-    }
-
-    // 扣除积分
-    try {
-      await decreaseCredits({
-        user_uuid: session.user.uuid,
-        trans_type: CreditsTransType.GenerateImage, // 使用专门的生成图片类型
-        credits: 2
-      })
-      console.log("✅ 积分扣除成功")
-    } catch (error: any) {
-      console.error("❌ 积分扣除失败:", error)
-      return NextResponse.json({ 
-        error: error.message || "积分不足或扣除失败" 
-      }, { status: 400 })
     }
 
     // 转换图片为 base64（只需要做一次）
@@ -149,8 +136,8 @@ export async function POST(request: NextRequest) {
     const base64Image = Buffer.from(bytes).toString('base64')
     const imageDataUrl = `data:${file.type};base64,${base64Image}`
 
-    console.log(`📁 收到图片文件: ${file.name}, 大小: ${file.size} bytes, 输出尺寸: ${size}`)
-    console.log(`🎨 Style: ${style}`)
+    console.log(`收到图片文件: ${file.name}, 大小: ${file.size} bytes, 输出尺寸: ${size}`)
+    console.log(`Style: ${style}`)
 
     // Style prompt 映射（与文生图API保持一致）
     const stylePromptMapping: { [key: string]: string } = {
@@ -161,7 +148,7 @@ export async function POST(request: NextRequest) {
 
     const stylePrompt = stylePromptMapping[style] || stylePromptMapping["medium"];
 
-    console.log(`📝 Style Prompt: ${stylePrompt}`)
+    console.log(`Style Prompt: ${stylePrompt}`)
 
     // 构建完整的提示词：基础要求 + style prompt
     const basePrompt = "Convert this colored illustration into clean black-and-white coloring-book line art. CRITICAL REQUIREMENT: The ENTIRE original image must be preserved completely - DO NOT crop, cut, trim, or remove ANY portion of the original image. ALL elements from edge to edge of the original image must remain visible and intact. Create a larger canvas with the target aspect ratio and place the complete, unmodified original image in the center. Fill the extra space around the original image with pure white background. Think of this as putting a complete postcard into a larger picture frame - the postcard (original image) stays exactly the same size and shape, you just add a white border around it. Draw bold, continuous pure-black strokes for outlines only. Remove all color, shading, gradients and fills, leaving crisp, simple contours. Output as a high-resolution PNG."
@@ -182,14 +169,14 @@ export async function POST(request: NextRequest) {
       seed: Math.floor(Math.random() * 1000000)
     }
 
-    console.log(`📝 完整提示词: ${fullPrompt}`)
+    console.log(`完整提示词: ${fullPrompt}`)
 
     // 重试循环（只重试 API 调用部分）
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        console.log(`🔄 第 ${attempt} 次尝试调用 Replicate API`)
-        console.log("🌐 准备调用 Replicate API: black-forest-labs/flux-kontext-pro")
-        console.log("🔑 API Token 已设置:", process.env.REPLICATE_API_TOKEN ? '是' : '否')
+        console.log(`第 ${attempt} 次尝试调用 Replicate API`)
+        console.log("准备调用 Replicate API: black-forest-labs/flux-kontext-pro")
+        console.log("API Token 已设置:", process.env.REPLICATE_API_TOKEN ? '是' : '否')
 
         const startTime = Date.now()
 
@@ -211,9 +198,9 @@ export async function POST(request: NextRequest) {
         
 
 
-        console.log(`📡 Replicate API 调用成功`)
-        console.log("🔍 输出类型:", typeof output)
-        console.log("🔍 输出构造函数:", output?.constructor?.name)
+        console.log(`Replicate API 调用成功`)
+        console.log("输出类型:", typeof output)
+        console.log("输出构造函数:", output?.constructor?.name)
 
         // 处理不同类型的 Replicate 输出
         let imageUrl: string
@@ -221,15 +208,15 @@ export async function POST(request: NextRequest) {
         if (typeof output === 'string') {
           // 直接返回 URL 字符串
           imageUrl = output
-          console.log("📎 输出格式: 直接 URL 字符串")
+          console.log("输出格式: 直接 URL 字符串")
         } else if (Array.isArray(output) && output.length > 0) {
           // 如果返回数组，取第一个元素
           imageUrl = output[0]
-          console.log("📎 输出格式: URL 数组")
+          console.log("输出格式: URL 数组")
           
         } else if (output && typeof output.getReader === 'function') {
           // 如果是 ReadableStream，直接读取为二进制图片数据
-          console.log("📎 输出格式: ReadableStream (二进制图片数据)")
+          console.log("输出格式: ReadableStream (二进制图片数据)")
           const reader = output.getReader()
           const chunks = []
           
@@ -248,22 +235,35 @@ export async function POST(request: NextRequest) {
               offset += chunk.length
             }
             
-            console.log("📄 获取到图片数据，大小:", fullData.length, "bytes")
-            console.log("📄 文件头:", fullData.slice(0, 8))
+            console.log("获取到图片数据，大小:", fullData.length, "bytes")
+            console.log("文件头:", fullData.slice(0, 8))
             
             let bufferData: Buffer = Buffer.from(fullData);
             // 如果需要，添加水印
             if (hasWatermark) {
-              console.log("💧 添加水印 (ReadableStream)...")
+              console.log("添加水印 (ReadableStream)...")
               bufferData = await addWatermark(bufferData);
-              console.log("✅ 水印添加成功 (ReadableStream)")
+              console.log("水印添加成功 (ReadableStream)")
             } else {
-              console.log("✅ 无需水印，直接返回原图 (ReadableStream)");
+              console.log("无需水印，直接返回原图 (ReadableStream)");
             }
 
             const imageData = bufferData.toString('base64');
 
-            console.log("✅ 图片数据转换为 base64 成功，长度:", imageData.length)
+            console.log("图片数据转换为 base64 成功，长度:", imageData.length)
+
+            // 🎯 图片生成成功后扣除积分
+            try {
+              await decreaseCredits({
+                user_uuid: session.user.uuid,
+                trans_type: CreditsTransType.GenerateImage,
+                credits: 1
+              })
+              console.log("✅ 图片生成成功，积分扣除完成")
+            } catch (error: any) {
+              console.error("⚠️ 积分扣除失败，但图片已生成:", error)
+              // 积分扣除失败不影响图片返回，只记录日志
+            }
 
             // 直接返回结果，不需要下载步骤
             const processingTime = Date.now() - startTime
@@ -283,14 +283,14 @@ export async function POST(request: NextRequest) {
         } else if (output && output.url) {
           // 如果是包含 url 属性的对象
           imageUrl = typeof output.url === 'function' ? output.url() : output.url
-          console.log("📎 输出格式: URL 对象")
+          console.log("输出格式: URL 对象")
         } else {
-          console.error("❌ 未知的输出格式:", output)
-          console.error("❌ 输出详细信息:", JSON.stringify(output, null, 2))
+          console.error("未知的输出格式:", output)
+          console.error("输出详细信息:", JSON.stringify(output, null, 2))
           throw new Error(`不支持的输出格式: ${typeof output}, constructor: ${output?.constructor?.name}`)
         }
 
-        console.log("🔗 解析得到的图片 URL:", imageUrl)
+        console.log("解析得到的图片 URL:", imageUrl)
 
         // 验证 URL 格式
         if (!imageUrl || !imageUrl.startsWith('http')) {
@@ -308,16 +308,29 @@ export async function POST(request: NextRequest) {
 
         // 如果需要，添加水印
         if (hasWatermark) {
-          console.log("💧 添加水印...")
+          console.log("添加水印...")
           const watermarkedBuffer = await addWatermark(Buffer.from(imageBuffer));
           imageData = watermarkedBuffer.toString('base64');
-          console.log("✅ 水印添加成功")
+          console.log("水印添加成功")
         } else {
           imageData = Buffer.from(imageBuffer).toString('base64')
-          console.log("✅ 无需水印，直接返回原图")
+          console.log("无需水印，直接返回原图")
         }
 
-        console.log("✅ 图片转换为 base64 成功，长度:", imageData.length)
+        console.log("图片转换为 base64 成功，长度:", imageData.length)
+
+        // 🎯 图片生成成功后扣除积分
+        try {
+          await decreaseCredits({
+            user_uuid: session.user.uuid,
+            trans_type: CreditsTransType.GenerateImage,
+            credits: 1
+          })
+          console.log("✅ 图片生成成功，积分扣除完成")
+        } catch (error: any) {
+          console.error("⚠️ 积分扣除失败，但图片已生成:", error)
+          // 积分扣除失败不影响图片返回，只记录日志
+        }
 
         // 如果成功，返回结果
         const processingTime = Date.now() - startTime
@@ -331,10 +344,11 @@ export async function POST(request: NextRequest) {
         })
 
       } catch (error: any) {
-        console.error(`❌ 第 ${attempt} 次尝试失败:`, error)
+        console.error(`第 ${attempt} 次尝试失败:`, error)
 
         if (attempt === maxRetries) {
-          console.error("❌ 图片生成最终失败:", error.message)
+          console.error("图片生成最终失败:", error.message)
+          console.log("❌ 图片生成失败，不扣除积分")
           return NextResponse.json({ 
             error: error.message || "图片生成失败",
             model: "flux-kontext-pro",
@@ -349,13 +363,14 @@ export async function POST(request: NextRequest) {
 
         // 等待后重试
         const delay = baseDelay * attempt
-        console.log(`⏳ 等待 ${delay}ms 后重试...`)
+        console.log(`等待 ${delay}ms 后重试...`)
         await new Promise(resolve => setTimeout(resolve, delay))
       }
     }
 
   } catch (error: any) {
-    console.error("❌ 请求处理失败:", error)
+    console.error("请求处理失败:", error)
+    console.log("❌ 请求处理失败，不扣除积分")
     return NextResponse.json({ 
       error: error.message || "请求处理失败",
       suggestion: '请检查上传的图片格式是否正确'
