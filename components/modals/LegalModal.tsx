@@ -39,8 +39,9 @@ export default function LegalModal({
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (open && !content) {
+    if (open) {
       setLoading(true);
+      setContent(""); // 清空之前的内容
       // 获取MDX文件内容
       fetch(`/api/legal-content/${type}`)
         .then((response) => response.json())
@@ -54,8 +55,11 @@ export default function LegalModal({
         .finally(() => {
           setLoading(false);
         });
+    } else {
+      // 当模态框关闭时清空内容
+      setContent("");
     }
-  }, [open, type, content]);
+  }, [open, type]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
