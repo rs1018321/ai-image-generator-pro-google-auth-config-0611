@@ -35,11 +35,13 @@ async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
 
     console.log("🖨️ [addWatermark] textWidth:", textWidth);
 
-    const cutoutWidth = textWidth + textPaddingHorizontal * 2;
-    const cutoutHeight = Math.max(borderPx, fontSize + textPaddingVertical * 2);
+    const cutoutWidth = Math.round(textWidth + textPaddingHorizontal * 2);
+    const cutoutHeight = Math.round(Math.max(borderPx, fontSize + textPaddingVertical * 2));
     const cutoutX = Math.round((finalWidth - cutoutWidth) / 2);
     // 将镂空矩形顶端放在距底部 cutoutHeight 位置
     const cutoutY = finalHeight - cutoutHeight;
+
+    console.log("🖨️ [addWatermark] cutoutWidth:", cutoutWidth, "cutoutHeight:", cutoutHeight);
 
     // 创建简化的文字 SVG - 使用系统默认字体
     const textSvg = `
@@ -54,13 +56,25 @@ async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
       </svg>
     `;
 
+    // 创建白色背景的 Buffer
+    const whiteBackground = await sharp({
+      create: {
+        width: cutoutWidth,
+        height: cutoutHeight,
+        channels: 3,
+        background: { r: 255, g: 255, b: 255 }
+      }
+    }).png().toBuffer();
+
+    console.log("🖨️ [addWatermark] 白色背景创建成功");
+
     // 使用 sharp 的 composite 功能合成图片
     return await sharp({
         create: {
           width: finalWidth,
           height: finalHeight,
           channels: 4, // 使用4通道以支持透明度
-          background: borderColor
+          background: { r: 0, g: 0, b: 0, alpha: 1 } // 黑色边框
         }
       })
       .composite([
@@ -68,14 +82,7 @@ async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
         { input: imageBuffer, top: borderPx, left: borderPx },
         // 2. 在底部边框创建白色镂空背景
         { 
-          input: {
-            create: {
-              width: cutoutWidth,
-              height: cutoutHeight,
-              channels: 3,
-              background: cutoutBackgroundColor
-            }
-          },
+          input: whiteBackground,
           top: cutoutY,
           left: cutoutX
         },

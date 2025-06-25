@@ -32,10 +32,12 @@ async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
     const textWidth = text.length * fontSize * 0.5;
     
     // 计算裁剪区域的尺寸和位置
-    const cutoutWidth = textWidth + textPaddingHorizontal * 2;
-    const cutoutHeight = Math.max(fontSize + textPaddingVertical * 2, borderPx + textPaddingVertical);
-    const cutoutX = Math.max(0, (width - cutoutWidth) / 2);
+    const cutoutWidth = Math.round(textWidth + textPaddingHorizontal * 2);
+    const cutoutHeight = Math.round(Math.max(fontSize + textPaddingVertical * 2, borderPx + textPaddingVertical));
+    const cutoutX = Math.max(0, Math.round((width - cutoutWidth) / 2));
     const cutoutY = Math.max(0, height - cutoutHeight);
+    
+    console.log(`🖨️ 水印参数: cutoutWidth=${cutoutWidth}, cutoutHeight=${cutoutHeight}`);
     
     // 创建简化的 SVG 水印 - 避免字体配置问题
     const svgWatermark = `
