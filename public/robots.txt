@@ -1,4 +1,8 @@
+# *
 User-agent: *
-Disallow: /*?*q=
-Disallow: /privacy-policy
-Disallow: /terms-of-service
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+
+# Host
+Host: https://mimi-panda.com
