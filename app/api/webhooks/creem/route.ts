@@ -13,12 +13,24 @@ import { findUserByEmail } from "@/models/user";
 
 export async function POST(request: NextRequest) {
   try {
-    console.log("Creem webhook received");
+    console.log("=== Creem webhook received ===");
+    
+    // 详细的环境变量检查
+    console.log("Environment check:");
+    console.log("- SUPABASE_URL:", process.env.SUPABASE_URL ? "✓ Set" : "✗ Missing");
+    console.log("- SUPABASE_ANON_KEY:", process.env.SUPABASE_ANON_KEY ? "✓ Set" : "✗ Missing");
+    console.log("- SUPABASE_SERVICE_ROLE_KEY:", process.env.SUPABASE_SERVICE_ROLE_KEY ? "✓ Set" : "✗ Missing");
+    console.log("- CREEM_WEBHOOK_SECRET:", process.env.CREEM_WEBHOOK_SECRET ? "✓ Set" : "✗ Missing");
+    console.log("- NODE_ENV:", process.env.NODE_ENV);
     
     // 获取请求头
     const headersList = await headers();
     const signature = headersList.get("creem-signature");
     const eventType = headersList.get("creem-event-type");
+    
+    console.log("Request headers:");
+    console.log("- creem-signature:", signature ? "✓ Present" : "✗ Missing");
+    console.log("- creem-event-type:", eventType || "Not provided");
     
     if (!signature) {
       console.error("Missing Creem signature");
@@ -30,9 +42,8 @@ export async function POST(request: NextRequest) {
 
     // 获取原始请求体
     const body = await request.text();
-    console.log("Webhook body:", body);
-    console.log("Event type:", eventType);
-    console.log("Signature:", signature);
+    console.log("Webhook body length:", body.length);
+    console.log("Webhook body preview:", body.substring(0, 200) + (body.length > 200 ? "..." : ""));
 
     // 验证webhook签名
     const webhookSecret = process.env.CREEM_WEBHOOK_SECRET;
@@ -52,6 +63,7 @@ export async function POST(request: NextRequest) {
     let event;
     try {
       event = JSON.parse(body);
+      console.log("Successfully parsed JSON event");
     } catch (error) {
       console.error("Failed to parse webhook JSON:", error);
       return NextResponse.json(
@@ -60,11 +72,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log("Parsed webhook event:", event);
+    console.log("Parsed webhook event keys:", Object.keys(event));
 
     // 从事件数据中获取事件类型（如果header中没有）
     const actualEventType = eventType || event.eventType || event.type;
-    console.log("Actual event type:", actualEventType);
+    console.log("Processing event type:", actualEventType);
 
     // 根据事件类型处理不同的webhook事件
     switch (actualEventType) {
@@ -136,7 +148,18 @@ export async function POST(request: NextRequest) {
 async function handleCheckoutCompleted(event: any) {
   try {
     console.log("=== handleCheckoutCompleted DEBUG ===");
-    console.log("Full event object:", JSON.stringify(event, null, 2));
+    
+    // 测试数据库连接
+    try {
+      const { getSupabaseClient } = await import("@/models/db");
+      const client = getSupabaseClient();
+      console.log("✓ Database connection successful");
+    } catch (dbError) {
+      console.error("✗ Database connection failed:", dbError);
+      throw new Error(`Database connection failed: ${dbError}`);
+    }
+    
+    console.log("Full event object keys:", Object.keys(event));
     
     // 尝试不同的数据结构访问方式
     let checkoutData = event.data?.object || event.object || event;
@@ -147,11 +170,12 @@ async function handleCheckoutCompleted(event: any) {
       checkoutData = event.checkout || event.session || event.payment || event;
     }
     
-    console.log("Extracted checkoutData:", JSON.stringify(checkoutData, null, 2));
+    console.log("Extracted checkoutData keys:", checkoutData ? Object.keys(checkoutData) : "null");
     
     if (!checkoutData || !checkoutData.id) {
       console.error("No valid checkout data found in event");
-      return;
+      console.error("Event structure:", JSON.stringify(event, null, 2));
+      throw new Error("No valid checkout data found");
     }
 
     console.log("Processing checkout completed:", checkoutData.id);
@@ -166,19 +190,22 @@ async function handleCheckoutCompleted(event: any) {
     const metadata = checkoutData.metadata || checkoutData.meta || {};
     
     console.log("User email:", userEmail);
-    console.log("Metadata:", JSON.stringify(metadata, null, 2));
+    console.log("Metadata keys:", Object.keys(metadata));
 
     if (!userEmail) {
       console.error("No user email found in checkout data");
-      return;
+      console.error("Available checkout data fields:", Object.keys(checkoutData));
+      throw new Error("No user email found");
     }
 
     // 获取用户信息
+    console.log("Looking up user by email:", userEmail);
     const user = await findUserByEmail(userEmail);
     if (!user) {
       console.error("User not found for checkout:", userEmail);
-      return;
+      throw new Error(`User not found: ${userEmail}`);
     }
+    console.log("Found user:", user.uuid);
 
     // 获取产品信息 - 尝试多种方式获取产品ID
     const originalProductId = metadata.product_id || 
@@ -197,7 +224,7 @@ async function handleCheckoutCompleted(event: any) {
         'standard': true, 
         'premium': true
       }));
-      return;
+      throw new Error(`Unknown product: ${originalProductId}`);
     }
 
     console.log(`Processing checkout for user ${user.uuid}, product: ${originalProductId}`);
