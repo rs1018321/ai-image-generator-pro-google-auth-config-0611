@@ -52,7 +52,7 @@ export default async function DefaultLayout({
             <h1 style={{
               fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
               color: '#64c19f'
-            }} className="font-bold text-5xl">Coloring Page</h1>
+            }} className="font-bold text-5xl">Coloring-Pages.app</h1>
           </Link>
         </div>
 

@@ -1,4 +1,3 @@
-
 import Link from 'next/link';
 import { clsx } from 'clsx';
 import styles from '../page.module.css'
@@ -31,7 +30,7 @@ const GrContentPage = () => {
     return (
         <div className={clsx("mt-20",styles.container) }>
             <div>
-                <h3 className={styles.accordionTitle}>Gallery of AI-Generated Coloring Pages</h3>
+                <h3 className={styles.accordionTitle}>Coloring-Pages.app</h3>
             </div>
 
             <div className={styles.gallerySection}>

@@ -1,8 +1,8 @@
 {
   "metadata": {
-    "title": "用AI创建有趣的涂色页 | Coloring Page",
-    "description": "Coloring Page 是一个用于构建AI涂色页生成器的NextJS模板，几秒钟内用AI创建令人惊叹的涂色页。",
-    "keywords": "Coloring Page, AI涂色页生成器, NextJS模板"
+    "title": "用AI创建有趣的涂色页 | Coloring-Pages.app",
+    "description": "Coloring-Pages.app 是一个用于构建AI涂色页生成器的NextJS模板，几秒钟内用AI创建令人惊叹的涂色页。",
+    "keywords": "Coloring-Pages.app, AI涂色页生成器, NextJS模板"
   },
   "user": {
     "sign_in": "登录",
@@ -103,7 +103,7 @@
   },
   "blog": {
     "title": "博客",
-    "description": "关于 Coloring Page 的新闻、资源和更新",
+    "description": "关于 Coloring-Pages.app 的新闻、资源和更新",
     "read_more_text": "阅读更多"
   },
   "my_invites": {
@@ -114,7 +114,7 @@
     "edit_invite_link": "编辑邀请链接",
     "copy_invite_link": "复制邀请链接",
     "invite_code": "邀请码",
-    "invite_tip": "每邀请 1 位朋友购买 Coloring Page，奖励 $50。",
+    "invite_tip": "每邀请 1 位朋友购买 Coloring-Pages.app，奖励 $50。",
     "invite_balance": "邀请奖励余额",
     "total_invite_count": "总邀请人数",
     "total_paid_count": "已充值人数",
@@ -122,7 +122,7 @@
     "update_invite_code": "设置邀请码",
     "update_invite_code_tip": "输入你的自定义邀请码",
     "update_invite_button": "保存",
-    "no_orders": "你需要先购买过 Coloring Page 才能邀请朋友",
+    "no_orders": "你需要先购买过 Coloring-Pages.app 才能邀请朋友",
     "no_affiliates": "你暂无邀请朋友的权限，请联系我们申请开通。",
     "table": {
       "invite_time": "邀请时间",
@@ -140,7 +140,7 @@
     "submit": "提交",
     "loading": "提交中...",
     "contact_tip": "其他联系方式",
-    "rating_tip": "您对 Coloring Page 的看法如何？",
+    "rating_tip": "您对 Coloring-Pages.app 的看法如何？",
     "placeholder": "在这里留下您的反馈..."
   }
 }

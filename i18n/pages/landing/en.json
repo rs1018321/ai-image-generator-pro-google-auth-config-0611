@@ -3,10 +3,10 @@
   "theme": "light",
   "header": {
     "brand": {
-      "title": "Coloring Page",
+      "title": "Coloring-Pages.app",
       "logo": {
         "src": "/imgs/logo.png",
-        "alt": "Coloring Page"
+        "alt": "Coloring-Pages.app"
       },
       "url": "https://mimi-panda.com/"
     },
@@ -221,7 +221,7 @@
   },
   "feature": {
     "name": "feature",
-    "title": "Powerful Features",
+    "title": "Key Features of Coloring-Pages.app",
     "description": "Providing the best AI coloring page generation experience",
     "items": [
       {
@@ -439,7 +439,7 @@
   "testimonial": {
     "name": "testimonial",
     "label": "Testimonial",
-    "title": "What Users Say About Our AI Generator",
+    "title": "What Users Say About Coloring-Pages.app",
     "description": "Hear how users create unique coloring pages.",
     "icon": "GoThumbsup",
     "items": [
@@ -535,11 +535,11 @@
   "footer": {
     "name": "footer",
     "brand": {
-      "title": "Coloring Page",
+      "title": "Coloring-Pages.app",
       "description": "Create unique coloring pages from your photos and text with AI.",
       "logo": {
         "src": "/imgs/logo.png",
-        "alt": "Coloring Page"
+        "alt": "Coloring-Pages.app"
       },
       "url": "https://mimi-panda.com/en"
     },

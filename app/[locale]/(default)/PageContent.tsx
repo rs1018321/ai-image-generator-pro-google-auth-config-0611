@@ -173,14 +173,14 @@ const testimonials: Testimonial[] = [
         name: "Thomas Ricci",
         title: "Publishing Designer",
         rating: 5,
-        content: "Amazing resource for creating unique illustrations for our books! The line art quality is professional and easy to modify if needed. It speeds up our workflow significantly while maintaining high standards."
+        content: "An excellent tool for designing custom coloring pages! I've created dozens of designs to print and color at home. The results are always charming and very satisfying to work with."
     },
     {
         avatar: "/imgs/avatars/lisa-thompson-hobbyist.png",
         name: "Lisa Thompson",
         title: "Hobbyist",
         rating: 5,
-        content: "An excellent tool for designing custom coloring pages! I've created dozens of designs to print and color at home. The results are always charming and very satisfying to work with."
+        content: "These coloring pages are a hit with my followers! Highly recommended. I use them in my content and get tons of positive feedback. Super fun, brand-friendly, and engaging for families."
     },
     {
         avatar: "/imgs/avatars/andrew-okoro-student.png",

@@ -66,7 +66,7 @@ export default function CustomLayout({
                         <h1 style={{
                             fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
                             color: '#64c19f'
-                        }} className={clsx(" font-bold text-5xl")} >Coloring Page</h1>
+                        }} className={clsx(" font-bold text-5xl")} >Coloring-Pages.app</h1>
                     </Link>
                 </div>
 
@@ -218,7 +218,7 @@ export default function CustomLayout({
             {/* 页脚 */}
             <footer className="bg-gray-800 text-white py-8 px-6">
                 <div className="max-w-6xl mx-auto text-center">
-                    <p>&copy; 2024 Coloring Page Generator. All rights reserved.</p>
+                    <p>&copy; 2024 Coloring-Pages.app Generator. All rights reserved.</p>
                 </div>
             </footer>
         </div>

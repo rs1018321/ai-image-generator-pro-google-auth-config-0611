@@ -23,10 +23,10 @@ export default async function AdminLayout({
 
   const sidebar: Sidebar = {
     brand: {
-      title: "Coloring Page",
+      title: "Coloring-Pages.app",
       logo: {
         src: "/imgs/logo.png",
-        alt: "Coloring Page",
+        alt: "Coloring-Pages.app",
       },
     },
     nav: {

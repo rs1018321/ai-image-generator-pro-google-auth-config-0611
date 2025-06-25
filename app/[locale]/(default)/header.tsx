@@ -47,7 +47,7 @@ export default function Header({ locale }: { locale: string }) {
                                     }}
                                     className="font-bold lg:text-5xl md:text-5xl text-4xl"
                                 >
-                                    Coloring Page
+                                    Coloring-Pages.app
                                 </h1>
                             </Link>
                         </div>

@@ -9,7 +9,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   
-  const title = locale === 'zh' ? '定价 - AI 填色页生成器' : 'Pricing - AI Coloring Page Generator';
+  const title = locale === 'zh' ? '定价 - Coloring-Pages.app' : 'Pricing - Coloring-Pages.app';
   const description = locale === 'zh' 
     ? '选择适合您的套餐，解锁高级填色页生成功能。包含100-1000积分，支持批量处理和高分辨率输出。'
     : 'Choose the perfect plan for your coloring book creation needs. Includes 100-1000 credits with batch processing and high-resolution output.';

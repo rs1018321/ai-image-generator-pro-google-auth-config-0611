@@ -1,8 +1,8 @@
 {
   "metadata": {
-    "title": "Create Fun Coloring Pages with AI | Coloring Page",
-    "description": "Coloring Page is a NextJS boilerplate for building AI coloring page generators, Create amazing coloring pages with AI in seconds.",
-    "keywords": "Coloring Page, AI Coloring Page Generator, NextJS Boilerplate"
+    "title": "Create Fun Coloring Pages with AI | Coloring-Pages.app",
+    "description": "Coloring-Pages.app is a NextJS boilerplate for building AI coloring page generators, Create amazing coloring pages with AI in seconds.",
+    "keywords": "Coloring-Pages.app, AI Coloring Page Generator, NextJS Boilerplate"
   },
   "user": {
     "sign_in": "Sign In",
@@ -103,7 +103,7 @@
   },
   "blog": {
     "title": "Blog",
-    "description": "News, resources, and updates about Coloring Page",
+    "description": "News, resources, and updates about Coloring-Pages.app",
     "read_more_text": "Read More"
   },
   "my_invites": {
@@ -114,7 +114,7 @@
     "edit_invite_link": "Edit Invite Link",
     "copy_invite_link": "Copy Invite Link",
     "invite_code": "Invite Code",
-    "invite_tip": "Invite 1 friend to buy Coloring Page, reward $50.",
+    "invite_tip": "Invite 1 friend to buy Coloring-Pages.app, reward $50.",
     "invite_balance": "Invite Reward Balance",
     "total_invite_count": "Total Invite Count",
     "total_paid_count": "Total Paid Count",
@@ -122,7 +122,7 @@
     "update_invite_code": "Set Invite Code",
     "update_invite_code_tip": "Input your custom invite code",
     "update_invite_button": "Save",
-    "no_orders": "You can't invite others before you bought Coloring Page",
+    "no_orders": "You can't invite others before you bought Coloring-Pages.app",
     "no_affiliates": "You're not allowed to invite others, please contact us to apply for permission.",
     "table": {
       "invite_time": "Invite Time",
@@ -140,14 +140,14 @@
     "submit": "Submit",
     "loading": "Submitting...",
     "contact_tip": "Other ways to contact us",
-    "rating_tip": "How do you feel about Coloring Page?",
+    "rating_tip": "How do you feel about Coloring-Pages.app?",
     "placeholder": "Leave your words here..."
   },
   "payout": {
     "title": "Payout",
     "total_orders": "Total orders",
     "total_amount": "Total amount",
-    "description": "orders paid with Coloring Page.",
+    "description": "orders paid with Coloring-Pages.app.",
     "revenue_this_month": "Revenue this month",
     "orders_this_month": "Orders this month",
     "revenue_last_month": "Revenue last month",

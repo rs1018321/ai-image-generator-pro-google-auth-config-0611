@@ -3,10 +3,10 @@
   "theme": "light",
   "header": {
     "brand": {
-      "title": "Coloring Page",
+      "title": "Coloring-Pages.app",
       "logo": {
-        "src": "/imgs/logo.png",
-        "alt": "Coloring Page"
+        "src": "/imgs/brand/logo.png",
+        "alt": "Coloring-Pages.app"
       },
       "url": "https://mimi-panda.com/zh"
     },
@@ -493,11 +493,11 @@
   "footer": {
     "name": "footer",
     "brand": {
-      "title": "Coloring Page",
+      "title": "Coloring-Pages.app",
       "description": "使用 AI 从您的照片和文本创建独特的填色页。",
       "logo": {
-        "src": "/imgs/logo.png",
-        "alt": "Coloring Page"
+        "src": "/imgs/brand/logo.png",
+        "alt": "Coloring-Pages.app"
       },
       "url": "https://mimi-panda.com/zh"
     },
