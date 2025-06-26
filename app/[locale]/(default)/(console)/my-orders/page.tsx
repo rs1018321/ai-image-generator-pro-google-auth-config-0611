@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CalendarDays, Crown, Shield, Star, AlertCircle, CheckCircle } from "lucide-react";
 import CancelSubscriptionButton from "@/components/subscription/cancel-subscription-button";
+import ReactivateSubscriptionButton from "@/components/subscription/reactivate-subscription-button";
 
 interface PageProps {
   searchParams: Promise<{ success?: string }>;
@@ -125,10 +126,23 @@ export default async function MyOrdersPage({ searchParams }: PageProps) {
               </div>
 
               {subscription.cancel_at_period_end ? (
-                <div className="p-3 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800">
-                  <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                    {t("my_orders.membership.will_expire")}
-                  </p>
+                <div className="space-y-3">
+                  <div className="p-3 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800">
+                    <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                      {t("my_orders.membership.will_expire")}
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <ReactivateSubscriptionButton 
+                      subscriptionId={subscription.creem_subscription_id}
+                      userUuid={user_uuid}
+                    />
+                    <Button variant="outline" asChild>
+                      <a href="/pricing" target="_blank">
+                        {t("my_orders.membership.upgrade")}
+                      </a>
+                    </Button>
+                  </div>
                 </div>
               ) : (
                 <div className="flex gap-2">

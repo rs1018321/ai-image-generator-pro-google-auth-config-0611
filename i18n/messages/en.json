@@ -69,7 +69,15 @@
       "canceling": "Cancelling...",
       "cancel_success": "Subscription cancelled successfully, will expire at the end of current period",
       "cancel_error": "Failed to cancel subscription, please try again later",
-      "subscription_success": "Subscription successful! Your membership status has been updated."
+      "subscription_success": "Subscription successful! Your membership status has been updated.",
+      "reactivate_subscription": "Reactivate Subscription",
+      "reactivate_confirm_title": "Reactivate Subscription",
+      "reactivate_confirm_description": "Are you sure you want to reactivate your subscription? Your subscription will continue automatically and billing will resume at the end of the current period.",
+      "reactivate_yes": "Confirm Reactivation",
+      "reactivate_no": "Cancel",
+      "reactivating": "Processing...",
+      "reactivate_success": "Subscription reactivated successfully",
+      "reactivate_error": "Failed to reactivate subscription, please try again later"
     }
   },
   "my_credits": {
