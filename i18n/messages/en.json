@@ -152,6 +152,13 @@
     "orders_this_month": "Orders this month",
     "revenue_last_month": "Revenue last month",
     "orders_last_month": "Orders last month",
-    "withdraw": "Withdraw"
+    "withdraw": "Withdraw",
+    "table": {
+      "date": "Date",
+      "amount": "Amount",
+      "type": "Type",
+      "order_number": "Order Number",
+      "balance": "Balance"
+    }
   }
 }
