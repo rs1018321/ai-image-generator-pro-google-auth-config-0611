@@ -98,6 +98,40 @@ export async function updateSubscriptionStatus(
   return data;
 }
 
+// 通过用户UUID更新订阅状态
+export async function updateSubscriptionByUserId(
+  user_uuid: string,
+  updates: {
+    status?: string;
+    current_period_start?: string;
+    current_period_end?: string;
+    cancel_at_period_end?: boolean;
+    canceled_at?: string;
+    creem_subscription_id?: string;
+  }
+) {
+  const supabase = getSupabaseClient();
+  
+  const { data, error } = await supabase
+    .from("subscriptions")
+    .update({
+      ...updates,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("user_uuid", user_uuid)
+    .in("status", ["active", "canceled"])
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .select()
+    .single();
+  
+  if (error) {
+    throw error;
+  }
+  
+  return data;
+}
+
 // 取消订阅（设置在期间结束时取消）
 export async function cancelSubscription(user_uuid: string) {
   const supabase = getSupabaseClient();

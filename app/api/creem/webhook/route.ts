@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { 
   createSubscription, 
   updateSubscriptionStatus, 
+  updateSubscriptionByUserId,
   getUserSubscription
 } from "@/models/subscription";
 import { increaseCredits } from "@/services/credit";
@@ -173,6 +174,30 @@ async function handleCheckoutCompleted(event: any) {
       });
       
       console.log(`Created subscription ${newSubscription?.id} for user ${user.uuid}`);
+    } else {
+      // 更新现有订阅 - 重新激活并更新周期时间
+      const now = new Date();
+      const newPeriodEnd = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+      
+      // 优先使用creem_subscription_id，如果没有则使用user_uuid
+      if (existingSubscription.creem_subscription_id) {
+        await updateSubscriptionStatus(existingSubscription.creem_subscription_id, {
+          status: 'active',
+          cancel_at_period_end: false,
+          current_period_start: now.toISOString(),
+          current_period_end: newPeriodEnd.toISOString(),
+        });
+      } else {
+        await updateSubscriptionByUserId(user.uuid!, {
+          status: 'active',
+          cancel_at_period_end: false,
+          current_period_start: now.toISOString(),
+          current_period_end: newPeriodEnd.toISOString(),
+          creem_subscription_id: checkoutData.subscription || `sub_${Date.now()}`,
+        });
+      }
+      
+      console.log(`Updated subscription for user ${user.uuid} with new period: ${now.toISOString()} to ${newPeriodEnd.toISOString()}`);
     }
 
     // 添加积分
@@ -230,18 +255,36 @@ async function handleSubscriptionActive(event: any) {
 
     console.log("Product info:", productInfo);
 
-    // 更新或创建订阅 - 但不添加积分，积分由其他事件处理
+    // 从Creem数据中获取准确的周期时间
+    const periodStart = subscriptionData.current_period_start_date || new Date().toISOString();
+    const periodEnd = subscriptionData.current_period_end_date || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+    
+    console.log(`Subscription period from Creem: ${periodStart} to ${periodEnd}`);
+
+    // 更新或创建订阅 - 使用Creem提供的准确周期时间
     const existingSubscription = await getUserSubscription(user.uuid!);
     
     if (existingSubscription) {
-      // 更新现有订阅
-      await updateSubscriptionStatus(existingSubscription.creem_subscription_id || "", {
-        status: 'active',
-        cancel_at_period_end: false,
-      });
-      console.log(`Updated subscription for user ${user.uuid}`);
+      // 更新现有订阅 - 使用Creem提供的准确周期时间
+      if (existingSubscription.creem_subscription_id) {
+        await updateSubscriptionStatus(existingSubscription.creem_subscription_id, {
+          status: 'active',
+          cancel_at_period_end: false,
+          current_period_start: periodStart,
+          current_period_end: periodEnd,
+        });
+      } else {
+        await updateSubscriptionByUserId(user.uuid!, {
+          status: 'active',
+          cancel_at_period_end: false,
+          current_period_start: periodStart,
+          current_period_end: periodEnd,
+          creem_subscription_id: subscriptionData.id,
+        });
+      }
+      console.log(`Updated subscription for user ${user.uuid} with Creem period: ${periodStart} to ${periodEnd}`);
     } else {
-      // 创建新订阅
+      // 创建新订阅 - 使用Creem提供的准确周期时间
       const newSubscription = await createSubscription({
         user_uuid: user.uuid!,
         product_id: productInfo.product_id,
@@ -249,10 +292,10 @@ async function handleSubscriptionActive(event: any) {
         status: 'active',
         credits_monthly: productInfo.credits,
         creem_subscription_id: subscriptionData.id,
-        current_period_start: new Date().toISOString(),
-        current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+        current_period_start: periodStart,
+        current_period_end: periodEnd,
       });
-      console.log(`Created subscription ${newSubscription?.id} for user ${user.uuid}`);
+      console.log(`Created subscription ${newSubscription?.id} for user ${user.uuid} with Creem period: ${periodStart} to ${periodEnd}`);
     }
 
     // 注意：subscription.active事件不添加积分，积分统一由checkout.completed处理
