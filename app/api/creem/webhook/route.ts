@@ -188,6 +188,8 @@ async function handleSubscriptionActive(event: any) {
     const subscriptionData = event.data?.object || event.object || event;
     const customerEmail = subscriptionData.customer?.email;
     
+    console.log("Subscription data:", JSON.stringify(subscriptionData, null, 2));
+    
     if (!customerEmail) {
       console.error("No customer email found");
       return;
@@ -200,16 +202,25 @@ async function handleSubscriptionActive(event: any) {
       return;
     }
 
-    // 获取产品信息
-    const productId = subscriptionData.metadata?.product_id || 'starter';
+    // 获取产品信息 - 从多个可能的位置尝试获取
+    let productId = subscriptionData.metadata?.product_id || 
+                   subscriptionData.product?.metadata?.product_id ||
+                   subscriptionData.product?.id;
+    
+    console.log("Product ID found:", productId);
+    
     const productInfo = getProductInfo(productId);
     
     if (!productInfo) {
       console.error("Unknown product:", productId);
+      console.log("Available metadata:", subscriptionData.metadata);
+      console.log("Product info:", subscriptionData.product);
       return;
     }
 
-    // 更新或创建订阅
+    console.log("Product info:", productInfo);
+
+    // 更新或创建订阅 - 但不添加积分，因为首次购买的积分由checkout.completed处理
     const existingSubscription = await getUserSubscription(user.uuid!);
     
     if (existingSubscription) {
@@ -234,16 +245,9 @@ async function handleSubscriptionActive(event: any) {
       console.log(`Created subscription ${newSubscription?.id} for user ${user.uuid}`);
     }
 
-    // 添加积分
-    await increaseCredits({
-      user_uuid: user.uuid!,
-      trans_type: "subscription_payment",
-      credits: productInfo.credits,
-      expired_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-      order_no: subscriptionData.id,
-    });
-    
-    console.log(`Added ${productInfo.credits} credits for user ${user.uuid}`);
+    // 注意：subscription.active事件不添加积分，首次购买的积分由checkout.completed处理
+    // 续费的积分由subscription.paid处理
+    console.log(`Subscription activated for user ${user.uuid} - no credits added (handled by other events)`);
   } catch (error) {
     console.error("Error in handleSubscriptionActive:", error);
   }
@@ -253,11 +257,11 @@ async function handleSubscriptionActive(event: any) {
 async function handleSubscriptionPaid(event: any) {
   try {
     console.log("=== handleSubscriptionPaid ===");
-    // 对于subscription.paid事件，通常意味着月度续费
-    // 我们需要添加积分
     
     const subscriptionData = event.data?.object || event.object || event;
     const customerEmail = subscriptionData.customer?.email;
+    
+    console.log("Subscription data:", JSON.stringify(subscriptionData, null, 2));
     
     if (!customerEmail) {
       console.error("No customer email found");
@@ -270,24 +274,42 @@ async function handleSubscriptionPaid(event: any) {
       return;
     }
 
-    const productId = subscriptionData.metadata?.product_id || 'starter';
+    // 获取产品信息 - 从多个可能的位置尝试获取
+    let productId = subscriptionData.metadata?.product_id || 
+                   subscriptionData.product?.metadata?.product_id ||
+                   subscriptionData.product?.id;
+    
+    console.log("Product ID found:", productId);
+    
     const productInfo = getProductInfo(productId);
     
     if (!productInfo) {
       console.error("Unknown product:", productId);
+      console.log("Available metadata:", subscriptionData.metadata);
+      console.log("Product info:", subscriptionData.product);
       return;
     }
 
-    // 添加月度积分
-    await increaseCredits({
-      user_uuid: user.uuid!,
-      trans_type: "subscription_payment",
-      credits: productInfo.credits,
-      expired_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-      order_no: `monthly_${subscriptionData.id}_${Date.now()}`,
-    });
+    console.log("Product info:", productInfo);
+
+    // 检查是否为续费：查看是否已存在订阅记录
+    const existingSubscription = await getUserSubscription(user.uuid!);
     
-    console.log(`Added monthly ${productInfo.credits} credits for user ${user.uuid}`);
+    if (existingSubscription) {
+      // 这是续费，添加月度积分
+      await increaseCredits({
+        user_uuid: user.uuid!,
+        trans_type: "subscription_payment",
+        credits: productInfo.credits,
+        expired_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+        order_no: `renewal_${subscriptionData.id}_${Date.now()}`,
+      });
+      
+      console.log(`Added renewal ${productInfo.credits} credits for user ${user.uuid}`);
+    } else {
+      // 这是首次订阅，不在这里添加积分（由checkout.completed处理）
+      console.log(`First subscription payment for user ${user.uuid} - credits handled by checkout.completed`);
+    }
   } catch (error) {
     console.error("Error in handleSubscriptionPaid:", error);
   }
