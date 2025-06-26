@@ -245,9 +245,9 @@ const PhotoColor: React.FC = () => {
 
                 // 更新用户积分
                 setUserCredits(prev => Math.max(0, prev - 1));
-                toast.success("图片生成成功！已消耗1个积分");
+                toast.success("Image generated successfully! 1 credit used.");
             } else {
-                alert("生成失败：未收到有效的图片数据");
+                alert("Generation failed: The content or format violates content policies or legal requirements.");
             }
             
         } catch (error: any) {
