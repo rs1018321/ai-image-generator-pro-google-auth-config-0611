@@ -2,10 +2,10 @@
 // 将现有的产品ID映射到Creem的产品ID
 
 export const CREEM_PRODUCT_MAPPING = {
-  // 现有产品ID -> Creem产品ID（需要在Creem控制台创建月度订阅产品）
-  "starter": "prod_63q4LTK5JPIrh0rMTNBCWa", // Starter月度订阅产品ID
-  "standard": "prod_63q4LTK5JPIrh0rMTNBCWa", // TODO: 需要在Creem控制台创建Standard月度订阅产品并替换此ID
-  "premium": "prod_63q4LTK5JPIrh0rMTNBCWa", // TODO: 需要在Creem控制台创建Premium月度订阅产品并替换此ID
+  // 现有产品ID -> Creem生产环境产品ID
+  "starter": "prod_3dRZI1gMk2xNAtxL9nb83U", // 入门版月度订阅产品ID (100积分/月)
+  "standard": "prod_5Uh5Qgi2Kg98F4uUnqlpyP", // 标准版月度订阅产品ID (500积分/月)
+  "premium": "prod_3Rpn1q8sKOwI65Gocrtjr1", // 高级版月度订阅产品ID (1000积分/月)
 };
 
 // 获取Creem产品ID

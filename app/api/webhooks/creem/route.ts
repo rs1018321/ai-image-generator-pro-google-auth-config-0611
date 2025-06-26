@@ -387,24 +387,40 @@ async function handleSubscriptionCancelled(data: any) {
 
 // 获取产品信息
 function getProductInfo(productId: string) {
+  // 支持内部产品ID
   const productMap: Record<string, { product_id: string, plan_name: string, credits: number }> = {
     'starter': { product_id: 'starter', plan_name: 'AI涂色页生成器 入门版', credits: 100 },
     'standard': { product_id: 'standard', plan_name: 'AI涂色页生成器 标准版', credits: 500 },
     'premium': { product_id: 'premium', plan_name: 'AI涂色页生成器 高级版', credits: 1000 },
   };
 
-  return productMap[productId] || null;
+  // 支持Creem生产环境产品ID
+  const creemProductMap: Record<string, { product_id: string, plan_name: string, credits: number }> = {
+    'prod_3dRZI1gMk2xNAtxL9nb83U': { product_id: 'starter', plan_name: 'AI涂色页生成器 入门版', credits: 100 },
+    'prod_5Uh5Qgi2Kg98F4uUnqlpyP': { product_id: 'standard', plan_name: 'AI涂色页生成器 标准版', credits: 500 },
+    'prod_3Rpn1q8sKOwI65Gocrtjr1': { product_id: 'premium', plan_name: 'AI涂色页生成器 高级版', credits: 1000 },
+  };
+
+  return productMap[productId] || creemProductMap[productId] || null;
 }
 
 // 获取产品信息
 function getProductInfoByOriginalId(originalProductId: string) {
+  // 支持内部产品ID
   const productMap: Record<string, { product_id: string, plan_name: string, credits: number }> = {
     'starter': { product_id: 'starter', plan_name: 'AI涂色页生成器 入门版', credits: 100 },
     'standard': { product_id: 'standard', plan_name: 'AI涂色页生成器 标准版', credits: 500 },
     'premium': { product_id: 'premium', plan_name: 'AI涂色页生成器 高级版', credits: 1000 },
   };
 
-  return productMap[originalProductId] || null;
+  // 支持Creem生产环境产品ID
+  const creemProductMap: Record<string, { product_id: string, plan_name: string, credits: number }> = {
+    'prod_3dRZI1gMk2xNAtxL9nb83U': { product_id: 'starter', plan_name: 'AI涂色页生成器 入门版', credits: 100 },
+    'prod_5Uh5Qgi2Kg98F4uUnqlpyP': { product_id: 'standard', plan_name: 'AI涂色页生成器 标准版', credits: 500 },
+    'prod_3Rpn1q8sKOwI65Gocrtjr1': { product_id: 'premium', plan_name: 'AI涂色页生成器 高级版', credits: 1000 },
+  };
+
+  return productMap[originalProductId] || creemProductMap[originalProductId] || null;
 }
 
 // 支持GET请求用于webhook验证

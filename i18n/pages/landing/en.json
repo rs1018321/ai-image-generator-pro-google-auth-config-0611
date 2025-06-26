@@ -506,11 +506,8 @@
       {
         "title": "What file formats can I upload?",
         "description": "Upload JPEG or PNG images up to 5MB to create coloring pages."
-      },
-      {
-        "title": "Is it free to use?",
-        "description": "Basic features are free. Premium plans unlock higher resolution and batch processing."
       }
+     
     ]
   },
   "cta": {
