@@ -149,7 +149,7 @@ export default function CreditConfirmModal({
               fontSize: '16px',
               color: '#666'
             }}>
-              Generating image will consume {credits} credits
+              Each image generation costs {credits} credit{credits > 1 ? 's' : ''}
             </DialogDescription>
           </DialogHeader>
           
@@ -237,7 +237,7 @@ export default function CreditConfirmModal({
             fontSize: '16px',
             color: '#666'
           }}>
-            Generating image will consume {credits} credits
+            Each image generation costs {credits} credit{credits > 1 ? 's' : ''}
           </DrawerDescription>
         </DrawerHeader>
         

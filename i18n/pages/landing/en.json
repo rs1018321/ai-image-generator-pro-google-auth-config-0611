@@ -369,10 +369,13 @@
         "product_name": "AI Coloring Page Generator Starter",
         "features": [
           "100 credits per month",
+          "Each image costs 1 credit",
           "High-quality AI generation",
           "Basic coloring page templates",
           "PNG format download",
-          "Email support"
+          "Email support",
+          "Personal use license",
+          "Basic customer support"
         ],
         "button": {
           "text": "Subscribe Now",
@@ -396,11 +399,13 @@
         "is_featured": true,
         "features": [
           "500 credits per month",
+          "Each image costs 1 credit",
           "Advanced AI generation algorithms",
           "Multiple artistic styles",
           "PDF + PNG formats",
           "Priority email support",
-          "Batch generation feature"
+          "Batch generation feature",
+          "Commercial use license"
         ],
         "button": {
           "text": "Subscribe Now",
@@ -422,6 +427,7 @@
         "product_name": "AI Coloring Page Generator Premium",
         "features": [
           "1000 credits per month",
+          "Each image costs 1 credit",
           "Top-tier AI generation engine",
           "All artistic styles",
           "High-resolution output",
@@ -549,24 +555,6 @@
     },
     "social": {
       "items": [
-        {
-          "title": "X",
-          "icon": "RiTwitterXFill",
-          "url": "https://x.com/coloringpageai",
-          "target": "_blank"
-        },
-        {
-          "title": "Github",
-          "icon": "RiGithubFill",
-          "url": "https://github.com/coloringpageai",
-          "target": "_blank"
-        },
-        {
-          "title": "Discord",
-          "icon": "RiDiscordFill",
-          "url": "https://discord.gg/HQNnrzjZQS",
-          "target": "_blank"
-        },
         {
           "title": "Email",
           "icon": "RiMailLine",

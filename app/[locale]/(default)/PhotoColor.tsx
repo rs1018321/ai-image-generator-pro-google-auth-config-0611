@@ -1301,62 +1301,89 @@ const PhotoColor: React.FC = () => {
                                     </div>
                                     <div style={{display: "flex", gap: "10px", justifyContent: "center", alignItems: "center"}}>
                                         {/* Twitter Logo */}
-                                        <div style={{
-                                            width: "28px",
-                                            height: "28px",
-                                            borderRadius: "50%",
-                                            backgroundColor: "#1DA1F2",
-                                            display: "flex",
-                                            justifyContent: "center",
-                                            alignItems: "center",
-                                            cursor: "pointer",
-                                            transition: "transform 0.2s"
-                                        }}>
+                                        <div 
+                                            style={{ 
+                                                width: "28px",
+                                                height: "28px",
+                                                borderRadius: "50%", 
+                                                backgroundColor: "#1DA1F2", 
+                                                display: "flex", 
+                                                justifyContent: "center", 
+                                                alignItems: "center",
+                                                cursor: "pointer",
+                                                transition: "transform 0.2s"
+                                            }}
+                                            onClick={() => {
+                                                const shareText = "Check out this amazing AI-generated coloring page I created!";
+                                                const shareUrl = window.location.href;
+                                                window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`, '_blank');
+                                            }}
+                                        >
                                             <TwitterLogoIcon style={{color: "white", fontSize: "14px"}}/>
                                         </div>
-
+                                        
                                         {/* Facebook Logo */}
-                                        <div style={{
-                                            width: "28px",
-                                            height: "28px",
-                                            borderRadius: "50%",
-                                            backgroundColor: "#4267B2",
-                                            display: "flex",
-                                            justifyContent: "center",
-                                            alignItems: "center",
-                                            cursor: "pointer",
-                                            transition: "transform 0.2s"
-                                        }}>
+                                        <div 
+                                            style={{ 
+                                                width: "28px",
+                                                height: "28px",
+                                                borderRadius: "50%", 
+                                                backgroundColor: "#4267B2", 
+                                                display: "flex", 
+                                                justifyContent: "center", 
+                                                alignItems: "center",
+                                                cursor: "pointer",
+                                                transition: "transform 0.2s"
+                                            }}
+                                            onClick={() => {
+                                                const shareUrl = window.location.href;
+                                                window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, '_blank');
+                                            }}
+                                        >
                                             <FaFacebookF style={{color: "white", fontSize: "14px"}}/>
                                         </div>
-
+                                        
                                         {/* LinkedIn Logo */}
-                                        <div style={{
-                                            width: "28px",
-                                            height: "28px",
-                                            borderRadius: "50%",
-                                            backgroundColor: "#0077B5",
-                                            display: "flex",
-                                            justifyContent: "center",
-                                            alignItems: "center",
-                                            cursor: "pointer",
-                                            transition: "transform 0.2s"
-                                        }}>
+                                        <div 
+                                            style={{ 
+                                                width: "28px",
+                                                height: "28px",
+                                                borderRadius: "50%", 
+                                                backgroundColor: "#0077B5", 
+                                                display: "flex", 
+                                                justifyContent: "center", 
+                                                alignItems: "center",
+                                                cursor: "pointer",
+                                                transition: "transform 0.2s"
+                                            }}
+                                            onClick={() => {
+                                                const shareText = "Check out this amazing AI-generated coloring page I created!";
+                                                const shareUrl = window.location.href;
+                                                window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`, '_blank');
+                                            }}
+                                        >
                                             <FaLinkedinIn style={{color: "white", fontSize: "14px"}}/>
                                         </div>
-
+                                        
                                         {/* WhatsApp Logo */}
-                                        <div style={{
-                                            width: "28px",
-                                            height: "28px",
-                                            borderRadius: "50%",
-                                            backgroundColor: "#25D366",
-                                            display: "flex",
-                                            justifyContent: "center",
-                                            alignItems: "center",
-                                            cursor: "pointer",
-                                            transition: "transform 0.2s"
-                                        }}>
+                                        <div 
+                                            style={{ 
+                                                width: "28px",
+                                                height: "28px",
+                                                borderRadius: "50%", 
+                                                backgroundColor: "#25D366", 
+                                                display: "flex", 
+                                                justifyContent: "center", 
+                                                alignItems: "center",
+                                                cursor: "pointer",
+                                                transition: "transform 0.2s"
+                                            }}
+                                            onClick={() => {
+                                                const shareText = "Check out this amazing AI-generated coloring page I created!";
+                                                const shareUrl = window.location.href;
+                                                window.open(`https://wa.me/?text=${encodeURIComponent(shareText + ' ' + shareUrl)}`, '_blank');
+                                            }}
+                                        >
                                             <FaWhatsapp style={{color: "white", fontSize: "14px"}}/>
                                         </div>
                                     </div>
@@ -2145,63 +2172,90 @@ const PhotoColor: React.FC = () => {
                     </div>
                             <div style={{display: "flex", gap: "10px", justifyContent: "center", alignItems: "center"}}>
                         {/* Twitter Logo */}
-                        <div style={{ 
-                                    width: "28px",
-                                    height: "28px",
-                            borderRadius: "50%", 
-                            backgroundColor: "#1DA1F2", 
-                            display: "flex", 
-                            justifyContent: "center", 
-                            alignItems: "center",
-                            cursor: "pointer",
-                            transition: "transform 0.2s"
-                        }}>
-                                    <TwitterLogoIcon style={{color: "white", fontSize: "14px"}}/>
+                        <div 
+                            style={{ 
+                                width: "28px",
+                                height: "28px",
+                                borderRadius: "50%", 
+                                backgroundColor: "#1DA1F2", 
+                                display: "flex", 
+                                justifyContent: "center", 
+                                alignItems: "center",
+                                cursor: "pointer",
+                                transition: "transform 0.2s"
+                            }}
+                            onClick={() => {
+                                const shareText = "Check out this amazing AI-generated coloring page I created!";
+                                const shareUrl = window.location.href;
+                                window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`, '_blank');
+                            }}
+                        >
+                            <TwitterLogoIcon style={{color: "white", fontSize: "14px"}}/>
                         </div>
                         
                         {/* Facebook Logo */}
-                        <div style={{ 
-                                    width: "28px",
-                                    height: "28px",
-                            borderRadius: "50%", 
-                            backgroundColor: "#4267B2", 
-                            display: "flex", 
-                            justifyContent: "center", 
-                            alignItems: "center",
-                            cursor: "pointer",
-                            transition: "transform 0.2s"
-                        }}>
-                                    <FaFacebookF style={{color: "white", fontSize: "14px"}}/>
+                        <div 
+                            style={{ 
+                                width: "28px",
+                                height: "28px",
+                                borderRadius: "50%", 
+                                backgroundColor: "#4267B2", 
+                                display: "flex", 
+                                justifyContent: "center", 
+                                alignItems: "center",
+                                cursor: "pointer",
+                                transition: "transform 0.2s"
+                            }}
+                            onClick={() => {
+                                const shareUrl = window.location.href;
+                                window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, '_blank');
+                            }}
+                        >
+                            <FaFacebookF style={{color: "white", fontSize: "14px"}}/>
                         </div>
                         
                         {/* LinkedIn Logo */}
-                        <div style={{ 
-                                    width: "28px",
-                                    height: "28px",
-                            borderRadius: "50%", 
-                            backgroundColor: "#0077B5", 
-                            display: "flex", 
-                            justifyContent: "center", 
-                            alignItems: "center",
-                            cursor: "pointer",
-                            transition: "transform 0.2s"
-                        }}>
-                                    <FaLinkedinIn style={{color: "white", fontSize: "14px"}}/>
+                        <div 
+                            style={{ 
+                                width: "28px",
+                                height: "28px",
+                                borderRadius: "50%", 
+                                backgroundColor: "#0077B5", 
+                                display: "flex", 
+                                justifyContent: "center", 
+                                alignItems: "center",
+                                cursor: "pointer",
+                                transition: "transform 0.2s"
+                            }}
+                            onClick={() => {
+                                const shareText = "Check out this amazing AI-generated coloring page I created!";
+                                const shareUrl = window.location.href;
+                                window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`, '_blank');
+                            }}
+                        >
+                            <FaLinkedinIn style={{color: "white", fontSize: "14px"}}/>
                         </div>
                         
                         {/* WhatsApp Logo */}
-                        <div style={{ 
-                                    width: "28px",
-                                    height: "28px",
-                            borderRadius: "50%", 
-                            backgroundColor: "#25D366", 
-                            display: "flex", 
-                            justifyContent: "center", 
-                            alignItems: "center",
-                            cursor: "pointer",
-                            transition: "transform 0.2s"
-                        }}>
-                                    <FaWhatsapp style={{color: "white", fontSize: "14px"}}/>
+                        <div 
+                            style={{ 
+                                width: "28px",
+                                height: "28px",
+                                borderRadius: "50%", 
+                                backgroundColor: "#25D366", 
+                                display: "flex", 
+                                justifyContent: "center", 
+                                alignItems: "center",
+                                cursor: "pointer",
+                                transition: "transform 0.2s"
+                            }}
+                            onClick={() => {
+                                const shareText = "Check out this amazing AI-generated coloring page I created!";
+                                const shareUrl = window.location.href;
+                                window.open(`https://wa.me/?text=${encodeURIComponent(shareText + ' ' + shareUrl)}`, '_blank');
+                            }}
+                        >
+                            <FaWhatsapp style={{color: "white", fontSize: "14px"}}/>
                         </div>
                     </div>
                 </div>
