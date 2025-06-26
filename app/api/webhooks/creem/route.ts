@@ -86,6 +86,11 @@ export async function POST(request: NextRequest) {
         await handleCheckoutCompleted(event);
         break;
 
+      case "subscription.active":
+        console.log("Processing subscription active event");
+        await handleSubscriptionActive(event);
+        break;
+
       case "subscription.paid":
       case "invoice.payment_succeeded":
         console.log("Processing subscription paid event");
@@ -421,6 +426,81 @@ function getProductInfoByOriginalId(originalProductId: string) {
   };
 
   return productMap[originalProductId] || creemProductMap[originalProductId] || null;
+}
+
+// 处理订阅激活事件 (Creem特有)
+async function handleSubscriptionActive(data: any) {
+  try {
+    console.log("Processing subscription.active event:", data);
+    
+    const customerEmail = data.customer?.email;
+    if (!customerEmail) {
+      console.error("No customer email in subscription.active event");
+      return;
+    }
+
+    // 获取用户
+    const user = await findUserByEmail(customerEmail);
+    if (!user) {
+      console.error("User not found for email:", customerEmail);
+      return;
+    }
+
+    // 获取产品信息
+    const productInfo = getProductInfo(data.subscription?.product_id);
+    if (!productInfo) {
+      console.error("Unknown product ID:", data.subscription?.product_id);
+      return;
+    }
+
+    // 检查是否已有活跃订阅
+    const existingSubscription = await getUserSubscription(user.uuid!);
+    
+    if (existingSubscription && existingSubscription.status === 'active') {
+      console.log("User already has active subscription, updating it");
+      // 更新现有订阅
+      await updateSubscriptionStatus(existingSubscription.creem_subscription_id || "", {
+        status: 'active',
+        current_period_end: new Date(data.subscription?.current_period_end * 1000).toISOString(),
+        cancel_at_period_end: false,
+      });
+    } else {
+      console.log("Creating new subscription for user");
+      // 创建新订阅
+      const newSubscription = await createSubscription({
+        user_uuid: user.uuid!,
+        product_id: productInfo.product_id,
+        plan_name: productInfo.plan_name,
+        status: 'active',
+        credits_monthly: productInfo.credits,
+        creem_subscription_id: data.subscription?.id,
+        current_period_start: new Date().toISOString(),
+        current_period_end: new Date(data.subscription?.current_period_end * 1000).toISOString(),
+      });
+      
+      if (!newSubscription) {
+        throw new Error("Failed to create subscription in database.");
+      }
+      console.log(`Successfully created subscription ${newSubscription.id} for user ${user.uuid}`);
+    }
+
+    // 添加积分 - 使用订阅ID作为order_no确保幂等
+    const orderNoForCredit = data.subscription?.id;
+    console.log(`Adding ${productInfo.credits} credits for user ${user.uuid} with order_no ${orderNoForCredit}`);
+    
+    await increaseCredits({
+      user_uuid: user.uuid!,
+      trans_type: "subscription_payment",
+      credits: productInfo.credits,
+      expired_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+      order_no: orderNoForCredit,
+    });
+    console.log("Successfully added credits via subscription.active webhook");
+
+    console.log("--- Subscription.active event processed successfully ---", customerEmail);
+  } catch (error) {
+    console.error("Error handling subscription.active:", error);
+  }
 }
 
 // 支持GET请求用于webhook验证
