@@ -81,6 +81,7 @@
       "trans_no": "Trans No",
       "trans_type": "Trans Type",
       "credits": "Credits",
+      "balance": "Balance",
       "updated_at": "Updated At",
       "status": "Status"
     }
