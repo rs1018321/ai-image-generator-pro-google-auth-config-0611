@@ -55,21 +55,16 @@ const accordionData = [
     },
     {
         id: '3',
-        title: 'Is it free to use?',
-        content: 'Yes! Our core features are completely free to use and require no login. You can try the image or text-to-line-art features instantly. We believe creativity should be accessible to everyone.'
-    },
-    {
-        id: '4',
         title: 'Is my uploaded image safe?',
         content: 'We respect your privacy. Your images are processed securely and never used for training or shared with anyone. You stay in control of your content. Files are automatically deleted after a short time.'
     },
     {
-        id: '5',
+        id: '4',
         title: 'Can I generate coloring pages just by typing text?',
         content: 'Absolutely! Just describe your scene or character, and our model will turn it into a beautiful black-and-white outline. It\'s that easy. You can even try fun prompts like "a dog flying a spaceship"!'
     },
     {
-        id: '6',
+        id: '5',
         title: 'How accurate is the generation?',
         content: 'Very! Our model is fine-tuned for Ghibli-like features — soft lines, fantasy details, and charm. But results still depend on image quality and your text description clarity. Try uploading a clean portrait or a clear idea for best results.'
     }
