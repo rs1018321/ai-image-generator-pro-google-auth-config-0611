@@ -7,6 +7,7 @@ import {
 } from "@/models/subscription";
 import { increaseCredits } from "@/services/credit";
 import { findUserByEmail } from "@/models/user";
+import { findCreditByOrderNo } from "@/models/credit";
 
 export async function POST(request: NextRequest) {
   try {
@@ -145,6 +146,16 @@ async function handleCheckoutCompleted(event: any) {
 
     console.log(`Processing checkout for user ${user.uuid}, product: ${productId}`);
 
+    // 获取订单号用于去重检查
+    const orderNo = metadata.order_no || checkoutData.id;
+    
+    // 检查是否已经为此订单添加过积分
+    const existingCredit = await checkExistingCreditByOrderNo(user.uuid!, orderNo);
+    if (existingCredit) {
+      console.log(`Credits already added for order ${orderNo}, skipping duplicate addition`);
+      return;
+    }
+
     // 创建或更新订阅
     const existingSubscription = await getUserSubscription(user.uuid!);
     
@@ -165,7 +176,6 @@ async function handleCheckoutCompleted(event: any) {
     }
 
     // 添加积分
-    const orderNo = metadata.order_no || checkoutData.id;
     await increaseCredits({
       user_uuid: user.uuid!,
       trans_type: "subscription_payment",
@@ -174,7 +184,7 @@ async function handleCheckoutCompleted(event: any) {
       order_no: orderNo,
     });
     
-    console.log(`Added ${productInfo.credits} credits for user ${user.uuid}`);
+    console.log(`Added ${productInfo.credits} credits for user ${user.uuid} for order ${orderNo}`);
   } catch (error) {
     console.error("Error in handleCheckoutCompleted:", error);
   }
@@ -220,7 +230,7 @@ async function handleSubscriptionActive(event: any) {
 
     console.log("Product info:", productInfo);
 
-    // 更新或创建订阅 - 但不添加积分，因为首次购买的积分由checkout.completed处理
+    // 更新或创建订阅 - 但不添加积分，积分由其他事件处理
     const existingSubscription = await getUserSubscription(user.uuid!);
     
     if (existingSubscription) {
@@ -245,9 +255,8 @@ async function handleSubscriptionActive(event: any) {
       console.log(`Created subscription ${newSubscription?.id} for user ${user.uuid}`);
     }
 
-    // 注意：subscription.active事件不添加积分，首次购买的积分由checkout.completed处理
-    // 续费的积分由subscription.paid处理
-    console.log(`Subscription activated for user ${user.uuid} - no credits added (handled by other events)`);
+    // 注意：subscription.active事件不添加积分，积分统一由checkout.completed处理
+    console.log(`Subscription activated for user ${user.uuid} - credits handled by checkout.completed`);
   } catch (error) {
     console.error("Error in handleSubscriptionActive:", error);
   }
@@ -292,26 +301,59 @@ async function handleSubscriptionPaid(event: any) {
 
     console.log("Product info:", productInfo);
 
-    // 检查是否为续费：查看是否已存在订阅记录
-    const existingSubscription = await getUserSubscription(user.uuid!);
+    // 从订阅数据中获取交易信息，用于生成唯一的订单号
+    const transactionId = subscriptionData.last_transaction_id || subscriptionData.last_transaction?.id;
+    const orderNo = subscriptionData.metadata?.order_no || `sub_payment_${subscriptionData.id}_${transactionId}`;
     
-    if (existingSubscription) {
-      // 这是续费，添加月度积分
+    console.log("Order/Transaction ID:", orderNo);
+
+    // 检查是否已经为此订单添加过积分
+    const existingCredit = await checkExistingCreditByOrderNo(user.uuid!, orderNo);
+    if (existingCredit) {
+      console.log(`Credits already added for order ${orderNo}, skipping duplicate addition`);
+      return;
+    }
+
+    // 检查是否为续费（查看metadata中的order_no是否存在）
+    const isRenewal = !subscriptionData.metadata?.order_no;
+    
+    if (isRenewal) {
+      // 这是续费，添加积分
       await increaseCredits({
         user_uuid: user.uuid!,
         trans_type: "subscription_payment",
         credits: productInfo.credits,
         expired_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-        order_no: `renewal_${subscriptionData.id}_${Date.now()}`,
+        order_no: orderNo,
       });
       
-      console.log(`Added renewal ${productInfo.credits} credits for user ${user.uuid}`);
+      console.log(`Added renewal ${productInfo.credits} credits for user ${user.uuid} for order ${orderNo}`);
     } else {
       // 这是首次订阅，不在这里添加积分（由checkout.completed处理）
       console.log(`First subscription payment for user ${user.uuid} - credits handled by checkout.completed`);
     }
   } catch (error) {
     console.error("Error in handleSubscriptionPaid:", error);
+  }
+}
+
+// 检查指定订单号是否已经添加过积分
+async function checkExistingCreditByOrderNo(userUuid: string, orderNo: string): Promise<boolean> {
+  try {
+    console.log(`Checking existing credit for user ${userUuid} and order ${orderNo}`);
+    
+    const existingCredit = await findCreditByOrderNo(orderNo);
+    
+    if (existingCredit) {
+      console.log(`Found existing credit record for order ${orderNo}:`, existingCredit);
+      return true;
+    }
+    
+    console.log(`No existing credit found for order ${orderNo}`);
+    return false;
+  } catch (error) {
+    console.error("Error checking existing credit:", error);
+    return false;
   }
 }
 
