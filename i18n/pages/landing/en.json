@@ -368,7 +368,7 @@
         "product_id": "starter",
         "product_name": "AI Coloring Page Generator Starter",
         "features": [
-          "100 credits per month",
+          "100 credits per month (Each image generation costs 1 credit)",
           "Top-tier AI generation engine",
           "High-resolution output",
           "Multiple artistic styles",
@@ -396,7 +396,7 @@
         "label": "Most Popular",
         "is_featured": true,
         "features": [
-          "500 credits per month",
+          "500 credits per month (Each image generation costs 1 credit)",
           "Top-tier AI generation engine",
           "High-resolution output",
           "Multiple artistic styles",
@@ -422,7 +422,7 @@
         "product_id": "premium",
         "product_name": "AI Coloring Page Generator Premium",
         "features": [
-          "1000 credits per month",
+          "1000 credits per month (Each image generation costs 1 credit)",
           "Top-tier AI generation engine",
           "High-resolution output",
           "Multiple artistic styles",
@@ -541,16 +541,16 @@
         "src": "/imgs/logo.png",
         "alt": "Coloring-Pages.app"
       },
-      "url": "https://mimi-panda.com/en"
+      "url": "Coloring-Pages.app"
     },
-    "copyright": "© 2025 • Coloring Page All rights reserved.",
+    "copyright": "© 2025 • Coloring-Pages.app All rights reserved.",
     "nav": {
       "items": []
     },
     "social": {
       "items": [
         {
-          "title": "support@coloring-pages.app",
+          "title": "support@Coloring-Pages.app",
           "icon": "RiMailLine",
           "url": "mailto:support@coloring-pages.app",
           "target": "_self"

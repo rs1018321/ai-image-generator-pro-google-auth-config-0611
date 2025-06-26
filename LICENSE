@@ -1,77 +1,84 @@
-ShipAny AI SaaS Boilerplate License Agreement
-
-TL;DR;
-Personal License: Build unlimited AI SaaS products as an individual developer.
-Team License: Build unlimited AI SaaS products as a team.
-
-This License Agreement ("Agreement") is made between ShipAny ("Licensor"), and you ("Licensee"), concerning the use of ShipAny AI SaaS Boilerplate ("Product"). By using the Product, you agree to these terms.
-
 1. License Types and Rights
-
 1.1 Personal License
+Coloring Pages grants you a Personal License which includes:
 
-ShipAny grants you a Personal License that includes:
+The right to develop unlimited AI SaaS applications.
 
-- Development of unlimited AI SaaS applications
-- Use of all included AI service templates and components
-- Commercial usage rights for your developed applications
-- Access to basic documentation and community support
+Use of all provided AI service templates, UI components, and features.
 
-  1.2 Team License
+Commercial usage rights for your developed applications.
 
-ShipAny grants you a Team License that includes:
+Access to basic documentation and community support.
 
-- All Personal License features
-- Team collaboration capabilities
-- Premium AI integration templates
-- Enterprise-ready features and configurations
-- Priority technical support
-- Advanced AI service implementation guides
+1.2 Team License
+Coloring Pages grants you a Team License which includes:
+
+All features of the Personal License.
+
+Team collaboration features and shared workflows.
+
+Access to premium AI integration templates.
+
+Enterprise-grade features and configurations.
+
+Priority technical support.
+
+Access to advanced AI service implementation guides.
 
 2. Usage Restrictions
+By using this Product, you agree not to:
 
-You agree not to:
+Resell, redistribute, or sublicense the boilerplate code as a standalone product.
 
-- Resell the boilerplate code as a standalone product
-- Share license keys or access credentials
-- Remove ShipAny attribution and copyright notices
-- Redistribute the source code publicly
-- Create competing AI boilerplate products
-- Use the code in violation of any laws or regulations
+Share license keys, API keys, or any access credentials.
+
+Remove the Coloring Pages attribution or copyright notices.
+
+Distribute the source code publicly (e.g., on GitHub, marketplaces, etc.).
+
+Create or offer a directly competing AI SaaS boilerplate or starter kit.
+
+Use the Product in violation of any applicable laws or regulations.
 
 3. Intellectual Property
-
-The Product, including all source code, documentation, and AI integration templates, remains the exclusive property of ShipAny. Your license grants you usage rights but not ownership of the Product.
+The Product, including all source code, documentation, design assets, and AI templates, remains the exclusive property of Coloring Pages. This Agreement grants you a license to use the Product, but it does not transfer ownership.
 
 4. Warranty Disclaimer
-
-The Product is provided "as is" without warranty. ShipAny does not guarantee that the Product will meet your specific requirements or be error-free.
+The Product is provided “as is” without any warranties of any kind, express or implied. Coloring Pages does not guarantee that the Product will meet your specific needs, be bug-free, or operate without interruptions.
 
 5. Liability Limitations
+Coloring Pages is not liable for any damages or losses resulting from:
 
-ShipAny shall not be liable for any damages arising from:
+The use or inability to use the Product.
 
-- Use or inability to use the Product
-- Integration with third-party AI services
-- Data processing or AI model operations
-- Service interruptions or failures
+Integration with third-party AI services.
+
+Data processing, AI model behavior, or output.
+
+Service outages, interruptions, or failures.
 
 6. Term and Termination
+This license remains valid until terminated. Coloring Pages may terminate your license immediately if you breach any terms of this Agreement. Upon termination:
 
-ShipAny may terminate your license if you breach this Agreement. Upon termination, you must cease using the Product and destroy all copies.
+You must cease all use of the Product.
+
+You must delete all copies of the Product from your systems.
 
 7. Support and Updates
+Personal License: Includes access to community-based support.
 
-- Personal License includes community support
-- Team License includes priority email support
-- Updates and improvements are provided at ShipAny's discretion
+Team License: Includes priority email support via support@coloring-pages.app.
+
+Updates, improvements, and bug fixes are provided at Coloring Pages’ sole discretion.
 
 8. General Provisions
+This Agreement is governed by the laws of Singapore.
 
-This Agreement is governed by the laws of Singapore. Any disputes shall be resolved in the courts of Singapore.
+Any disputes will be handled exclusively by the courts in Singapore.
 
-Last Updated: [2024-12-30]
+By using the Product, you acknowledge that you have read and understood this Agreement and agree to be bound by its terms.
 
-ShipAny
-Website: https://shipany.ai
-Contact: support@shipany.ai
+Last Updated: [2025-06-25]
+Coloring Pages
+Website: https://coloring-pages.app
+Contact: support@coloring-pages.app

@@ -500,7 +500,7 @@
         "src": "/imgs/brand/logo.png",
         "alt": "Coloring-Pages.app"
       },
-      "url": "https://mimi-panda.com/zh"
+      "url": "Coloring-Pages.app"
     },
     "copyright": "© 2025 • Coloring Page 保留所有权利。",
     "nav": {
@@ -509,7 +509,7 @@
     "social": {
       "items": [
         {
-          "title": "support@coloring-pages.app",
+          "title": "support@Coloring-Pages.app",
           "icon": "RiMailLine",
           "url": "mailto:support@coloring-pages.app",
           "target": "_self"
