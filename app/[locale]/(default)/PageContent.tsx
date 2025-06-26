@@ -829,6 +829,7 @@ export default function LandingPage({page, locale}: LandingPageProps) {
             </div>
 
             {/* What Users Say About Coloring Page 标题部份 */}
+            {/* 暂时注释掉用户评价部分
             <div style={{marginTop: '8rem'}}>
                 <h3 className={styles.accordionTitle}>What Users Say About Coloring-Pages.app</h3>
                 <p className={styles.accordionTip}>Hear from artists, fans, and creators who use our Coloring Page AI
@@ -836,6 +837,7 @@ export default function LandingPage({page, locale}: LandingPageProps) {
             </div>
 
             {/* 2列card 部分 */}
+            {/* 
             <div className={styles.testimonialsContainer}>
                 {testimonials.map((testimonial, index) => (
                     <div key={index}
@@ -876,6 +878,7 @@ export default function LandingPage({page, locale}: LandingPageProps) {
                     </div>
                 ))}
             </div>
+            */}
 
             {/* FAQ 标题部份 */}
             <div id="faq" style={{marginTop: '12rem', marginBottom: '3rem'}}>
