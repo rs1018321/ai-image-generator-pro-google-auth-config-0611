@@ -369,13 +369,11 @@
         "product_name": "AI Coloring Page Generator Starter",
         "features": [
           "100 credits per month",
-          "Each image costs 1 credit",
-          "High-quality AI generation",
-          "Basic coloring page templates",
-          "PNG format download",
-          "Email support",
-          "Personal use license",
-          "Basic customer support"
+          "Top-tier AI generation engine",
+          "High-resolution output",
+          "Multiple artistic styles",
+          "Priority email support",
+          "PNG format download"
         ],
         "button": {
           "text": "Subscribe Now",
@@ -399,13 +397,11 @@
         "is_featured": true,
         "features": [
           "500 credits per month",
-          "Each image costs 1 credit",
-          "Advanced AI generation algorithms",
+          "Top-tier AI generation engine",
+          "High-resolution output",
           "Multiple artistic styles",
-          "PDF + PNG formats",
           "Priority email support",
-          "Batch generation feature",
-          "Commercial use license"
+          "PNG format download"
         ],
         "button": {
           "text": "Subscribe Now",
@@ -427,13 +423,11 @@
         "product_name": "AI Coloring Page Generator Premium",
         "features": [
           "1000 credits per month",
-          "Each image costs 1 credit",
           "Top-tier AI generation engine",
-          "All artistic styles",
           "High-resolution output",
-          "API access",
-          "Dedicated customer support",
-          "Commercial use license"
+          "Multiple artistic styles",
+          "Priority email support",
+          "PNG format download"
         ],
         "button": {
           "text": "Subscribe Now",
@@ -556,9 +550,9 @@
     "social": {
       "items": [
         {
-          "title": "Email",
+          "title": "support@coloring-pages.app",
           "icon": "RiMailLine",
-          "url": "mailto:support@coloringpage.ai",
+          "url": "mailto:support@coloring-pages.app",
           "target": "_self"
         }
       ]
