@@ -152,7 +152,7 @@ export default function CreditConfirmModal({
               color: hasEnoughCredits ? '#679fb5' : '#f44336',
               fontSize: '24px'
             }}>
-              {hasEnoughCredits ? 'Confirm Image Generation' : 'Insufficient Credits'}
+              {hasEnoughCredits ? 'Confirm Image Generation' : 'Need More Credits?'}
             </DialogTitle>
             <DialogDescription style={{ 
               fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
@@ -161,7 +161,7 @@ export default function CreditConfirmModal({
             }}>
               {hasEnoughCredits 
                 ? `Generating image will consume ${credits} credit`
-                : '您的账户积分不足，请订阅套餐后继续使用'
+                : ''
               }
             </DialogDescription>
           </DialogHeader>
@@ -207,10 +207,10 @@ export default function CreditConfirmModal({
             ) : (
               <div className="text-center py-4">
                 <div style={{ fontSize: '16px', color: '#666', marginBottom: '16px' }}>
-                  生成图片需要 {credits} 个积分，但您当前只有 {leftCredits} 个积分
+                Choose a plan to refill and keep creating!
                 </div>
                 <div style={{ fontSize: '14px', color: '#999' }}>
-                  订阅我们的套餐，获得更多积分继续创作精美的涂色页！
+                Each image costs 1 credit
                 </div>
               </div>
             )}
@@ -252,7 +252,7 @@ export default function CreditConfirmModal({
                   borderColor: '#4CAF50'
                 }}
               >
-                订阅套餐
+                Get Credits
               </Button>
             )}
           </div>
@@ -270,7 +270,7 @@ export default function CreditConfirmModal({
             color: hasEnoughCredits ? '#679fb5' : '#f44336',
             fontSize: '24px'
           }}>
-            {hasEnoughCredits ? 'Confirm Image Generation' : 'Insufficient Credits'}
+            {hasEnoughCredits ? 'Confirm Image Generation' : 'Need More Credits?'}
           </DrawerTitle>
           <DrawerDescription style={{ 
             fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
@@ -279,7 +279,7 @@ export default function CreditConfirmModal({
           }}>
             {hasEnoughCredits 
               ? `Generating image will consume ${credits} credit`
-              : '您的账户积分不足，请订阅套餐后继续使用'
+              : ''
             }
           </DrawerDescription>
         </DrawerHeader>
@@ -325,10 +325,10 @@ export default function CreditConfirmModal({
           ) : (
             <div className="text-center py-4">
               <div style={{ fontSize: '16px', color: '#666', marginBottom: '16px' }}>
-                生成图片需要 {credits} 个积分，但您当前只有 {leftCredits} 个积分
+              Choose a plan to refill and keep creating!
               </div>
               <div style={{ fontSize: '14px', color: '#999' }}>
-                订阅我们的套餐，获得更多积分继续创作精美的涂色页！
+              Each image costs 1 credit
               </div>
             </div>
           )}
