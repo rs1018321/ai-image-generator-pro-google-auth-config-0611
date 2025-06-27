@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 
 import {
   Dialog,
@@ -121,6 +122,7 @@ export default function CreditConfirmModal({
   leftCredits,
 }: CreditConfirmModalProps) {
   const t = useTranslations();
+  const router = useRouter();
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   const handleConfirm = () => {
@@ -132,6 +134,14 @@ export default function CreditConfirmModal({
     onOpenChange(false);
   };
 
+  const handleSubscribe = () => {
+    onOpenChange(false);
+    router.push('/pricing');
+  };
+
+  // 检查积分是否足够
+  const hasEnoughCredits = leftCredits >= credits;
+
   if (isDesktop) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
@@ -139,17 +149,20 @@ export default function CreditConfirmModal({
           <DialogHeader>
             <DialogTitle style={{ 
               fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
-              color: '#679fb5',
+              color: hasEnoughCredits ? '#679fb5' : '#f44336',
               fontSize: '24px'
             }}>
-              Confirm Image Generation
+              {hasEnoughCredits ? 'Confirm Image Generation' : 'Insufficient Credits'}
             </DialogTitle>
             <DialogDescription style={{ 
               fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
               fontSize: '16px',
               color: '#666'
             }}>
-              Generating image will consume {credits} credit
+              {hasEnoughCredits 
+                ? `Generating image will consume ${credits} credit`
+                : '您的账户积分不足，请订阅套餐后继续使用'
+              }
             </DialogDescription>
           </DialogHeader>
           
@@ -167,27 +180,40 @@ export default function CreditConfirmModal({
               </span>
             </div>
             
-            <div className="flex justify-between items-center mb-4">
-              <span style={{ fontSize: '16px', color: '#333' }}>This generation:</span>
-              <span style={{ 
-                fontSize: '18px', 
-                fontWeight: 'bold', 
-                color: '#ff9800' 
-              }}>
-                -{credits} credit{credits > 1 ? 's' : ''}
-              </span>
-            </div>
-            
-            <div className="flex justify-between items-center border-t pt-2">
-              <span style={{ fontSize: '16px', color: '#333' }}>Balance after generation:</span>
-              <span style={{ 
-                fontSize: '18px', 
-                fontWeight: 'bold', 
-                color: leftCredits >= credits ? '#4CAF50' : '#f44336' 
-              }}>
-                {Math.max(0, leftCredits - credits)} credits
-              </span>
-            </div>
+            {hasEnoughCredits ? (
+              <>
+                <div className="flex justify-between items-center mb-4">
+                  <span style={{ fontSize: '16px', color: '#333' }}>This generation:</span>
+                  <span style={{ 
+                    fontSize: '18px', 
+                    fontWeight: 'bold', 
+                    color: '#ff9800' 
+                  }}>
+                    -{credits} credit{credits > 1 ? 's' : ''}
+                  </span>
+                </div>
+                
+                <div className="flex justify-between items-center border-t pt-2">
+                  <span style={{ fontSize: '16px', color: '#333' }}>Balance after generation:</span>
+                  <span style={{ 
+                    fontSize: '18px', 
+                    fontWeight: 'bold', 
+                    color: leftCredits >= credits ? '#4CAF50' : '#f44336' 
+                  }}>
+                    {Math.max(0, leftCredits - credits)} credits
+                  </span>
+                </div>
+              </>
+            ) : (
+              <div className="text-center py-4">
+                <div style={{ fontSize: '16px', color: '#666', marginBottom: '16px' }}>
+                  生成图片需要 {credits} 个积分，但您当前只有 {leftCredits} 个积分
+                </div>
+                <div style={{ fontSize: '14px', color: '#999' }}>
+                  订阅我们的套餐，获得更多积分继续创作精美的涂色页！
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="flex gap-3">
@@ -202,19 +228,33 @@ export default function CreditConfirmModal({
             >
               Cancel
             </Button>
-            <Button 
-              onClick={handleConfirm}
-              className="flex-1"
-              disabled={leftCredits < credits}
-              style={{
-                fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
-                fontSize: '16px',
-                backgroundColor: leftCredits >= credits ? '#679fb5' : '#ccc',
-                borderColor: leftCredits >= credits ? '#679fb5' : '#ccc'
-              }}
-            >
-              {leftCredits >= credits ? 'Confirm Generation' : 'Insufficient Credits'}
-            </Button>
+            {hasEnoughCredits ? (
+              <Button 
+                onClick={handleConfirm}
+                className="flex-1"
+                style={{
+                  fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                  fontSize: '16px',
+                  backgroundColor: '#679fb5',
+                  borderColor: '#679fb5'
+                }}
+              >
+                Confirm Generation
+              </Button>
+            ) : (
+              <Button 
+                onClick={handleSubscribe}
+                className="flex-1"
+                style={{
+                  fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                  fontSize: '16px',
+                  backgroundColor: '#4CAF50',
+                  borderColor: '#4CAF50'
+                }}
+              >
+                订阅套餐
+              </Button>
+            )}
           </div>
         </GlassDialogContent>
       </Dialog>
@@ -227,17 +267,20 @@ export default function CreditConfirmModal({
         <DrawerHeader className="text-left">
           <DrawerTitle style={{ 
             fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
-            color: '#679fb5',
+            color: hasEnoughCredits ? '#679fb5' : '#f44336',
             fontSize: '24px'
           }}>
-            Confirm Image Generation
+            {hasEnoughCredits ? 'Confirm Image Generation' : 'Insufficient Credits'}
           </DrawerTitle>
           <DrawerDescription style={{ 
             fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
             fontSize: '16px',
             color: '#666'
           }}>
-            Generating image will consume {credits} credit
+            {hasEnoughCredits 
+              ? `Generating image will consume ${credits} credit`
+              : '您的账户积分不足，请订阅套餐后继续使用'
+            }
           </DrawerDescription>
         </DrawerHeader>
         
@@ -255,53 +298,94 @@ export default function CreditConfirmModal({
             </span>
           </div>
           
-          <div className="flex justify-between items-center mb-4">
-            <span style={{ fontSize: '16px', color: '#333' }}>This generation:</span>
-            <span style={{ 
-              fontSize: '18px', 
-              fontWeight: 'bold', 
-              color: '#ff9800' 
-            }}>
-              -{credits} credit{credits > 1 ? 's' : ''}
-            </span>
-          </div>
-          
-          <div className="flex justify-between items-center border-t pt-2">
-            <span style={{ fontSize: '16px', color: '#333' }}>Balance after generation:</span>
-            <span style={{ 
-              fontSize: '18px', 
-              fontWeight: 'bold', 
-              color: leftCredits >= credits ? '#4CAF50' : '#f44336' 
-            }}>
-              {Math.max(0, leftCredits - credits)} credits
-            </span>
-          </div>
+          {hasEnoughCredits ? (
+            <>
+              <div className="flex justify-between items-center mb-4">
+                <span style={{ fontSize: '16px', color: '#333' }}>This generation:</span>
+                <span style={{ 
+                  fontSize: '18px', 
+                  fontWeight: 'bold', 
+                  color: '#ff9800' 
+                }}>
+                  -{credits} credit{credits > 1 ? 's' : ''}
+                </span>
+              </div>
+              
+              <div className="flex justify-between items-center border-t pt-2">
+                <span style={{ fontSize: '16px', color: '#333' }}>Balance after generation:</span>
+                <span style={{ 
+                  fontSize: '18px', 
+                  fontWeight: 'bold', 
+                  color: leftCredits >= credits ? '#4CAF50' : '#f44336' 
+                }}>
+                  {Math.max(0, leftCredits - credits)} credits
+                </span>
+              </div>
+            </>
+          ) : (
+            <div className="text-center py-4">
+              <div style={{ fontSize: '16px', color: '#666', marginBottom: '16px' }}>
+                生成图片需要 {credits} 个积分，但您当前只有 {leftCredits} 个积分
+              </div>
+              <div style={{ fontSize: '14px', color: '#999' }}>
+                订阅我们的套餐，获得更多积分继续创作精美的涂色页！
+              </div>
+            </div>
+          )}
         </div>
 
         <DrawerFooter className="pt-2">
-          <Button 
-            onClick={handleConfirm}
-            disabled={leftCredits < credits}
-            style={{
-              fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
-              fontSize: '16px',
-              backgroundColor: leftCredits >= credits ? '#679fb5' : '#ccc',
-              borderColor: leftCredits >= credits ? '#679fb5' : '#ccc'
-            }}
-          >
-            {leftCredits >= credits ? 'Confirm Generation' : 'Insufficient Credits'}
-          </Button>
-          <DrawerClose asChild>
-            <Button 
-              variant="outline"
-              style={{
-                fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
-                fontSize: '16px'
-              }}
-            >
-              Cancel
-            </Button>
-          </DrawerClose>
+          {hasEnoughCredits ? (
+            <>
+              <Button 
+                onClick={handleConfirm}
+                style={{
+                  fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                  fontSize: '16px',
+                  backgroundColor: '#679fb5',
+                  borderColor: '#679fb5'
+                }}
+              >
+                Confirm Generation
+              </Button>
+              <DrawerClose asChild>
+                <Button 
+                  variant="outline"
+                  style={{
+                    fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                    fontSize: '16px'
+                  }}
+                >
+                  Cancel
+                </Button>
+              </DrawerClose>
+            </>
+          ) : (
+            <>
+              <Button 
+                onClick={handleSubscribe}
+                style={{
+                  fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                  fontSize: '16px',
+                  backgroundColor: '#4CAF50',
+                  borderColor: '#4CAF50'
+                }}
+              >
+                订阅套餐
+              </Button>
+              <DrawerClose asChild>
+                <Button 
+                  variant="outline"
+                  style={{
+                    fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+                    fontSize: '16px'
+                  }}
+                >
+                  Cancel
+                </Button>
+              </DrawerClose>
+            </>
+          )}
         </DrawerFooter>
       </GlassDrawerContent>
     </Drawer>
