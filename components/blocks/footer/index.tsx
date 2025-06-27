@@ -107,7 +107,7 @@ export default function Footer({ footer }: { footer: FooterType }) {
                   {footer.copyright}
                   {process.env.NEXT_PUBLIC_SHOW_BRAND === "true" && (
                     <Link
-                      href="https://coloring-pages.app"
+                      href="https://www.coloring-pages.app"
                       target="_blank"
                       className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                     >

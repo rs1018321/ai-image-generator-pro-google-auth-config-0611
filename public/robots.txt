@@ -5,4 +5,4 @@ Disallow: /admin/
 Disallow: /api/
 
 # Host
-Host: https://mimi-panda.com
+Host: https://www.coloring-pages.app

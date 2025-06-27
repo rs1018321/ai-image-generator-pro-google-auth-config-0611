@@ -1,6 +1,6 @@
 /** @type {import('next-sitemap').IConfig} */
 module.exports = {
-  siteUrl: process.env.SITE_URL || 'https://mimi-panda.com',
+  siteUrl: process.env.SITE_URL || 'https://www.coloring-pages.app',
   generateRobotsTxt: true,
   exclude: ['/admin/*', '/api/*'],
   generateIndexSitemap: false,
