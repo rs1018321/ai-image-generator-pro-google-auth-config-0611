@@ -63,8 +63,8 @@ export default async function RootLayout({
       height: "100%"
     }}>
       <head>
-        {/* Google Analytics - 只在生产环境且有GA ID时加载 */}
-        {gaId && process.env.NODE_ENV === 'production' && (
+        {/* Google Analytics - 只要有GA ID就加载 */}
+        {gaId && (
           <>
             <Script
               src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
