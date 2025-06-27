@@ -434,9 +434,9 @@ function getProductInfo(productId: string) {
   };
 
   const creemProductMap: Record<string, { product_id: string, plan_name: string, credits: number }> = {
-    'prod_3dRZI1gMk2xNAtxL9nb83U': { product_id: 'starter', plan_name: 'AI涂色页生成器 入门版', credits: 100 },
-    'prod_5Uh5Qgi2Kg98F4uUnqlpyP': { product_id: 'standard', plan_name: 'AI涂色页生成器 标准版', credits: 500 },
-    'prod_3Rpn1q8sKOwI65Gocrtjr1': { product_id: 'premium', plan_name: 'AI涂色页生成器 高级版', credits: 1000 },
+    'prod_1S0nB5G2p83JuARibtXa1A': { product_id: 'starter', plan_name: 'AI涂色页生成器 入门版', credits: 100 },
+    'prod_1VWwRwxQZUn9wY9sml9NzS': { product_id: 'standard', plan_name: 'AI涂色页生成器 标准版', credits: 500 },
+    'prod_6I1ETNuN7xqxMgR2OXqmNZ': { product_id: 'premium', plan_name: 'AI涂色页生成器 高级版', credits: 1000 },
   };
 
   return productMap[productId] || creemProductMap[productId] || null;
