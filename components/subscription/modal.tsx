@@ -121,21 +121,21 @@ export default function SubscriptionModal() {
       <Dialog open={showSubscriptionModal} onOpenChange={setShowSubscriptionModal}>
         <GlassDialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>升级会员</DialogTitle>
+            <DialogTitle>Subscribe to Unlock</DialogTitle>
             <DialogDescription>
-              此功能需要会员权限，请升级您的会员套餐以解锁更多功能。
+            Any plan will remove the watermark and give you access to extra creative tools.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <Button onClick={handleViewPlans} className="w-full">
-              查看会员套餐
+            View Plans
             </Button>
             <Button 
               variant="outline" 
               onClick={() => setShowSubscriptionModal(false)}
               className="w-full"
             >
-              取消
+              Maybe Later
             </Button>
           </div>
         </GlassDialogContent>
@@ -147,19 +147,19 @@ export default function SubscriptionModal() {
     <Drawer open={showSubscriptionModal} onOpenChange={setShowSubscriptionModal}>
       <GlassDrawerContent>
         <DrawerHeader className="text-left">
-          <DrawerTitle>升级会员</DrawerTitle>
+          <DrawerTitle>Subscribe to Unlock</DrawerTitle>
           <DrawerDescription>
-            此功能需要会员权限，请升级您的会员套餐以解锁更多功能。
+          Any plan will remove the watermark and give you access to extra creative tools.
           </DrawerDescription>
         </DrawerHeader>
         <div className="px-4 pb-4">
           <Button onClick={handleViewPlans} className="w-full mb-2">
-            查看会员套餐
+          View Plans
           </Button>
         </div>
         <DrawerFooter className="pt-2">
           <DrawerClose asChild>
-            <Button variant="outline">取消</Button>
+            <Button variant="outline">Maybe Later</Button>
           </DrawerClose>
         </DrawerFooter>
       </GlassDrawerContent>

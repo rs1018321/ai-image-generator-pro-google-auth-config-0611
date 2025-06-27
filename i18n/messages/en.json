@@ -15,8 +15,8 @@
     "admin_system": "Admin System"
   },
   "sign_modal": {
-    "sign_in_title": "Sign In",
-    "sign_in_description": "Sign in to your account",
+    "sign_in_title": "Sign In & Get 10 Free Credits",
+    "sign_in_description": "Enjoy 10 free credits right after you log in. Every image costs just 1 credit—test-drive our best-in-class AI generator today!",
     "sign_up_title": "Sign Up",
     "sign_up_description": "Create an account",
     "email_title": "Email",
@@ -28,7 +28,7 @@
     "continue": "Continue",
     "no_account": "Don't have an account?",
     "email_sign_in": "Sign in with Email",
-    "google_sign_in": "Sign in with Google",
+    "google_sign_in": "Get My 10 Credits · Sign in with Google",
     "github_sign_in": "Sign in with GitHub",
     "close_title": "Close",
     "cancel_title": "Cancel"
