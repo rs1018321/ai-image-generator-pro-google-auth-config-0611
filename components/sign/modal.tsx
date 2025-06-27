@@ -124,7 +124,13 @@ export default function SignModal() {
       <Dialog open={showSignModal} onOpenChange={setShowSignModal}>
         <GlassDialogContent className="sm:max-w-[425px] min-h-[300px]">
           <DialogHeader className="space-y-10">
-            <DialogTitle>{t("sign_modal.sign_in_title")}</DialogTitle>
+            <DialogTitle style={{ 
+              fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+              fontSize: '24px',
+              fontWeight: 'bold'
+            }}>
+              {t("sign_modal.sign_in_title")}
+            </DialogTitle>
             <div className="text-sm text-muted-foreground space-y-4" style={{ 
               fontFamily: "'Comic Sans MS', 'Marker Felt', cursive"
             }}>
@@ -154,7 +160,13 @@ export default function SignModal() {
     <Drawer open={showSignModal} onOpenChange={setShowSignModal}>
       <GlassDrawerContent className="min-h-[240px]">
         <DrawerHeader className="text-left space-y-10">
-          <DrawerTitle>{t("sign_modal.sign_in_title")}</DrawerTitle>
+          <DrawerTitle style={{ 
+            fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+            fontSize: '22px',
+            fontWeight: 'bold'
+          }}>
+            {t("sign_modal.sign_in_title")}
+          </DrawerTitle>
           <div className="text-sm text-muted-foreground space-y-4" style={{ 
             fontFamily: "'Comic Sans MS', 'Marker Felt', cursive"
           }}>
