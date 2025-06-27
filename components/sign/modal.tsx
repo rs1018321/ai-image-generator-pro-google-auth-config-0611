@@ -122,10 +122,10 @@ export default function SignModal() {
   if (isDesktop) {
     return (
       <Dialog open={showSignModal} onOpenChange={setShowSignModal}>
-        <GlassDialogContent className="sm:max-w-[425px] min-h-[500px]">
-          <DialogHeader>
+        <GlassDialogContent className="sm:max-w-[425px] min-h-[300px]">
+          <DialogHeader className="space-y-10">
             <DialogTitle>{t("sign_modal.sign_in_title")}</DialogTitle>
-            <div className="text-sm text-muted-foreground space-y-2" style={{ 
+            <div className="text-sm text-muted-foreground space-y-4" style={{ 
               fontFamily: "'Comic Sans MS', 'Marker Felt', cursive"
             }}>
               <div style={{ fontSize: '16px', color: '#333' }}>
@@ -134,12 +134,17 @@ export default function SignModal() {
               <div style={{ fontSize: '16px', color: '#333' }}>
                 Try our top-tier AI generator today!
               </div>
-              <div style={{ fontSize: '12px', color: '#999', fontStyle: 'italic' }}>
-                *Free credits are granted on your first sign-in only
-              </div>
             </div>
           </DialogHeader>
-          <ProfileForm />
+          <ProfileForm className="mt-8" />
+          <div className="text-center mt-2" style={{ 
+            fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+            fontSize: '12px', 
+            color: '#999', 
+            fontStyle: 'italic' 
+          }}>
+            *Free credits are granted on your first sign-in only
+          </div>
         </GlassDialogContent>
       </Dialog>
     );
@@ -147,10 +152,10 @@ export default function SignModal() {
 
   return (
     <Drawer open={showSignModal} onOpenChange={setShowSignModal}>
-      <GlassDrawerContent className="min-h-[400px]">
-        <DrawerHeader className="text-left">
+      <GlassDrawerContent className="min-h-[240px]">
+        <DrawerHeader className="text-left space-y-10">
           <DrawerTitle>{t("sign_modal.sign_in_title")}</DrawerTitle>
-          <div className="text-sm text-muted-foreground space-y-2" style={{ 
+          <div className="text-sm text-muted-foreground space-y-4" style={{ 
             fontFamily: "'Comic Sans MS', 'Marker Felt', cursive"
           }}>
             <div style={{ fontSize: '16px', color: '#333' }}>
@@ -159,12 +164,17 @@ export default function SignModal() {
             <div style={{ fontSize: '16px', color: '#333' }}>
               Try our top-tier AI generator today!
             </div>
-            <div style={{ fontSize: '12px', color: '#999', fontStyle: 'italic' }}>
-              *Free credits are granted on your first sign-in only
-            </div>
           </div>
         </DrawerHeader>
-        <ProfileForm className="px-4" />
+        <ProfileForm className="px-4 mt-6" />
+        <div className="text-center mt-2 px-4" style={{ 
+          fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
+          fontSize: '12px', 
+          color: '#999', 
+          fontStyle: 'italic' 
+        }}>
+          *Free credits are granted on your first sign-in only
+        </div>
         <DrawerFooter className="pt-4">
           <DrawerClose asChild>
             <Button variant="outline">{t("sign_modal.cancel_title")}</Button>
@@ -196,7 +206,6 @@ function ProfileForm({ className }: React.ComponentProps<"form">) {
 
       {process.env.NEXT_PUBLIC_AUTH_GOOGLE_ENABLED === "true" && (
         <Button
-          variant="outline"
           className="w-full flex items-center gap-2"
           onClick={() => {
             signIn("google", { 
