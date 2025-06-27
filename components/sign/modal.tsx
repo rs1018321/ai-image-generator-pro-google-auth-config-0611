@@ -122,12 +122,22 @@ export default function SignModal() {
   if (isDesktop) {
     return (
       <Dialog open={showSignModal} onOpenChange={setShowSignModal}>
-        <GlassDialogContent className="sm:max-w-[425px]">
+        <GlassDialogContent className="sm:max-w-[425px] min-h-[500px]">
           <DialogHeader>
             <DialogTitle>{t("sign_modal.sign_in_title")}</DialogTitle>
-            <DialogDescription>
-              {t("sign_modal.sign_in_description")}
-            </DialogDescription>
+            <div className="text-sm text-muted-foreground space-y-2" style={{ 
+              fontFamily: "'Comic Sans MS', 'Marker Felt', cursive"
+            }}>
+              <div style={{ fontSize: '16px', color: '#333' }}>
+                Every image costs just 1 credit
+              </div>
+              <div style={{ fontSize: '16px', color: '#333' }}>
+                Try our top-tier AI generator today!
+              </div>
+              <div style={{ fontSize: '12px', color: '#999', fontStyle: 'italic' }}>
+                *Free credits are granted on your first sign-in only
+              </div>
+            </div>
           </DialogHeader>
           <ProfileForm />
         </GlassDialogContent>
@@ -137,12 +147,22 @@ export default function SignModal() {
 
   return (
     <Drawer open={showSignModal} onOpenChange={setShowSignModal}>
-      <GlassDrawerContent>
+      <GlassDrawerContent className="min-h-[400px]">
         <DrawerHeader className="text-left">
           <DrawerTitle>{t("sign_modal.sign_in_title")}</DrawerTitle>
-          <DrawerDescription>
-            {t("sign_modal.sign_in_description")}
-          </DrawerDescription>
+          <div className="text-sm text-muted-foreground space-y-2" style={{ 
+            fontFamily: "'Comic Sans MS', 'Marker Felt', cursive"
+          }}>
+            <div style={{ fontSize: '16px', color: '#333' }}>
+              Every image costs just 1 credit
+            </div>
+            <div style={{ fontSize: '16px', color: '#333' }}>
+              Try our top-tier AI generator today!
+            </div>
+            <div style={{ fontSize: '12px', color: '#999', fontStyle: 'italic' }}>
+              *Free credits are granted on your first sign-in only
+            </div>
+          </div>
         </DrawerHeader>
         <ProfileForm className="px-4" />
         <DrawerFooter className="pt-4">
