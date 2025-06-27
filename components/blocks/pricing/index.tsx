@@ -486,9 +486,7 @@ export default function Pricing({ pricing, variant = "full" }: { pricing: Pricin
                         )}
                       </Button>
                     )}
-                    <p className="text-gray-500 text-xs text-center mt-2 leading-relaxed">
-                      Sandbox checkout – no real charge during review.
-                    </p>
+                    
                     {item.tip && (
                       <p className="text-muted-foreground text-sm mt-2 leading-relaxed">
                         {item.tip}
