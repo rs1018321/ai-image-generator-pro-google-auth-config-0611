@@ -15,7 +15,7 @@ const withMDX = mdx({
   },
 });
 
-// CSP配置，支持Google Analytics和Microsoft Clarity
+// CSP配置，支持Google Analytics、Microsoft Clarity和Plausible
 const contentSecurityPolicy = `
   default-src 'self';
   script-src 'self' 'unsafe-inline' 'unsafe-eval'
@@ -25,7 +25,8 @@ const contentSecurityPolicy = `
       https://www.google-analytics.com
       https://googletagmanager.com
       https://www.clarity.ms
-      https://clarity.ms;
+      https://clarity.ms
+      https://plausible.io;
   connect-src 'self'
       https://www.google-analytics.com
       https://google-analytics.com
@@ -34,7 +35,8 @@ const contentSecurityPolicy = `
       https://clarity.ms
       https://a.clarity.ms
       https://accounts.google.com
-      https://apis.google.com;
+      https://apis.google.com
+      https://plausible.io;
   img-src 'self' data: blob:
       https://www.google-analytics.com
       https://google-analytics.com

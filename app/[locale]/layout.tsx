@@ -56,6 +56,7 @@ export default async function RootLayout({
 
   const gaId = process.env.NEXT_PUBLIC_GA_ID;
   const clarityId = process.env.NEXT_PUBLIC_CLARITY_ID;
+  const plausibleDomain = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN ?? "coloring-pages.app";
 
   return (
     <html lang={locale} suppressHydrationWarning className="font-comic" style={{
@@ -93,6 +94,15 @@ export default async function RootLayout({
               })(window, document, "clarity", "script", "${clarityId}");
             `}
           </Script>
+        )}
+
+        {/* Plausible Analytics - 只要有域名配置就加载 */}
+        {plausibleDomain && (
+          <Script
+            src="https://plausible.io/js/script.outbound-links.js"
+            strategy="afterInteractive"
+            data-domain={plausibleDomain}
+          />
         )}
       </head>
       <body
