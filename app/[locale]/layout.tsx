@@ -98,11 +98,16 @@ export default async function RootLayout({
 
         {/* Plausible Analytics - 只要有域名配置就加载 */}
         {plausibleDomain && (
-          <Script
-            src="https://plausible.io/js/script.outbound-links.js"
-            strategy="afterInteractive"
-            data-domain={plausibleDomain}
-          />
+          <>
+            <Script
+              src="https://plausible.io/js/script.file-downloads.hash.outbound-links.pageview-props.revenue.tagged-events.js"
+              strategy="afterInteractive"
+              data-domain={plausibleDomain}
+            />
+            <Script id="plausible-init" strategy="afterInteractive">
+              {`window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) }`}
+            </Script>
+          </>
         )}
       </head>
       <body
