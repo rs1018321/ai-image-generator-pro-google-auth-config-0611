@@ -15,6 +15,37 @@ const withMDX = mdx({
   },
 });
 
+// CSP配置，支持Google Analytics和Microsoft Clarity
+const contentSecurityPolicy = `
+  default-src 'self';
+  script-src 'self' 'unsafe-inline' 'unsafe-eval'
+      https://accounts.google.com
+      https://apis.google.com
+      https://www.googletagmanager.com
+      https://www.google-analytics.com
+      https://googletagmanager.com
+      https://www.clarity.ms
+      https://clarity.ms;
+  connect-src 'self'
+      https://www.google-analytics.com
+      https://google-analytics.com
+      https://analytics.google.com
+      https://www.clarity.ms
+      https://clarity.ms
+      https://a.clarity.ms
+      https://accounts.google.com
+      https://apis.google.com;
+  img-src 'self' data: blob:
+      https://www.google-analytics.com
+      https://google-analytics.com
+      https://www.clarity.ms
+      https://clarity.ms;
+  style-src 'self' 'unsafe-inline';
+  font-src 'self' data:;
+  object-src 'none';
+  base-uri 'self';
+`;
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: "standalone",
@@ -35,7 +66,7 @@ const nextConfig = {
         headers: [
           {
             key: "Content-Security-Policy",
-            value: "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://accounts.google.com https://apis.google.com; object-src 'none'; base-uri 'self';"
+            value: contentSecurityPolicy.replace(/\s{2,}/g, " ").trim(),
           },
         ],
       },
