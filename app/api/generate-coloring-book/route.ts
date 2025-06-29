@@ -2,11 +2,15 @@ import { NextRequest, NextResponse } from 'next/server'
 import Replicate from 'replicate'
 import { auth } from '@/auth'
 import { decreaseCredits, CreditsTransType } from '@/services/credit'
-import sharp from 'sharp'
+
+// 在文件顶部声明 runtime
+export const runtime = 'nodejs'
 
 // ------ 更新：水印处理函数 ------
 async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
   try {
+    // 动态导入 sharp，避免 Edge Runtime 不兼容
+    const sharp = (await import('sharp')).default;
     console.log("🖨️ [addWatermark] 开始添加水印，buffer 大小:", imageBuffer.length);
     const borderPx = 5;
     const domainText = "coloring-pages.app"; // 域名水印文字
@@ -240,13 +244,12 @@ export async function POST(request: NextRequest) {
             console.log("文件头:", fullData.slice(0, 8))
             
             let bufferData: Buffer = Buffer.from(fullData);
-            // 如果需要，添加水印
             if (hasWatermark) {
               console.log("添加水印 (ReadableStream)...")
               bufferData = await addWatermark(bufferData);
               console.log("水印添加成功 (ReadableStream)")
             } else {
-              console.log("无需水印，直接返回原图 (ReadableStream)");
+              console.log("未勾选水印开关，直接返回原图 (ReadableStream)");
             }
 
             const imageData = bufferData.toString('base64');
@@ -307,15 +310,14 @@ export async function POST(request: NextRequest) {
         const imageBuffer = await imageResponse.arrayBuffer()
         let imageData: string;
 
-        // 如果需要，添加水印
         if (hasWatermark) {
           console.log("添加水印...")
           const watermarkedBuffer = await addWatermark(Buffer.from(imageBuffer));
           imageData = watermarkedBuffer.toString('base64');
           console.log("水印添加成功")
         } else {
-          imageData = Buffer.from(imageBuffer).toString('base64')
-          console.log("无需水印，直接返回原图")
+          imageData = Buffer.from(imageBuffer).toString('base64');
+          console.log("未勾选水印开关，直接返回原图")
         }
 
         console.log("图片转换为 base64 成功，长度:", imageData.length)
@@ -377,4 +379,15 @@ export async function POST(request: NextRequest) {
       suggestion: '请检查上传的图片格式是否正确'
     }, { status: 500 })
   }
+}
+
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization"
+    }
+  });
 }
