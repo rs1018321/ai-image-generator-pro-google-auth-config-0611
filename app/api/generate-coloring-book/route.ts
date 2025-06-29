@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import Replicate from 'replicate'
 import { auth } from '@/auth'
 import { decreaseCredits, CreditsTransType } from '@/services/credit'
+import path from 'path';
+import fs from 'fs/promises';
+import sharp from 'sharp';
 
 // 在文件顶部声明 runtime
 export const runtime = 'nodejs'
@@ -9,94 +12,82 @@ export const runtime = 'nodejs'
 // ------ 更新：水印处理函数 ------
 async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
   try {
-    // 动态导入 sharp，避免 Edge Runtime 不兼容
-    const sharp = (await import('sharp')).default;
-    console.log("🖨️ [addWatermark] 开始添加水印，buffer 大小:", imageBuffer.length);
-    const borderPx = 5;
-    const domainText = "coloring-pages.app"; // 域名水印文字
-    
+    console.log("🖨️ [addWatermark] 使用图片水印最终方案");
+
+    // --- 配置 ---
+    const top_left_right_border = 5; // 上、左、右边框宽度
+    const bottom_margin = 25; // 底部包含水印的区域总高度
+
+    // 1. 加载水印文字图片
+    const watermarkImagePath = path.join(process.cwd(), 'public', 'imgs', 'watermark-text.png');
+    const watermarkTextBuffer = await fs.readFile(watermarkImagePath);
+
     const image = sharp(imageBuffer);
     const meta = await image.metadata();
     const imageWidth = meta.width!;
     const imageHeight = meta.height!;
 
-    console.log("🖨️ [addWatermark] 原图尺寸:", imageWidth, imageHeight);
+    // 2. 计算最终图片的尺寸
+    const finalWidth = imageWidth + top_left_right_border * 2;
+    const finalHeight = imageHeight + top_left_right_border + bottom_margin;
 
-    const finalWidth = imageWidth + borderPx * 2;
-    const finalHeight = imageHeight + borderPx * 2;
+    // 3. 动态缩放水印文字图片以适应底部区域
+    const watermarkText = sharp(watermarkTextBuffer);
+    const targetWatermarkHeight = Math.round(bottom_margin * 0.5); // 文字高度占底部区域的50%
+    const resizedWatermarkTextBuffer = await watermarkText
+      .resize({ height: targetWatermarkHeight })
+      .toBuffer();
+    const resizedWatermarkTextMeta = await sharp(resizedWatermarkTextBuffer).metadata();
+    const watermarkWidth = resizedWatermarkTextMeta.width!;
 
-    console.log("🖨️ [addWatermark] 最终图尺寸:", finalWidth, finalHeight);
+    // 4. 为水印文字创建白色背景板
+    const whiteBoxPadding = 4; // 白色背景板的内边距
+    const whiteBoxWidth = watermarkWidth + whiteBoxPadding * 2;
+    const whiteBoxHeight = targetWatermarkHeight + whiteBoxPadding * 2;
+    const whiteBoxBuffer = await sharp({
+      create: {
+        width: whiteBoxWidth,
+        height: whiteBoxHeight,
+        channels: 3,
+        background: { r: 255, g: 255, b: 255 } // 白色
+      }
+    }).png().toBuffer();
 
-    const fontSize = Math.max(12, Math.round(imageWidth * 0.018)); // 适中的字体大小
-    const textPaddingHorizontal = Math.round(fontSize * 0.8);
-    const textPaddingVertical = Math.round(fontSize * 0.3);
+    // 5. 计算各元素的位置
+    // 白色背景板的位置 (在底部区域内水平和垂直居中)
+    const whiteBoxX = Math.round((finalWidth - whiteBoxWidth) / 2);
+    const whiteBoxY = imageHeight + top_left_right_border + Math.round((bottom_margin - whiteBoxHeight) / 2);
+    
+    // 水印文字的位置 (在白色背景板内部)
+    const textX = whiteBoxX + whiteBoxPadding;
+    const textY = whiteBoxY + whiteBoxPadding;
 
-    // 计算文本宽度（保守估算）
-    const textWidth = domainText.length * fontSize * 0.6;
-
-    console.log("🖨️ [addWatermark] textWidth:", textWidth);
-
-    const cutoutWidth = Math.round(textWidth + textPaddingHorizontal * 2);
-    const cutoutHeight = Math.round(Math.max(borderPx, fontSize + textPaddingVertical * 2));
-    const cutoutX = Math.round((finalWidth - cutoutWidth) / 2);
-    const cutoutY = finalHeight - cutoutHeight;
-
-    console.log("🖨️ [addWatermark] cutoutWidth:", cutoutWidth, "cutoutHeight:", cutoutHeight);
-
-    // 创建包含边框和文字的完整SVG水印
-    const svgWatermark = `
-      <svg width="${finalWidth}" height="${finalHeight}" xmlns="http://www.w3.org/2000/svg">
-        <!-- 黑色边框 -->
-        <rect x="0" y="0" width="${finalWidth}" height="${borderPx}" fill="black"/>
-        <rect x="0" y="${finalHeight - borderPx}" width="${finalWidth}" height="${borderPx}" fill="black"/>
-        <rect x="0" y="0" width="${borderPx}" height="${finalHeight}" fill="black"/>
-        <rect x="${finalWidth - borderPx}" y="0" width="${borderPx}" height="${finalHeight}" fill="black"/>
-        
-        <!-- 底部白色区域 -->
-        <rect x="${cutoutX}" y="${cutoutY}" width="${cutoutWidth}" height="${cutoutHeight}" fill="white" stroke="black" stroke-width="1"/>
-        
-        <!-- 域名文字水印 -->
-        <text x="${cutoutX + cutoutWidth / 2}" y="${cutoutY + cutoutHeight / 2}" 
-              font-family="Arial, Helvetica, sans-serif" 
-              font-size="${fontSize}" 
-              font-weight="normal"
-              fill="black" 
-              text-anchor="middle" 
-              dominant-baseline="central">${domainText}</text>
-      </svg>
-    `;
-
-    console.log("🖨️ [addWatermark] SVG水印创建完成，字体大小:", fontSize);
-
-    // 使用 sharp 合成图片
+    // 6. 合成最终图片
     return await sharp({
         create: {
           width: finalWidth,
           height: finalHeight,
-          channels: 4,
-          background: { r: 255, g: 255, b: 255, alpha: 0 } // 透明背景
+          channels: 3,
+          background: { r: 0, g: 0, b: 0 } // 黑色背景作为边框
         }
       })
       .composite([
-        // 1. 将原图置于中心
-        { input: imageBuffer, top: borderPx, left: borderPx },
-        // 2. 叠加SVG水印（包含边框和文字）
-        { 
-          input: Buffer.from(svgWatermark),
-          top: 0,
-          left: 0
-        }
+        // 第1层: 原图
+        { input: imageBuffer, top: top_left_right_border, left: top_left_right_border },
+        // 第2层: 白色背景板
+        { input: whiteBoxBuffer, top: whiteBoxY, left: whiteBoxX },
+        // 第3层: 水印文字图片
+        { input: resizedWatermarkTextBuffer, top: textY, left: textX },
       ])
       .png({
         compressionLevel: 6,
         adaptiveFiltering: false
       })
       .toBuffer();
-      
+
   } catch (error) {
-    console.error("❌ [addWatermark] 添加水印失败:", error);
-    // 如果水印添加失败，返回原图而不是抛出错误
-    console.log("⚠️ [addWatermark] 水印添加失败，返回原图");
+    console.error("❌ [addWatermark] 添加图片水印失败:", error);
+    // 如果失败，返回原图，保证功能可用
     return imageBuffer;
   }
 }
