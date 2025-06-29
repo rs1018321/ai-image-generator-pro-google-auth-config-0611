@@ -1649,15 +1649,15 @@ const PhotoColor: React.FC = () => {
                                     flexDirection: "column",
                                     alignItems: "center"
                                 }}>
-                                    <img
-                                        src={clearImage}
-                                        alt="camera"
-                                        style={{
+                                <img
+                                    src={clearImage}
+                                    alt="camera"
+                                    style={{
                                             width: "150px",
                                             height: "150px",
-                                            objectFit: "contain",
-                                        }}
-                                    />
+                                        objectFit: "contain",
+                                    }}
+                                />
                                     {/* 添加安全提示文字 */}
                                     <div style={{
                                         marginTop: "8px",
@@ -2172,13 +2172,13 @@ const PhotoColor: React.FC = () => {
                             style={{ 
                                 width: "28px",
                                 height: "28px",
-                                borderRadius: "50%", 
-                                backgroundColor: "#1DA1F2", 
-                                display: "flex", 
-                                justifyContent: "center", 
-                                alignItems: "center",
-                                cursor: "pointer",
-                                transition: "transform 0.2s"
+                            borderRadius: "50%", 
+                            backgroundColor: "#1DA1F2", 
+                            display: "flex", 
+                            justifyContent: "center", 
+                            alignItems: "center",
+                            cursor: "pointer",
+                            transition: "transform 0.2s"
                             }}
                             onClick={() => {
                                 const shareText = "Check out this amazing AI-generated coloring page I created!";
@@ -2194,13 +2194,13 @@ const PhotoColor: React.FC = () => {
                             style={{ 
                                 width: "28px",
                                 height: "28px",
-                                borderRadius: "50%", 
-                                backgroundColor: "#4267B2", 
-                                display: "flex", 
-                                justifyContent: "center", 
-                                alignItems: "center",
-                                cursor: "pointer",
-                                transition: "transform 0.2s"
+                            borderRadius: "50%", 
+                            backgroundColor: "#4267B2", 
+                            display: "flex", 
+                            justifyContent: "center", 
+                            alignItems: "center",
+                            cursor: "pointer",
+                            transition: "transform 0.2s"
                             }}
                             onClick={() => {
                                 const shareUrl = window.location.href;
@@ -2215,13 +2215,13 @@ const PhotoColor: React.FC = () => {
                             style={{ 
                                 width: "28px",
                                 height: "28px",
-                                borderRadius: "50%", 
-                                backgroundColor: "#0077B5", 
-                                display: "flex", 
-                                justifyContent: "center", 
-                                alignItems: "center",
-                                cursor: "pointer",
-                                transition: "transform 0.2s"
+                            borderRadius: "50%", 
+                            backgroundColor: "#0077B5", 
+                            display: "flex", 
+                            justifyContent: "center", 
+                            alignItems: "center",
+                            cursor: "pointer",
+                            transition: "transform 0.2s"
                             }}
                             onClick={() => {
                                 const shareText = "Check out this amazing AI-generated coloring page I created!";
@@ -2237,13 +2237,13 @@ const PhotoColor: React.FC = () => {
                             style={{ 
                                 width: "28px",
                                 height: "28px",
-                                borderRadius: "50%", 
-                                backgroundColor: "#25D366", 
-                                display: "flex", 
-                                justifyContent: "center", 
-                                alignItems: "center",
-                                cursor: "pointer",
-                                transition: "transform 0.2s"
+                            borderRadius: "50%", 
+                            backgroundColor: "#25D366", 
+                            display: "flex", 
+                            justifyContent: "center", 
+                            alignItems: "center",
+                            cursor: "pointer",
+                            transition: "transform 0.2s"
                             }}
                             onClick={() => {
                                 const shareText = "Check out this amazing AI-generated coloring page I created!";

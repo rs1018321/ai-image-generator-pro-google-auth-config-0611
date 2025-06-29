@@ -9,77 +9,76 @@ import sharp from 'sharp';
 // 在文件顶部声明 runtime
 export const runtime = 'nodejs'
 
-// --- 新增：将水印图片内嵌为Base64常量 ---
-const WATERMARK_IMAGE_BASE64 = "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";
-
 // ------ 更新：水印处理函数 ------
 async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
   try {
-    console.log("🖨️ [addWatermark] 使用内嵌图片水印最终方案");
+    console.log("🖨️ [addWatermark] 开始添加水印和边框");
 
-    // --- 配置 ---
-    const top_left_right_border = 5; // 上、左、右边框宽度
-    const bottom_margin = 25; // 底部包含水印的区域总高度
-
-    // 1. 从Base64常量加载水印文字图片
-    const watermarkTextBuffer = Buffer.from(WATERMARK_IMAGE_BASE64, 'base64');
-    
     const image = sharp(imageBuffer);
     const meta = await image.metadata();
     const imageWidth = meta.width!;
     const imageHeight = meta.height!;
 
-    // 2. 计算最终图片的尺寸
-    const finalWidth = imageWidth + top_left_right_border * 2;
-    const finalHeight = imageHeight + top_left_right_border + bottom_margin;
+    console.log(`📐 原图尺寸: ${imageWidth}x${imageHeight}`);
 
-    // 3. 动态缩放水印文字图片以适应底部区域
-    const watermarkText = sharp(watermarkTextBuffer);
-    const targetWatermarkHeight = Math.round(bottom_margin * 0.5); // 文字高度占底部区域的50%
-    const resizedWatermarkTextBuffer = await watermarkText
-      .resize({ height: targetWatermarkHeight })
-      .toBuffer();
-    const resizedWatermarkTextMeta = await sharp(resizedWatermarkTextBuffer).metadata();
-    const watermarkWidth = resizedWatermarkTextMeta.width!;
+    // --- 配置参数 ---
+    const borderWidth = 8; // 边框宽度
+    const bottomHeight = 30; // 底部水印区域高度
+    const fontSize = 16; // 文字大小
+    const textColor = "#333333"; // 文字颜色
 
-    // 4. 为水印文字创建白色背景板
-    const whiteBoxPadding = 4; // 白色背景板的内边距
-    const whiteBoxWidth = watermarkWidth + whiteBoxPadding * 2;
-    const whiteBoxHeight = targetWatermarkHeight + whiteBoxPadding * 2;
-    const whiteBoxBuffer = await sharp({
-      create: {
-        width: whiteBoxWidth,
-        height: whiteBoxHeight,
-        channels: 3,
-        background: { r: 255, g: 255, b: 255 } // 白色
-      }
-    }).png().toBuffer();
+    // 计算最终图片尺寸
+    const finalWidth = imageWidth + borderWidth * 2;
+    const finalHeight = imageHeight + borderWidth + bottomHeight;
 
-    // 5. 计算各元素的位置
-    // 白色背景板的位置 (在底部区域内水平和垂直居中)
-    const whiteBoxX = Math.round((finalWidth - whiteBoxWidth) / 2);
-    const whiteBoxY = imageHeight + top_left_right_border + Math.round((bottom_margin - whiteBoxHeight) / 2);
-    
-    // 水印文字的位置 (在白色背景板内部)
-    const textX = whiteBoxX + whiteBoxPadding;
-    const textY = whiteBoxY + whiteBoxPadding;
+    console.log(`📐 最终尺寸: ${finalWidth}x${finalHeight}`);
 
-    // 6. 合成最终图片
-    return await sharp({
+    // 创建SVG水印
+    const svgWatermark = `
+      <svg width="${finalWidth}" height="${finalHeight}" xmlns="http://www.w3.org/2000/svg">
+        <!-- 黑色边框 -->
+        <rect x="0" y="0" width="${finalWidth}" height="${borderWidth}" fill="black"/>
+        <rect x="0" y="0" width="${borderWidth}" height="${finalHeight}" fill="black"/>
+        <rect x="${finalWidth - borderWidth}" y="0" width="${borderWidth}" height="${finalHeight}" fill="black"/>
+        <rect x="0" y="${finalHeight - bottomHeight}" width="${finalWidth}" height="${bottomHeight}" fill="black"/>
+        
+        <!-- 底部白色背景 -->
+        <rect x="${borderWidth}" y="${imageHeight + borderWidth}" width="${imageWidth}" height="${bottomHeight}" fill="white"/>
+        
+        <!-- 水印文字 -->
+        <text x="${finalWidth / 2}" y="${imageHeight + borderWidth + bottomHeight / 2 + 6}" 
+              text-anchor="middle" 
+              font-family="Arial, sans-serif" 
+              font-size="${fontSize}" 
+              font-weight="bold"
+              fill="${textColor}">coloring page</text>
+      </svg>
+    `;
+
+    console.log("🎨 SVG水印创建完成");
+
+    // 合成最终图片
+    const result = await sharp({
         create: {
           width: finalWidth,
           height: finalHeight,
           channels: 3,
-          background: { r: 0, g: 0, b: 0 } // 黑色背景作为边框
+          background: { r: 255, g: 255, b: 255 } // 白色背景
         }
       })
       .composite([
-        // 第1层: 原图
-        { input: imageBuffer, top: top_left_right_border, left: top_left_right_border },
-        // 第2层: 白色背景板
-        { input: whiteBoxBuffer, top: whiteBoxY, left: whiteBoxX },
-        // 第3层: 水印文字图片
-        { input: resizedWatermarkTextBuffer, top: textY, left: textX },
+        // 第1层: 原图 (放在边框内)
+        { 
+          input: imageBuffer, 
+          top: borderWidth, 
+          left: borderWidth 
+        },
+        // 第2层: SVG水印 (边框和文字)
+        { 
+          input: Buffer.from(svgWatermark), 
+          top: 0, 
+          left: 0 
+        }
       ])
       .png({
         compressionLevel: 6,
@@ -87,8 +86,11 @@ async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
       })
       .toBuffer();
 
+    console.log("✅ [addWatermark] 水印添加成功");
+    return result;
+
   } catch (error) {
-    console.error("❌ [addWatermark] 添加图片水印失败:", error);
+    console.error("❌ [addWatermark] 添加水印失败:", error);
     // 如果失败，返回原图，保证功能可用
     return imageBuffer;
   }

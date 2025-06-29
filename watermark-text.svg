@@ -1,0 +1,12 @@
+<svg width="250" height="30" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 30">
+  <style>
+    .text {
+      font-family: Arial, sans-serif;
+      font-size: 20px;
+      fill: black;
+      text-anchor: middle;
+      dominant-baseline: central;
+    }
+  </style>
+  <text x="125" y="15" class="text">coloring-pages.app</text>
+</svg> 
