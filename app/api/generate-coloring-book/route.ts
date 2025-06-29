@@ -18,8 +18,8 @@ async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
     const top_left_right_border = 5; // 上、左、右边框宽度
     const bottom_margin = 25; // 底部包含水印的区域总高度
 
-    // 1. 加载水印文字图片
-    const watermarkImagePath = path.join(process.cwd(), 'public', 'imgs', 'watermark-text.png');
+    // 1. 加载水印文字图片 (从lib/assets/读取，确保被打包到Vercel)
+    const watermarkImagePath = path.join(process.cwd(), 'lib', 'assets', 'watermark-text.png');
     const watermarkTextBuffer = await fs.readFile(watermarkImagePath);
 
     const image = sharp(imageBuffer);
