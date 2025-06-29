@@ -9,9 +9,8 @@ async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
   try {
     console.log("🖨️ [addWatermark] 开始添加水印，buffer 大小:", imageBuffer.length);
     const borderPx = 5;
-    const text = "coloring page";
-    // ⚠️ 取消文字水印，保留边框，因此无需 textColor/borderColor 变量
-
+    const domainText = "coloring-pages.app"; // 域名水印文字
+    
     const image = sharp(imageBuffer);
     const meta = await image.metadata();
     const imageWidth = meta.width!;
@@ -24,54 +23,65 @@ async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
 
     console.log("🖨️ [addWatermark] 最终图尺寸:", finalWidth, finalHeight);
 
-    const fontSize = Math.round(imageWidth * 0.025); // 减小字体大小避免问题
+    const fontSize = Math.max(12, Math.round(imageWidth * 0.018)); // 适中的字体大小
     const textPaddingHorizontal = Math.round(fontSize * 0.8);
-    const textPaddingVertical = Math.round(fontSize * 0.2); // 垂直内边距
+    const textPaddingVertical = Math.round(fontSize * 0.3);
 
-    // 简化文本宽度计算，避免 SVG 字体问题
-    const textWidth = text.length * fontSize * 0.6; // 保守估算
+    // 计算文本宽度（保守估算）
+    const textWidth = domainText.length * fontSize * 0.6;
 
     console.log("🖨️ [addWatermark] textWidth:", textWidth);
 
     const cutoutWidth = Math.round(textWidth + textPaddingHorizontal * 2);
     const cutoutHeight = Math.round(Math.max(borderPx, fontSize + textPaddingVertical * 2));
     const cutoutX = Math.round((finalWidth - cutoutWidth) / 2);
-    // 将镂空矩形顶端放在距底部 cutoutHeight 位置
     const cutoutY = finalHeight - cutoutHeight;
 
     console.log("🖨️ [addWatermark] cutoutWidth:", cutoutWidth, "cutoutHeight:", cutoutHeight);
 
-    // 创建白色背景的 Buffer
-    const whiteBackground = await sharp({
-      create: {
-        width: cutoutWidth,
-        height: cutoutHeight,
-        channels: 3,
-        background: { r: 255, g: 255, b: 255 }
-      }
-    }).png().toBuffer();
+    // 创建包含边框和文字的完整SVG水印
+    const svgWatermark = `
+      <svg width="${finalWidth}" height="${finalHeight}" xmlns="http://www.w3.org/2000/svg">
+        <!-- 黑色边框 -->
+        <rect x="0" y="0" width="${finalWidth}" height="${borderPx}" fill="black"/>
+        <rect x="0" y="${finalHeight - borderPx}" width="${finalWidth}" height="${borderPx}" fill="black"/>
+        <rect x="0" y="0" width="${borderPx}" height="${finalHeight}" fill="black"/>
+        <rect x="${finalWidth - borderPx}" y="0" width="${borderPx}" height="${finalHeight}" fill="black"/>
+        
+        <!-- 底部白色区域 -->
+        <rect x="${cutoutX}" y="${cutoutY}" width="${cutoutWidth}" height="${cutoutHeight}" fill="white" stroke="black" stroke-width="1"/>
+        
+        <!-- 域名文字水印 -->
+        <text x="${cutoutX + cutoutWidth / 2}" y="${cutoutY + cutoutHeight / 2}" 
+              font-family="Arial, Helvetica, sans-serif" 
+              font-size="${fontSize}" 
+              font-weight="normal"
+              fill="black" 
+              text-anchor="middle" 
+              dominant-baseline="central">${domainText}</text>
+      </svg>
+    `;
 
-    console.log("🖨️ [addWatermark] 白色背景创建成功");
+    console.log("🖨️ [addWatermark] SVG水印创建完成，字体大小:", fontSize);
 
-    // 使用 sharp 的 composite 功能合成图片（仅边框与白底，无文字，避免 Fontconfig 错误）
+    // 使用 sharp 合成图片
     return await sharp({
         create: {
           width: finalWidth,
           height: finalHeight,
-          channels: 4, // 使用4通道以支持透明度
-          background: { r: 0, g: 0, b: 0, alpha: 1 } // 黑色边框
+          channels: 4,
+          background: { r: 255, g: 255, b: 255, alpha: 0 } // 透明背景
         }
       })
       .composite([
         // 1. 将原图置于中心
         { input: imageBuffer, top: borderPx, left: borderPx },
-        // 2. 在底部边框创建白色镂空背景
+        // 2. 叠加SVG水印（包含边框和文字）
         { 
-          input: whiteBackground,
-          top: cutoutY,
-          left: cutoutX
+          input: Buffer.from(svgWatermark),
+          top: 0,
+          left: 0
         }
-        // ⚠️ 暂时移除文字叠加，避免 Fontconfig 错误
       ])
       .png({
         compressionLevel: 6,
