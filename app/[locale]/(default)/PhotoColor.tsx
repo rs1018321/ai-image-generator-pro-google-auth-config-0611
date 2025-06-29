@@ -230,11 +230,7 @@ const PhotoColor: React.FC = () => {
             console.log(`🎨 Style: ${selectedStyle}`);
             console.log(`💧 Watermark: ${hasWatermark}`); // 新增：水印日志
 
-            const response = await axios.post("/api/generate-coloring-book", formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
+            const response = await axios.post("/api/generate-coloring-book", formData);
             
             console.log("✅ API 请求成功，后端返回：", response.data);
             
