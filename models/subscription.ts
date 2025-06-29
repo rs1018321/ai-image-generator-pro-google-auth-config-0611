@@ -6,7 +6,7 @@ export interface Subscription {
   product_id: string; // starter, standard, premium
   plan_name: string;
   status: string; // active, canceled, expired, pending
-  credits_monthly: number; // 每月积分数量
+  credits_monthly: number; // 每月积分数量的
   creem_subscription_id?: string;
   current_period_start?: string;
   current_period_end?: string;
