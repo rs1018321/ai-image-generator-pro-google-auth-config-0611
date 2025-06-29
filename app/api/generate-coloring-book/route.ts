@@ -9,19 +9,21 @@ import sharp from 'sharp';
 // 在文件顶部声明 runtime
 export const runtime = 'nodejs'
 
+// --- 新增：将水印图片内嵌为Base64常量 ---
+const WATERMARK_IMAGE_BASE64 = "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";
+
 // ------ 更新：水印处理函数 ------
 async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
   try {
-    console.log("🖨️ [addWatermark] 使用图片水印最终方案");
+    console.log("🖨️ [addWatermark] 使用内嵌图片水印最终方案");
 
     // --- 配置 ---
     const top_left_right_border = 5; // 上、左、右边框宽度
     const bottom_margin = 25; // 底部包含水印的区域总高度
 
-    // 1. 加载水印文字图片 (从lib/assets/读取，确保被打包到Vercel)
-    const watermarkImagePath = path.join(process.cwd(), 'lib', 'assets', 'watermark-text.png');
-    const watermarkTextBuffer = await fs.readFile(watermarkImagePath);
-
+    // 1. 从Base64常量加载水印文字图片
+    const watermarkTextBuffer = Buffer.from(WATERMARK_IMAGE_BASE64, 'base64');
+    
     const image = sharp(imageBuffer);
     const meta = await image.metadata();
     const imageWidth = meta.width!;
