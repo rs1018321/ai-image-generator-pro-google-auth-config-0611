@@ -79,6 +79,11 @@ const nextConfig = {
   },
   experimental: {
     allowedDevOrigins: [process.env.NEXTAUTH_URL || ""].filter(Boolean),
+    // 注释掉ngrok相关配置，本地开发时使用
+    // allowedDevOrigins: [
+    //   "https://*.ngrok-free.app", // 允许所有ngrok子域名
+    //   "http://*.ngrok-free.app"
+    // ],
   },
 };
 

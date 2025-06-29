@@ -96,7 +96,7 @@ export default async function RootLayout({
           </Script>
         )}
 
-        {/* Plausible Analytics - 只要有域名配置就加载 */}
+        {/* Plausible Analytics - 只要有域名配置就加载了 */}
         {plausibleDomain && (
           <>
             <Script
