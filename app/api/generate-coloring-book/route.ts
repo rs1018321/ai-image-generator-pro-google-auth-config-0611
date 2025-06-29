@@ -12,7 +12,7 @@ export const runtime = 'nodejs'
 // ------ 更新：水印处理函数 ------
 async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
   try {
-    console.log("🖨️ [addWatermark] 开始添加水印和边框");
+    console.log("��️ [addWatermark] 使用lib/assets/watermark-text.png图片水印");
 
     const image = sharp(imageBuffer);
     const meta = await image.metadata();
@@ -24,8 +24,6 @@ async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
     // --- 配置参数 ---
     const borderWidth = 8; // 边框宽度
     const bottomHeight = 30; // 底部水印区域高度
-    const fontSize = 16; // 文字大小
-    const textColor = "#333333"; // 文字颜色
 
     // 计算最终图片尺寸
     const finalWidth = imageWidth + borderWidth * 2;
@@ -33,8 +31,30 @@ async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
 
     console.log(`📐 最终尺寸: ${finalWidth}x${finalHeight}`);
 
-    // 创建SVG水印
-    const svgWatermark = `
+    // 读取水印图片文件 - 修改为lib/assets路径
+    const watermarkPath = path.join(process.cwd(), 'lib', 'assets', 'watermark-text.png');
+    console.log(`🔍 读取水印图片: ${watermarkPath}`);
+    
+    const watermarkBuffer = await fs.readFile(watermarkPath);
+    console.log(`✅ 水印图片读取成功，大小: ${watermarkBuffer.length} bytes`);
+
+    // 获取水印图片信息并调整大小
+    const watermarkMeta = await sharp(watermarkBuffer).metadata();
+    const targetHeight = Math.round(bottomHeight * 0.7); // 水印高度为底部区域的70%
+    
+    const resizedWatermarkBuffer = await sharp(watermarkBuffer)
+      .resize({ height: targetHeight })
+      .toBuffer();
+    
+    const resizedMeta = await sharp(resizedWatermarkBuffer).metadata();
+    console.log(`🎨 水印调整后尺寸: ${resizedMeta.width}x${resizedMeta.height}`);
+
+    // 计算水印位置 (底部居中)
+    const watermarkX = Math.round((finalWidth - resizedMeta.width!) / 2);
+    const watermarkY = imageHeight + borderWidth + Math.round((bottomHeight - resizedMeta.height!) / 2);
+
+    // 创建边框SVG
+    const borderSvg = `
       <svg width="${finalWidth}" height="${finalHeight}" xmlns="http://www.w3.org/2000/svg">
         <!-- 黑色边框 -->
         <rect x="0" y="0" width="${finalWidth}" height="${borderWidth}" fill="black"/>
@@ -44,18 +64,10 @@ async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
         
         <!-- 底部白色背景 -->
         <rect x="${borderWidth}" y="${imageHeight + borderWidth}" width="${imageWidth}" height="${bottomHeight}" fill="white"/>
-        
-        <!-- 水印文字 -->
-        <text x="${finalWidth / 2}" y="${imageHeight + borderWidth + bottomHeight / 2 + 6}" 
-              text-anchor="middle" 
-              font-family="Arial, sans-serif" 
-              font-size="${fontSize}" 
-              font-weight="bold"
-              fill="${textColor}">coloring page</text>
       </svg>
     `;
 
-    console.log("🎨 SVG水印创建完成");
+    console.log("🎨 边框SVG创建完成");
 
     // 合成最终图片
     const result = await sharp({
@@ -73,11 +85,17 @@ async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
           top: borderWidth, 
           left: borderWidth 
         },
-        // 第2层: SVG水印 (边框和文字)
+        // 第2层: 边框SVG
         { 
-          input: Buffer.from(svgWatermark), 
+          input: Buffer.from(borderSvg), 
           top: 0, 
           left: 0 
+        },
+        // 第3层: 水印图片
+        { 
+          input: resizedWatermarkBuffer, 
+          top: watermarkY, 
+          left: watermarkX 
         }
       ])
       .png({

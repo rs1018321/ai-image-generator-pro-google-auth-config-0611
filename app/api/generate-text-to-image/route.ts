@@ -4,6 +4,8 @@ import { auth } from '@/auth'
 import { decreaseCredits, CreditsTransType } from '@/services/credit'
 import sharp from 'sharp'
 import { getRecommendedModel } from '@/lib/language-detector'
+import path from 'path'
+import fs from 'fs/promises'
 
 const replicate = new Replicate({
   auth: process.env.REPLICATE_TEXT_API_TOKEN!,  // 使用文生图专用的 API Token
@@ -14,10 +16,10 @@ const fluxReplicate = new Replicate({
   auth: process.env.REPLICATE_API_TOKEN!,  // 使用图生图的 API Token
 })
 
-// 添加水印函数 - 优化 Vercel 环境兼容性
+// 添加水印函数 - 使用lib/assets/watermark-text.png图片
 async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
   try {
-    console.log("🎨 开始添加水印到生成的图片");
+    console.log("🎨 使用lib/assets/watermark-text.png图片水印");
     
     // 获取图片信息
     const { width, height } = await sharp(imageBuffer).metadata();
@@ -27,25 +29,42 @@ async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
     
     console.log(`📐 图片尺寸: ${width}x${height}`);
     
-    // 水印设置 - 简化版本，避免字体问题
+    // 水印设置
     const borderPx = 15; // 边框厚度 15px
-    const fontSize = Math.max(20, Math.min(width * 0.03, 36)); // 减小字体大小
-    const text = "coloring page";
-    const textPaddingHorizontal = 16;
-    const textPaddingVertical = 6;
+    const bottomHeight = 40; // 底部水印区域高度
     
-    // 计算文本宽度（保守估算）
-    const textWidth = text.length * fontSize * 0.5;
+    // 读取水印图片文件 - 修改为lib/assets路径
+    const watermarkPath = path.join(process.cwd(), 'lib', 'assets', 'watermark-text.png');
+    console.log(`🔍 读取水印图片: ${watermarkPath}`);
     
+    const watermarkBuffer = await fs.readFile(watermarkPath);
+    console.log(`✅ 水印图片读取成功，大小: ${watermarkBuffer.length} bytes`);
+
+    // 获取水印图片信息并调整大小
+    const watermarkMeta = await sharp(watermarkBuffer).metadata();
+    const targetHeight = Math.round(bottomHeight * 0.7); // 水印高度为底部区域的70%
+    
+    const resizedWatermarkBuffer = await sharp(watermarkBuffer)
+      .resize({ height: targetHeight })
+      .toBuffer();
+    
+    const resizedMeta = await sharp(resizedWatermarkBuffer).metadata();
+    console.log(`🎨 水印调整后尺寸: ${resizedMeta.width}x${resizedMeta.height}`);
+
     // 计算裁剪区域的尺寸和位置
-    const cutoutWidth = Math.round(textWidth + textPaddingHorizontal * 2);
-    const cutoutHeight = Math.round(Math.max(fontSize + textPaddingVertical * 2, borderPx + textPaddingVertical));
+    const cutoutWidth = Math.round(resizedMeta.width! + 16); // 水印宽度 + 内边距
+    const cutoutHeight = Math.max(bottomHeight, borderPx + 10);
     const cutoutX = Math.max(0, Math.round((width - cutoutWidth) / 2));
     const cutoutY = Math.max(0, height - cutoutHeight);
     
-    console.log(`🖨️ 水印参数: cutoutWidth=${cutoutWidth}, cutoutHeight=${cutoutHeight}`);
+    // 计算水印位置 (底部居中)
+    const watermarkX = Math.round((width - resizedMeta.width!) / 2);
+    const watermarkY = height - Math.round((cutoutHeight + resizedMeta.height!) / 2);
     
-    // 创建简化的 SVG 水印 - 仅边框与白底，无文字，避免 Fontconfig 错误
+    console.log(`🖨️ 水印参数: cutoutWidth=${cutoutWidth}, cutoutHeight=${cutoutHeight}`);
+    console.log(`🖨️ 水印位置: x=${watermarkX}, y=${watermarkY}`);
+    
+    // 创建边框和白底SVG
     const svgWatermark = `
       <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
         <!-- 黑色边框 -->
@@ -59,15 +78,20 @@ async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
       </svg>
     `;
     
-    console.log("🖼️ SVG水印创建完成");
+    console.log("🖼️ 边框SVG创建完成");
     
-    // 使用更安全的 Sharp 配置
+    // 使用Sharp合成
     const watermarkedImage = await sharp(imageBuffer)
       .composite([
         {
           input: Buffer.from(svgWatermark),
           top: 0,
           left: 0,
+        },
+        {
+          input: resizedWatermarkBuffer,
+          top: watermarkY,
+          left: watermarkX,
         }
       ])
       .png({
