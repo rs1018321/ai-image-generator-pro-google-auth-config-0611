@@ -30,8 +30,7 @@ async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
     console.log(`📐 图片尺寸: ${width}x${height}`);
     
     // 水印设置
-    const borderPx = 15; // 边框厚度 15px
-    const bottomHeight = 40; // 底部水印区域高度
+    const bottomHeight = 30; // 底部水印区域高度，与图生图保持一致
     
     // 读取水印图片文件 - 修改为lib/assets路径
     const watermarkPath = path.join(process.cwd(), 'lib', 'assets', 'watermark-text.png');
@@ -51,43 +50,36 @@ async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
     const resizedMeta = await sharp(resizedWatermarkBuffer).metadata();
     console.log(`🎨 水印调整后尺寸: ${resizedMeta.width}x${resizedMeta.height}`);
 
-    // 计算裁剪区域的尺寸和位置
-    const cutoutWidth = Math.round(resizedMeta.width! + 16); // 水印宽度 + 内边距
-    const cutoutHeight = Math.max(bottomHeight, borderPx + 10);
-    const cutoutX = Math.max(0, Math.round((width - cutoutWidth) / 2));
-    const cutoutY = Math.max(0, height - cutoutHeight);
+    // 计算最终图片尺寸（去掉边框，只增加底部高度）
+    const finalWidth = width;
+    const finalHeight = height + bottomHeight;
     
     // 计算水印位置 (底部居中)
-    const watermarkX = Math.round((width - resizedMeta.width!) / 2);
-    const watermarkY = height - Math.round((cutoutHeight + resizedMeta.height!) / 2);
+    const watermarkX = Math.round((finalWidth - resizedMeta.width!) / 2);
+    const watermarkY = height + Math.round((bottomHeight - resizedMeta.height!) / 2);
     
-    console.log(`🖨️ 水印参数: cutoutWidth=${cutoutWidth}, cutoutHeight=${cutoutHeight}`);
+    console.log(`🖨️ 最终尺寸: ${finalWidth}x${finalHeight}`);
     console.log(`🖨️ 水印位置: x=${watermarkX}, y=${watermarkY}`);
     
-    // 创建边框和白底SVG
-    const svgWatermark = `
-      <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
-        <!-- 黑色边框 -->
-        <rect x="0" y="0" width="${width}" height="${borderPx}" fill="black"/>
-        <rect x="0" y="${height - borderPx}" width="${width}" height="${borderPx}" fill="black"/>
-        <rect x="0" y="0" width="${borderPx}" height="${height}" fill="black"/>
-        <rect x="${width - borderPx}" y="0" width="${borderPx}" height="${height}" fill="black"/>
-        
-        <!-- 底部白色区域 -->
-        <rect x="${cutoutX}" y="${cutoutY}" width="${cutoutWidth}" height="${cutoutHeight}" fill="white" stroke="black" stroke-width="1"/>
-      </svg>
-    `;
-    
-    console.log("🖼️ 边框SVG创建完成");
+    console.log("🖼️ 创建简洁水印（无边框）");
     
     // 使用Sharp合成
-    const watermarkedImage = await sharp(imageBuffer)
+    const watermarkedImage = await sharp({
+        create: {
+          width: finalWidth,
+          height: finalHeight,
+          channels: 3,
+          background: { r: 255, g: 255, b: 255 } // 白色背景
+        }
+      })
       .composite([
+        // 第1层: 原图
         {
-          input: Buffer.from(svgWatermark),
+          input: imageBuffer,
           top: 0,
           left: 0,
         },
+        // 第2层: 水印图片（直接在白色底部区域显示）
         {
           input: resizedWatermarkBuffer,
           top: watermarkY,

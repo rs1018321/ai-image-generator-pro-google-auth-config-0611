@@ -12,7 +12,7 @@ export const runtime = 'nodejs'
 // ------ 更新：水印处理函数 ------
 async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
   try {
-    console.log("��️ [addWatermark] 使用lib/assets/watermark-text.png图片水印");
+    console.log("🖨️ [addWatermark] 使用lib/assets/watermark-text.png图片水印");
 
     const image = sharp(imageBuffer);
     const meta = await image.metadata();
@@ -22,12 +22,11 @@ async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
     console.log(`📐 原图尺寸: ${imageWidth}x${imageHeight}`);
 
     // --- 配置参数 ---
-    const borderWidth = 8; // 边框宽度
     const bottomHeight = 30; // 底部水印区域高度
 
-    // 计算最终图片尺寸
-    const finalWidth = imageWidth + borderWidth * 2;
-    const finalHeight = imageHeight + borderWidth + bottomHeight;
+    // 计算最终图片尺寸（去掉边框，只增加底部高度）
+    const finalWidth = imageWidth;
+    const finalHeight = imageHeight + bottomHeight;
 
     console.log(`📐 最终尺寸: ${finalWidth}x${finalHeight}`);
 
@@ -51,23 +50,9 @@ async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
 
     // 计算水印位置 (底部居中)
     const watermarkX = Math.round((finalWidth - resizedMeta.width!) / 2);
-    const watermarkY = imageHeight + borderWidth + Math.round((bottomHeight - resizedMeta.height!) / 2);
+    const watermarkY = imageHeight + Math.round((bottomHeight - resizedMeta.height!) / 2);
 
-    // 创建边框SVG
-    const borderSvg = `
-      <svg width="${finalWidth}" height="${finalHeight}" xmlns="http://www.w3.org/2000/svg">
-        <!-- 黑色边框 -->
-        <rect x="0" y="0" width="${finalWidth}" height="${borderWidth}" fill="black"/>
-        <rect x="0" y="0" width="${borderWidth}" height="${finalHeight}" fill="black"/>
-        <rect x="${finalWidth - borderWidth}" y="0" width="${borderWidth}" height="${finalHeight}" fill="black"/>
-        <rect x="0" y="${finalHeight - bottomHeight}" width="${finalWidth}" height="${bottomHeight}" fill="black"/>
-        
-        <!-- 底部白色背景 -->
-        <rect x="${borderWidth}" y="${imageHeight + borderWidth}" width="${imageWidth}" height="${bottomHeight}" fill="white"/>
-      </svg>
-    `;
-
-    console.log("🎨 边框SVG创建完成");
+    console.log("🎨 创建简洁水印（无边框）");
 
     // 合成最终图片
     const result = await sharp({
@@ -79,19 +64,13 @@ async function addWatermark(imageBuffer: Buffer): Promise<Buffer> {
         }
       })
       .composite([
-        // 第1层: 原图 (放在边框内)
+        // 第1层: 原图
         { 
           input: imageBuffer, 
-          top: borderWidth, 
-          left: borderWidth 
-        },
-        // 第2层: 边框SVG
-        { 
-          input: Buffer.from(borderSvg), 
           top: 0, 
           left: 0 
         },
-        // 第3层: 水印图片
+        // 第2层: 水印图片（直接在白色底部区域显示）
         { 
           input: resizedWatermarkBuffer, 
           top: watermarkY, 
