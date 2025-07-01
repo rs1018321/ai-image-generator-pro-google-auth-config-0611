@@ -1,6 +1,9 @@
+'use client';
+
 import Link from 'next/link';
 import { clsx } from 'clsx';
 import styles from '../../page.module.css'
+import ImageModal from '../../../../../components/ui/ImageModal';
 
 const AdultColoringPagesPage = () => {
     // 假设 imgFeatures 数据在这里定义或从其他地方导入
@@ -48,7 +51,7 @@ const AdultColoringPagesPage = () => {
                             className={clsx(styles.keyFeatureContentCard, styles.zoomContainer, styles.borderHandDrown)}
                         >
                             <div className={styles.featureContentImageContainer}>
-                                <img
+                                <ImageModal
                                     src={feature.image}
                                     alt={`AI Generated Coloring Page ${index + 1}`}
                                     className={styles.featureContentImage}
