@@ -1,8 +1,8 @@
 import Link from 'next/link';
 import { clsx } from 'clsx';
-import styles from '../page.module.css'
+import styles from '../../page.module.css'
 
-const GrListPage = () => {
+const ColoringPagesForKidsPage = () => {
     // 假设 imgFeatures 数据在这里定义或从其他地方导入
     const imgFeatures = [
         {
@@ -30,7 +30,7 @@ const GrListPage = () => {
     return (
         <div className={clsx("mt-20",styles.container) }>
             <div>
-                <h3 className={styles.accordionTitle}>Explore Coloring-Page Collections by Theme – Seasons, Characters, Animals</h3>
+                <h3 className={styles.accordionTitle}>Coloring Pages for Kids</h3>
             </div>
 
             <div className={styles.gallerySection}>
@@ -62,4 +62,4 @@ const GrListPage = () => {
     );
 };
 
-export default GrListPage;
+export default ColoringPagesForKidsPage; 

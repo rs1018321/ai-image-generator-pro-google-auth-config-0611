@@ -70,30 +70,37 @@ const accordionData = [
     }
 ];
 
-// 定义图片卡片数据类型
+// 定义图片功能卡片数据类型
 interface ImgFeature {
     image: string;
+    description: string;
 }
 
 // 关键功能数据（6条，每行3列）
 const imgFeatures: ImgFeature[] = [
     {
-        image: "/imgs/gallery/coloring-page-1.png"
+        image: "/imgs/gallery/coloring-page-1.png",
+        description: "coloring pages for kids"
     },
     {
-        image: "/imgs/gallery/coloring-page-2.png"
+        image: "/imgs/gallery/coloring-page-2.png",
+        description: "adult coloring pages"
     },
     {
-        image: "/imgs/gallery/coloring-page-3.png"
+        image: "/imgs/gallery/coloring-page-3.png",
+        description: "cute coloring pages"
     },
     {
-        image: "/imgs/gallery/coloring-page-4.png"
+        image: "/imgs/gallery/coloring-page-4.png",
+        description: "christmas coloring pages"
     },
     {
-        image: "/imgs/gallery/coloring-page-5.png"
+        image: "/imgs/gallery/coloring-page-5.png",
+        description: "halloween coloring pages"
     },
     {
-        image: "/imgs/gallery/coloring-page-6.png"
+        image: "/imgs/gallery/coloring-page-6.png",
+        description: "bluey coloring pages"
     }
 ];
 
@@ -606,7 +613,7 @@ export default function LandingPage({page, locale}: LandingPageProps) {
                     fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
                     color: '#7b6611',
                     margin: '0'
-                }} className="text-2xl  lg:text-6xl md:text-4xl font-bold text-center">Create Fun Coloring Pages with AI
+                }} className="text-xl lg:text-4xl md:text-3xl font-bold text-center">Generate Printable Coloring Pages with AI in Seconds
                 </h1>
             </div>
 
@@ -747,15 +754,14 @@ export default function LandingPage({page, locale}: LandingPageProps) {
 
             {/* Gallery of AI-Generated Coloring Pages 标题部份 */}
             <div>
-                <h3 className={clsx("lg:mt-[20vh] md:mt-[15vh] mt-[10vh]", styles.accordionTitle)}>Gallery of
-                    AI-Generated Coloring Pages</h3>
-                <p className={styles.accordionTip}>Explore magical worlds created with AI coloring page generator.</p>
+                <h3 className={clsx("lg:mt-[20vh] md:mt-[15vh] mt-[10vh]", styles.accordionTitle)}>{page.showcase?.title || "Gallery of AI-Generated Coloring Pages"}</h3>
+                <p className={styles.accordionTip}>{page.showcase?.description || "Explore magical worlds created with AI coloring page generator."}</p>
             </div>
 
             <div className={styles.gallerySection}>
                 <div className={clsx("flex flex-row-reverse flex-wrap text-xl", styles.keyFeaturesContainer)}
                 >
-                    <Link href={`/galleryList`}>
+                    <Link href={`/printable`}>
           <span
               style={{
                   fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
@@ -772,37 +778,50 @@ export default function LandingPage({page, locale}: LandingPageProps) {
 
                 <div className={styles.keyFeaturesContainer}>
 
-                    {imgFeatures.map((feature, index) => (
-
-                        <div key={index}
-                             style={{
-                                 // @ts-ignore
-                                 '--border-width': '5px',
-                                 '--border-style': 'solid',
-                                 '--border-color': '#f8e71c',
-                                 '--border-radius': '8px'
-                             }}
-                             className={clsx(styles.keyFeatureCard, styles.zoomContainer, styles.borderHandDrown)}>
-                            <div className={styles.featureImageContainer}>
-                                <Link href={`/galleryContent`}>
+                    {imgFeatures.map((feature, index) => {
+                        // 定义每张图片对应的路径
+                        const imagePaths = [
+                            '/printable/coloring-pages-for-kids',
+                            '/printable/adult-coloring-pages', 
+                            '/printable/cute-coloring-pages',
+                            '/printable/christmas-coloring-pages',
+                            '/printable/halloween-coloring-pages',
+                            '/printable/bluey-coloring-pages'
+                        ];
+                        
+                        return (
+                            <Link
+                                key={index}
+                                href={imagePaths[index]}
+                                style={{
+                                    // @ts-ignore
+                                    '--border-width': '5px',
+                                    '--border-style': 'solid',
+                                    '--border-color': '#f8e71c',
+                                    '--border-radius': '8px',
+                                }}
+                                className={clsx(styles.homepageGalleryCard, styles.zoomContainer, styles.borderHandDrown)}
+                            >
+                                <div className={styles.homepageGalleryImageContainer}>
                                     <img
                                         src={feature.image}
                                         alt={`AI Generated Coloring Page ${index + 1}`}
-                                        className={styles.featureImage}
+                                        className={styles.homepageGalleryImage}
                                     />
-                                </Link>
-                            </div>
-                        </div>
-
-                    ))}
+                                </div>
+                                <div className={styles.featureDescription}>
+                                    {feature.description}
+                                </div>
+                            </Link>
+                        );
+                    })}
                 </div>
             </div>
 
             {/*  标题部份 */}
             <div style={{marginTop: '8rem'}}>
-                <h3 className={styles.accordionTitle}>Key Features of Coloring-Pages.app</h3>
-                <p className={styles.accordionTip}>Everything you need to create coloring page artwork for personal or
-                    commercial use.</p>
+                <h3 className={styles.accordionTitle}>{page.feature?.title || "Key Features of Coloring-Pages.app"}</h3>
+                <p className={styles.accordionTip}>{page.feature?.description || "Everything you need to create coloring page artwork for personal or commercial use."}</p>
             </div>
 
             {/* 关键功能区域 */}
@@ -882,8 +901,8 @@ export default function LandingPage({page, locale}: LandingPageProps) {
 
             {/* FAQ 标题部份 */}
             <div id="faq" style={{marginTop: '12rem', marginBottom: '3rem'}}>
-                <h3 className={styles.accordionTitle}>Frequently Asked Questions</h3>
-                <p className={styles.accordionTip}>Have another question? Contact us on Discord or by email.</p>
+                <h3 className={styles.accordionTitle}>{page.faq?.title || "Frequently Asked Questions"}</h3>
+                <p className={styles.accordionTip}>{page.faq?.description || "Have another question? Contact us on Discord or by email."}</p>
             </div>
             {/* FAQ 折叠面板 */}
             {accordionData.map(item => (

@@ -312,7 +312,7 @@ export default function CustomPage() {
                     fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
                     color: '#7b6611',
                     margin: '0'
-                }} className="text-6xl font-bold text-center">Create Fun Coloring Pages with AI
+                }} className="text-4xl font-bold text-center">Generate Printable Coloring Pages with AI in Seconds
                 </h1>
             </div>
 
