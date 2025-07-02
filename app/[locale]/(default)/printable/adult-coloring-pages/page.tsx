@@ -9,22 +9,22 @@ const AdultColoringPagesPage = () => {
     // 假设 imgFeatures 数据在这里定义或从其他地方导入
     const imgFeatures = [
         {
-            image: "/imgs/gallery/coloring-page-1.png"
+            image: "/imgs/categories/adult/adult-coloring-1.png"
         },
         {
-            image: "/imgs/gallery/coloring-page-2.png"
+            image: "/imgs/categories/adult/adult-coloring-2.png"
         },
         {
-            image: "/imgs/gallery/coloring-page-3.png"
+            image: "/imgs/categories/adult/adult-coloring-3.png"
         },
         {
-            image: "/imgs/gallery/coloring-page-4.png"
+            image: "/imgs/categories/adult/adult-coloring-4.png"
         },
         {
-            image: "/imgs/gallery/coloring-page-5.png"
+            image: "/imgs/categories/adult/adult-coloring-5.png"
         },
         {
-            image: "/imgs/gallery/coloring-page-6.png"
+            image: "/imgs/categories/adult/adult-coloring-6.png"
         }
 
     ];

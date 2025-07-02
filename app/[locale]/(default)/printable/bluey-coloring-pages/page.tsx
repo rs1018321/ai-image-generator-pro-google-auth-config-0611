@@ -9,22 +9,22 @@ const BlueyColoringPagesPage = () => {
     // 假设 imgFeatures 数据在这里定义或从其他地方导入
     const imgFeatures = [
         {
-            image: "/imgs/gallery/coloring-page-1.png"
+            image: "/imgs/categories/bluey/bluey-coloring-1.png"
         },
         {
-            image: "/imgs/gallery/coloring-page-2.png"
+            image: "/imgs/categories/bluey/bluey-coloring-2.png"
         },
         {
-            image: "/imgs/gallery/coloring-page-3.png"
+            image: "/imgs/categories/bluey/bluey-coloring-3.png"
         },
         {
-            image: "/imgs/gallery/coloring-page-4.png"
+            image: "/imgs/categories/bluey/bluey-coloring-4.png"
         },
         {
-            image: "/imgs/gallery/coloring-page-5.png"
+            image: "/imgs/categories/bluey/bluey-coloring-5.png"
         },
         {
-            image: "/imgs/gallery/coloring-page-6.png"
+            image: "/imgs/categories/bluey/bluey-coloring-6.png"
         }
 
     ];

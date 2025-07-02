@@ -39,8 +39,12 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: '/favicon.ico',
+    icon: [
+      { url: '/favicon.ico' },
+      { url: '/favicon.png', type: 'image/png' },
+    ],
     apple: '/apple-touch-icon.png',
+    shortcut: '/favicon.ico',
   },
   viewport: 'width=device-width, initial-scale=1',
   themeColor: '#f8e71c',
