@@ -13,8 +13,5 @@ export const localePrefix = "as-needed";
 export const localeDetection = false;
 
 export const pathnames = {
-  en: {
-    "privacy-policy": "/privacy-policy",
-    "terms-of-service": "/terms-of-service",
-  },
+  en: {},
 } satisfies Pathnames<typeof locales>;
