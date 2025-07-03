@@ -12,8 +12,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const staticPages = [
     '', // 首页
     'pricing',
-    'galleryList',
-    'galleryContent',
     'posts',
     'printable',
     'printable/coloring-pages-for-kids',
@@ -22,8 +20,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     'printable/christmas-coloring-pages',
     'printable/halloween-coloring-pages',
     'printable/bluey-coloring-pages',
-    'privacy-policy',
-    'terms-of-service'
   ];
 
   // 为每种语言和每个页面生成 sitemap 条目
@@ -48,10 +44,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
         changeFrequency = 'monthly';
       } else if (page.startsWith('printable/')) {
         // 涂色页面
-        priority = 0.8;
-        changeFrequency = 'weekly';
-      } else if (page === 'galleryList' || page === 'galleryContent') {
-        // 画廊页面
         priority = 0.8;
         changeFrequency = 'weekly';
       } else if (page === 'posts') {
