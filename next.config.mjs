@@ -34,6 +34,7 @@ const contentSecurityPolicy = `
       https://www.clarity.ms
       https://clarity.ms
       https://a.clarity.ms
+      https://i.clarity.ms
       https://accounts.google.com
       https://apis.google.com
       https://plausible.io;
@@ -41,6 +42,7 @@ const contentSecurityPolicy = `
       https://www.google-analytics.com
       https://google-analytics.com
       https://www.clarity.ms
+      https://avatars.githubusercontent.com
       https://clarity.ms;
   style-src 'self' 'unsafe-inline';
   font-src 'self' data:;
