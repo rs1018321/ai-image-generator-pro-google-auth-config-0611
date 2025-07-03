@@ -5,10 +5,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const currentDate = new Date();
   const lastModified = new Date('2025-01-15'); // 最近更新日期
   
-  // 支持的语言
-  const locales = ['en', 'zh'];
+  // 只支持英文
+  const locales = ['en'];
   
-  // 静态页面路径
+  // 静态页面路径（移除custom相关页面）
   const staticPages = [
     '', // 首页
     'pricing',
@@ -22,7 +22,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     'printable/christmas-coloring-pages',
     'printable/halloween-coloring-pages',
     'printable/bluey-coloring-pages',
-    'custom',
     'privacy-policy',
     'terms-of-service'
   ];
@@ -55,10 +54,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
         // 画廊页面
         priority = 0.8;
         changeFrequency = 'weekly';
-      } else if (page === 'custom') {
-        // 自定义页面
-        priority = 0.9;
-        changeFrequency = 'daily';
       } else if (page === 'posts') {
         // 博客页面
         priority = 0.7;
@@ -71,7 +66,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
       sitemapEntries.push({
         url,
-        lastModified: page === '' || page === 'custom' ? currentDate : lastModified,
+        lastModified: page === '' ? currentDate : lastModified,
         changeFrequency,
         priority,
       });

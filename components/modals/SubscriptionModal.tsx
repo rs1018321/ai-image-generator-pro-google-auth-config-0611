@@ -64,12 +64,10 @@ export default function SubscriptionModal({ open, onOpenChange }: Props) {
           </DialogClose>
           <DialogHeader>
             <DialogTitle className="text-3xl font-bold text-center">
-              {locale === "zh" ? "选择您的套餐" : "Choose Your Perfect Plan"}
+              Choose Your Perfect Plan
             </DialogTitle>
             <p className="text-center text-muted-foreground mt-2">
-              {locale === "zh"
-                ? "灵活的月度订阅，随时可取消"
-                : "Flexible monthly subscription plans, cancel anytime"}
+              Flexible monthly subscription plans, cancel anytime
             </p>
           </DialogHeader>
 

@@ -6,24 +6,24 @@ export async function generateMetadata({
   params,
 }: {
   params: Promise<{ locale: string }>;
-}): Promise<Metadata> {
+}) {
   const { locale } = await params;
   
-  const title = locale === 'zh' ? '定价 - Coloring-Pages.app' : 'Pricing - Coloring-Pages.app';
-  const description = locale === 'zh' 
-    ? '选择适合您的套餐，解锁高级填色页生成功能。包含100-1000积分，支持批量处理和高分辨率输出。'
-    : 'Choose the perfect plan for your coloring book creation needs. Includes 100-1000 credits with batch processing and high-resolution output.';
+  const title = 'Pricing - Coloring-Pages.app';
+  const description = 'Choose from our flexible pricing plans for AI-generated coloring pages. Free tier available with premium options for unlimited access.';
+
+  let canonicalUrl = `${process.env.NEXT_PUBLIC_WEB_URL}/pricing`;
+
+  if (locale !== "en") {
+    canonicalUrl = `${process.env.NEXT_PUBLIC_WEB_URL}/${locale}/pricing`;
+  }
 
   return {
     title,
     description,
-    keywords: locale === 'zh' 
-      ? '填色页,定价,AI生成,儿童活动,创意工具'
-      : 'coloring pages, pricing, AI generation, kids activities, creative tools',
-    openGraph: {
-      title,
-      description,
-      type: 'website',
+    keywords: 'coloring pages pricing, subscription plans, AI coloring generator cost, premium coloring pages',
+    alternates: {
+      canonical: canonicalUrl,
     },
   };
 }

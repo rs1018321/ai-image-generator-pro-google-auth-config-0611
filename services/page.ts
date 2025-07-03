@@ -2,9 +2,6 @@ import { LandingPage } from "@/types/pages/landing";
 
 export async function getLandingPage(locale: string): Promise<LandingPage> {
   try {
-    if (locale === "zh-CN") {
-      locale = "zh";
-    }
     return await import(
       `@/i18n/pages/landing/${locale.toLowerCase()}.json`
     ).then((module) => module.default);

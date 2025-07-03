@@ -1,7 +1,7 @@
 "use client";
 import React, { ReactNode, useState, useEffect } from 'react';
 import clsx from 'clsx';
-import { Globe, Menu, X } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import styles from './page.module.css';
 import Link from "next/link";
 import DashboardButton from "@/components/navigation/dashboard-button";
@@ -156,22 +156,6 @@ export default function Header({ locale }: { locale: string }) {
 
                         {/* 桌面端右侧按钮 - 条件显示 */}
                         <div className="hidden md:flex items-center space-x-11">
-                            {/* 语言切换 */}
-                            <div className="relative">
-                                <button
-                                    className="flex items-center hover:text-purple-600"
-                                    style={{
-                                        fontFamily: "'Comic Sans MS', 'Marker Felt', cursive",
-                                        color: '#69b08b',
-                                        fontSize: '23px',
-                                        fontWeight: 'bold',
-                                        transform: 'translateY(7px)'
-                                    }}
-                                >
-                                    <Globe className="h-5 w-5 mr-1" />
-                                    <span>{locale === 'zh' ? '中文' : 'English'}</span>
-                                </button>
-                            </div>
                             {/* 登录按钮 */}
                             <HeaderSignButton locale={locale} />
                         </div>
@@ -216,13 +200,6 @@ export default function Header({ locale }: { locale: string }) {
                             <DashboardButton locale={locale} variant="mobile" />
                             <div className="border-t border-gray-300 pt-3 mt-3">
                                 <HeaderSignButton locale={locale} />
-                            </div>
-                            {/* 语言切换 - 移动端 */}
-                            <div className="relative pt-3">
-                                <button className="flex items-center text-gray-800 w-full hover:bg-[#d8e4a1] p-2 rounded">
-                                    <Globe className="h-5 w-5 mr-2" />
-                                    <span>{locale === 'zh' ? '中文' : 'English'}</span>
-                                </button>
                             </div>
                         </nav>
                     </div>
