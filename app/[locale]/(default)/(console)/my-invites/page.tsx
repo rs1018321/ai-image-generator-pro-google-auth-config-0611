@@ -126,7 +126,7 @@ export default async function () {
         {
           title: t("my_invites.edit_invite_link"),
           icon: "RiBookLine",
-          url: "https://docs.coloringpage.ai",
+          url: "https://docs.coloring-pages.app",
           target: "_blank",
           variant: "outline",
         },

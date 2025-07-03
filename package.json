@@ -4,11 +4,10 @@
   "private": true,
   "type": "module",
   "author": "idoubi",
-  "homepage": "https://coloringpage.ai",
+  "homepage": "https://www.coloring-pages.app",
   "scripts": {
-    "dev": "cross-env NODE_NO_WARNINGS=1 next dev",
+    "dev": "next dev",
     "build": "next build",
-    "postbuild": "next-sitemap --config next-sitemap.config.cjs",
     "start": "next start",
     "lint": "next lint",
     "analyze": "ANALYZE=true pnpm build",
