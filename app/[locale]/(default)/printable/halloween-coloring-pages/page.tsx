@@ -4,6 +4,26 @@ import Link from 'next/link';
 import { clsx } from 'clsx';
 import styles from '../../page.module.css'
 import ImageModal from '../../../../../components/ui/ImageModal';
+import { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const canonicalUrl = locale === 'en'
+    ? `${process.env.NEXT_PUBLIC_WEB_URL}/printable/halloween-coloring-pages`
+    : `${process.env.NEXT_PUBLIC_WEB_URL}/${locale}/printable/halloween-coloring-pages`;
+
+  return {
+    title: 'Halloween Coloring Pages',
+    description: 'Spooky and fun Halloween coloring pages for all ages. Printable designs of pumpkins, ghosts, and witches.',
+    alternates: {
+      canonical: canonicalUrl,
+    },
+  };
+}
 
 const HalloweenColoringPagesPage = () => {
     // 假设 imgFeatures 数据在这里定义或从其他地方导入

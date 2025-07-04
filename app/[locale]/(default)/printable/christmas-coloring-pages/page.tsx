@@ -4,6 +4,26 @@ import Link from 'next/link';
 import { clsx } from 'clsx';
 import styles from '../../page.module.css'
 import ImageModal from '../../../../../components/ui/ImageModal';
+import { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const canonicalUrl = locale === 'en'
+    ? `${process.env.NEXT_PUBLIC_WEB_URL}/printable/christmas-coloring-pages`
+    : `${process.env.NEXT_PUBLIC_WEB_URL}/${locale}/printable/christmas-coloring-pages`;
+
+  return {
+    title: 'Christmas Coloring Pages',
+    description: 'Get into the holiday spirit with our festive Christmas coloring pages. Printable sheets of Santa, reindeer, and more.',
+    alternates: {
+      canonical: canonicalUrl,
+    },
+  };
+}
 
 const ChristmasColoringPagesPage = () => {
     // 假设 imgFeatures 数据在这里定义或从其他地方导入

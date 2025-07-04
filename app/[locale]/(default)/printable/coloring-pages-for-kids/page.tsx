@@ -4,6 +4,26 @@ import Link from 'next/link';
 import { clsx } from 'clsx';
 import styles from '../../page.module.css'
 import ImageModal from '../../../../../components/ui/ImageModal';
+import { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const canonicalUrl = locale === 'en'
+    ? `${process.env.NEXT_PUBLIC_WEB_URL}/printable/coloring-pages-for-kids`
+    : `${process.env.NEXT_PUBLIC_WEB_URL}/${locale}/printable/coloring-pages-for-kids`;
+
+  return {
+    title: 'Coloring Pages for Kids',
+    description: 'Fun and engaging coloring pages for kids. Printable sheets featuring animals, cartoons, and more.',
+    alternates: {
+      canonical: canonicalUrl,
+    },
+  };
+}
 
 const ColoringPagesForKidsPage = () => {
     // 假设 imgFeatures 数据在这里定义或从其他地方导入

@@ -4,6 +4,26 @@ import Link from 'next/link';
 import { clsx } from 'clsx';
 import styles from '../../page.module.css'
 import ImageModal from '../../../../../components/ui/ImageModal';
+import { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const canonicalUrl = locale === 'en'
+    ? `${process.env.NEXT_PUBLIC_WEB_URL}/printable/adult-coloring-pages`
+    : `${process.env.NEXT_PUBLIC_WEB_URL}/${locale}/printable/adult-coloring-pages`;
+
+  return {
+    title: 'Adult Coloring Pages',
+    description: 'Relax and unwind with our collection of intricate adult coloring pages. Printable designs featuring mandalas, nature, and abstract patterns.',
+    alternates: {
+      canonical: canonicalUrl,
+    },
+  };
+}
 
 const AdultColoringPagesPage = () => {
     // 假设 imgFeatures 数据在这里定义或从其他地方导入

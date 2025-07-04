@@ -4,6 +4,26 @@ import Link from 'next/link';
 import { clsx } from 'clsx';
 import styles from '../../page.module.css'
 import ImageModal from '../../../../../components/ui/ImageModal';
+import { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const canonicalUrl = locale === 'en'
+    ? `${process.env.NEXT_PUBLIC_WEB_URL}/printable/bluey-coloring-pages`
+    : `${process.env.NEXT_PUBLIC_WEB_URL}/${locale}/printable/bluey-coloring-pages`;
+
+  return {
+    title: 'Bluey Coloring Pages',
+    description: 'Join Bluey and her family with our collection of Bluey coloring pages. Printable fun for all young fans.',
+    alternates: {
+      canonical: canonicalUrl,
+    },
+  };
+}
 
 const BlueyColoringPagesPage = () => {
     // 假设 imgFeatures 数据在这里定义或从其他地方导入

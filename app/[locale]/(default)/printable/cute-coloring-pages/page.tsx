@@ -4,6 +4,26 @@ import Link from 'next/link';
 import { clsx } from 'clsx';
 import styles from '../../page.module.css'
 import ImageModal from '../../../../../components/ui/ImageModal';
+import { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const canonicalUrl = locale === 'en'
+    ? `${process.env.NEXT_PUBLIC_WEB_URL}/printable/cute-coloring-pages`
+    : `${process.env.NEXT_PUBLIC_WEB_URL}/${locale}/printable/cute-coloring-pages`;
+
+  return {
+    title: 'Cute Coloring Pages',
+    description: 'Discover adorable and cute coloring pages. Perfect for all ages, featuring charming animals, foods, and characters.',
+    alternates: {
+      canonical: canonicalUrl,
+    },
+  };
+}
 
 const CuteColoringPagesPage = () => {
     // 假设 imgFeatures 数据在这里定义或从其他地方导入

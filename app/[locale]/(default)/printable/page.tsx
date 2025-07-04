@@ -1,6 +1,26 @@
 import Link from 'next/link';
 import { clsx } from 'clsx';
 import styles from '../page.module.css'
+import { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const canonicalUrl = locale === 'en'
+    ? `${process.env.NEXT_PUBLIC_WEB_URL}/printable`
+    : `${process.env.NEXT_PUBLIC_WEB_URL}/${locale}/printable`;
+
+  return {
+    title: 'Printable Coloring Pages Collections',
+    description: 'Explore our vast collection of printable coloring pages for all ages. Fun, creative, and ready to print.',
+    alternates: {
+      canonical: canonicalUrl,
+    },
+  };
+}
 
 const PrintablePage = () => {
     // 假设 imgFeatures 数据在这里定义或从其他地方导入
