@@ -17,8 +17,8 @@ export async function GET(
       );
     }
 
-    // 读取对应的MDX文件
-    const filePath = path.join(process.cwd(), "app", "(legal)", type, "page.mdx");
+    // 构建MDX文件相对于项目根目录的路径
+    const filePath = path.join(process.cwd(), 'content', 'legal', `${type}.mdx`);
     
     if (!fs.existsSync(filePath)) {
       return NextResponse.json(
@@ -27,10 +27,10 @@ export async function GET(
       );
     }
 
-    const content = fs.readFileSync(filePath, "utf-8");
+    const fileContents = fs.readFileSync(filePath, "utf-8");
     
     // 改进的MDX到HTML转换
-    let htmlContent = content
+    let htmlContent = fileContents
       // 处理标题 - 添加适当的CSS类来控制间距
       .replace(/^# (.+)$/gm, '<h1 class="text-3xl font-bold mb-6 mt-8">$1</h1>')
       .replace(/^## (.+)$/gm, '<h2 class="text-2xl font-semibold mb-4 mt-8">$1</h2>')
