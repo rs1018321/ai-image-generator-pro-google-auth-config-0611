@@ -1,24 +1,11 @@
 import { Metadata } from "next";
 import BlueyColoringPagesContent from './content';
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}): Promise<Metadata> {
-  const { locale } = await params;
-  const canonicalUrl = locale === 'en'
-    ? `${process.env.NEXT_PUBLIC_WEB_URL}/printable/bluey-coloring-pages`
-    : `${process.env.NEXT_PUBLIC_WEB_URL}/${locale}/printable/bluey-coloring-pages`;
-
-  return {
-    title: 'Bluey Coloring Pages',
-    description: 'Join Bluey and her family with our collection of Bluey coloring pages. Printable fun for all young fans.',
-    alternates: {
-      canonical: canonicalUrl,
-    },
-  };
-}
+export const metadata: Metadata = {
+  title: 'Bluey Coloring Pages – Print Free Adventures of Bluey & Bingo',
+  description:
+    'Fans of Bluey: enjoy 50 free coloring pages featuring Bluey, Bingo, mum & dad. Printable PDFs for family fun.',
+};
 
 export default function BlueyColoringPagesPage() {
   return <BlueyColoringPagesContent />;

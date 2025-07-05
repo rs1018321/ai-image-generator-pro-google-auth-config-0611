@@ -1,24 +1,11 @@
 import { Metadata } from "next";
 import CuteColoringPagesContent from './content';
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}): Promise<Metadata> {
-  const { locale } = await params;
-  const canonicalUrl = locale === 'en'
-    ? `${process.env.NEXT_PUBLIC_WEB_URL}/printable/cute-coloring-pages`
-    : `${process.env.NEXT_PUBLIC_WEB_URL}/${locale}/printable/cute-coloring-pages`;
-
-  return {
-    title: 'Cute Coloring Pages',
-    description: 'Discover adorable and cute coloring pages. Perfect for all ages, featuring charming animals, foods, and characters.',
-    alternates: {
-      canonical: canonicalUrl,
-    },
-  };
-}
+export const metadata: Metadata = {
+  title: 'Cute Coloring Pages – Kawaii Animals & Sweet Treats (PDF)',
+  description:
+    'Kawaii cats, baby unicorns, cupcakes! 120 cute coloring pages you can print for free.',
+};
 
 export default function CuteColoringPagesPage() {
   return <CuteColoringPagesContent />;
